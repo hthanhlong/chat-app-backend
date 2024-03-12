@@ -4,7 +4,6 @@ export const DOCUMENT_NAME = 'Message';
 export const COLLECTION_NAME = 'messages';
 
 export default interface Message {
-  _id: Types.ObjectId;
   sender: Types.ObjectId;
   receiver: Types.ObjectId;
   text: string;
@@ -16,10 +15,12 @@ export default interface Message {
 const schema = new Schema<Message>(
   {
     sender: {
-        type: Schema.Types.ObjectId, ref: 'User'
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
     receiver: {
-        type: Schema.Types.ObjectId, ref: 'User'
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
     text: {
       type: Schema.Types.String,

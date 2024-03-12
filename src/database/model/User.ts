@@ -1,10 +1,9 @@
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 export const DOCUMENT_NAME = 'User';
 export const COLLECTION_NAME = 'users';
 
 export default interface User {
-  _id: Types.ObjectId;
   username: string;
   profilePicUrl?: string;
   email: string;
@@ -35,6 +34,7 @@ const schema = new Schema<User>(
       select: false,
       max_length: 200,
     },
+
     password: {
       type: Schema.Types.String,
       select: false,
@@ -46,6 +46,10 @@ const schema = new Schema<User>(
     isActive: {
       type: Schema.Types.Boolean,
       default: true,
+    },
+    salt: {
+      type: Schema.Types.String,
+      default: '',
     },
     createdAt: {
       type: Schema.Types.Date,
