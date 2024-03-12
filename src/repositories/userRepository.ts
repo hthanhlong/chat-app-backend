@@ -1,11 +1,9 @@
 import User, { UserModel } from "../database/model/User";
 
 class UserRepository {
-    async createUser(user : User): Promise<{ user: User}> {
+    async createUser(user : Omit<User, '_id'>): Promise<{ user: User}> {
         const createdUser = await UserModel.create(user);
-        return {
-            user: { ...createdUser.toObject() }
-          };
+        return { user: { ...createdUser.toObject() }};
     }
 }
 
