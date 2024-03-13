@@ -17,7 +17,7 @@ export const hashPassword = async (
   }
 };
 
-export const validatePassword = async (
+export const checkPassword = async (
   password: string,
   hashedPassword: string,
   salt: string,

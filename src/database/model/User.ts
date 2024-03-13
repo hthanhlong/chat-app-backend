@@ -25,27 +25,27 @@ const schema = new Schema<User>(
     profilePicUrl: {
       type: Schema.Types.String,
       trim: true,
+      select: false,
     },
     email: {
       type: Schema.Types.String,
       unique: true,
       sparse: true, // allows null
       trim: true,
-      select: false,
       max_length: 200,
     },
-
     password: {
       type: Schema.Types.String,
-      select: false,
     },
     verified: {
       type: Schema.Types.Boolean,
       default: true,
+      select: false,
     },
     isActive: {
       type: Schema.Types.Boolean,
       default: true,
+      select: false,
     },
     salt: {
       type: Schema.Types.String,

@@ -1,24 +1,23 @@
+import jwt from 'jsonwebtoken';
+import {
+  ACCESS_TOKEN_TIME,
+  JWT_SECRET_ACCESS,
+  JWT_SECRET_REFRESH,
+  REFRESH_TOKEN_TIME,
+} from '../config';
 
-async function encode(payload) {
-  // const token = jwt.sign(payload, process.env.JWT_SECRET, {
-  //   expiresIn: process.env.JWT_EXPIRATION,
-  // });
-  // return token;
+export const generateToken = (payload: any) => {
+  const accessToken = jwt.sign(payload, JWT_SECRET_ACCESS, {
+    expiresIn: ACCESS_TOKEN_TIME,
+  });
 
-}
+  const refreshToken = jwt.sign(payload, JWT_SECRET_REFRESH, {
+    expiresIn: REFRESH_TOKEN_TIME,
+  });
 
-async function decode(token: string) {
-  // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  // return decoded;
-
-}
-
-async function validate(token: string) {
-  
-}
-
-export default {
-  encode,
-  validate,
-  decode,
+  return { accessToken, refreshToken };
 };
+
+// export const async decode = (token: string) =>  {}
+
+// export const async validate = (token: string) => {}

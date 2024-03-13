@@ -5,8 +5,8 @@ import { BadRequestError } from '../core/ApiError';
 export const signupController = async (req: Request, res: Response) => {
   const { username, email } = req.body;
 
-  const isExistEmail = await AuthService.findUserByEmail(email);
-  if (isExistEmail) {
+  const user = await AuthService.findUserByEmail(email);
+  if (user !== null) {
     throw new BadRequestError('Email already exists');
   }
 
@@ -14,7 +14,7 @@ export const signupController = async (req: Request, res: Response) => {
   if (isExistUsername) {
     throw new BadRequestError('Username already exists');
   }
-  
+
   await AuthService.signup(req.body);
 
   res.status(201).json({
@@ -22,5 +22,33 @@ export const signupController = async (req: Request, res: Response) => {
     errorCode: null,
     message: 'Signup successful',
     data: null,
+  });
+};
+
+export const loginController = async (req: Request, res: Response) => {
+  const user = await AuthService.findUserByEmail(req.body.email);
+  if (user === null) {
+    throw new BadRequestError('Email or Password was not correctly');
+  }
+
+  const { password: hashedPassword, salt } = user;
+
+  const isRightPassword = await AuthService.ValidatePassword(
+    req.body.password,
+    hashedPassword,
+    salt,
+  );
+
+  if (!isRightPassword) {
+    throw new BadRequestError('Email or Password was not correctly');
+  }
+
+  const data = await AuthService.login(user);
+
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'login successful',
+    data: data,
   });
 };
