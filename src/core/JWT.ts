@@ -38,3 +38,19 @@ export const validateToken =
       }
     }
   };
+
+export const validateTokenWS = (
+  type: string = 'ACCESS',
+  accessToken: string,
+) => {
+  try {
+    const k = type === 'ACCESS' ? JWT_SECRET_ACCESS : JWT_SECRET_REFRESH;
+    const token = accessToken;
+    if (!token) return null;
+    const decoded = jwt.verify(token, k);
+    return decoded;
+  } catch (error: Error | any) {
+    console.log('error', error?.message);
+    return null;
+  }
+};
