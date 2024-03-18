@@ -19,7 +19,7 @@ router.use(validateToken('ACCESS'));
 //router for authentication
 router.get(
   '/',
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res) => {
     res.send('Hello World');
   }),
 );

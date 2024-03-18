@@ -5,14 +5,24 @@ import { BadRequestError } from '../core/ApiError';
 export const signupController = async (req: Request, res: Response) => {
   const { username, email } = req.body;
 
-  const user = await AuthService.findUserByEmail(email);
-  if (user !== null) {
-    throw new BadRequestError('Email already exists');
-  }
-
   const isExistUsername = await AuthService.findUserByUsername(username);
   if (isExistUsername) {
-    throw new BadRequestError('Username already exists');
+    res.status(400).json({
+      isSuccess: false,
+      errorCode: null,
+      message: 'Username already exists',
+      data: null,
+    });
+  }
+
+  const user = await AuthService.findUserByEmail(email);
+  if (user !== null) {
+    res.status(400).json({
+      isSuccess: false,
+      errorCode: null,
+      message: 'Email already exists',
+      data: null,
+    });
   }
 
   await AuthService.signup(req.body);
@@ -26,7 +36,7 @@ export const signupController = async (req: Request, res: Response) => {
 };
 
 export const loginController = async (req: Request, res: Response) => {
-  const user = await AuthService.findUserByEmail(req.body.email);
+  const user = await AuthService.findUserByUsername(req.body.username);
   if (user === null) {
     throw new BadRequestError('Email or Password was not correctly');
   }

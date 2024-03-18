@@ -28,3 +28,7 @@ export const checkPassword = async (
   }
   return false;
 };
+
+export const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
