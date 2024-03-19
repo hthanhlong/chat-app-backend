@@ -18,22 +18,22 @@ const schema = new Schema<User>(
     username: {
       type: Schema.Types.String,
       trim: true,
-      max_length: 200,
+      max_length: 64,
+      unique: true,
+    },
+    email: {
+      type: Schema.Types.String,
+      unique: true,
+      trim: true,
+      max_length: 100,
+    },
+    password: {
+      type: Schema.Types.String,
     },
     profilePicUrl: {
       type: Schema.Types.String,
       trim: true,
       select: false,
-    },
-    email: {
-      type: Schema.Types.String,
-      unique: true,
-      sparse: true, // allows null
-      trim: true,
-      max_length: 200,
-    },
-    password: {
-      type: Schema.Types.String,
     },
     verified: {
       type: Schema.Types.Boolean,

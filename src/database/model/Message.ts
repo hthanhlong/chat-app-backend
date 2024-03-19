@@ -7,7 +7,7 @@ export default interface Message {
   senderId: Types.ObjectId;
   receiverId: Types.ObjectId;
   text: string;
-  file: string;
+  file?: string;
 }
 
 const schema = new Schema<Message>(
