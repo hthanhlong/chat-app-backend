@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import AuthService from '../services/AuthService';
+import UserService from '../services/UserService';
 import { BadRequestError } from '../core/ApiError';
 
 export const signupController = async (req: Request, res: Response) => {
   const { username, email } = req.body;
 
-  const isExistUsername = await AuthService.findUserByUsername(username);
+  const isExistUsername = await UserService.findUserByUsername(username);
   if (isExistUsername) {
     res.status(400).json({
       isSuccess: false,
@@ -15,7 +16,7 @@ export const signupController = async (req: Request, res: Response) => {
     });
   }
 
-  const user = await AuthService.findUserByEmail(email);
+  const user = await UserService.findUserByEmail(email);
   if (user !== null) {
     res.status(400).json({
       isSuccess: false,
@@ -36,7 +37,7 @@ export const signupController = async (req: Request, res: Response) => {
 };
 
 export const loginController = async (req: Request, res: Response) => {
-  const user = await AuthService.findUserByUsername(req.body.username);
+  const user = await UserService.findUserByUsername(req.body.username);
   if (user === null) {
     throw new BadRequestError('Email or Password was not correctly');
   }

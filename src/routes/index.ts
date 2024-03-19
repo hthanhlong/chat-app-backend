@@ -7,6 +7,7 @@ import {
 } from '../controller/authController';
 import asyncHandler from '../helpers/asyncHandler';
 import { validateToken } from '../core/JWT';
+import { getAllUsers } from '../controller/userController';
 const router = express.Router();
 
 //router common
@@ -17,11 +18,6 @@ router.post('/login', validator(loginSchema), asyncHandler(loginController));
 router.use(validateToken('ACCESS'));
 
 //router for authentication
-router.get(
-  '/',
-  asyncHandler(async (req, res) => {
-    res.send('Hello World');
-  }),
-);
+router.get('/users', asyncHandler(getAllUsers));
 
 export default router;
