@@ -1,24 +1,22 @@
 import { model, Schema, Types } from 'mongoose';
 
 export const DOCUMENT_NAME = 'Message';
-export const COLLECTION_NAME = 'messages';
+export const COLLECTION_NAME = 'messages'; // display on database
 
 export default interface Message {
-  sender: Types.ObjectId;
-  receiver: Types.ObjectId;
+  senderId: Types.ObjectId;
+  receiverId: Types.ObjectId;
   text: string;
   file: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const schema = new Schema<Message>(
   {
-    sender: {
+    senderId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
-    receiver: {
+    receiverId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
@@ -28,24 +26,17 @@ const schema = new Schema<Message>(
     file: {
       type: Schema.Types.String,
     },
-    createdAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
-    updatedAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
   },
   {
     versionKey: false,
+    timestamps: true,
   },
 );
 
-schema.index({ _id: 1, status: 1 });
-schema.index({ email: 1 });
-schema.index({ status: 1 });
+schema.index({ _id: 1 });
 
-export const UserModel = model<Message>(DOCUMENT_NAME, schema, COLLECTION_NAME);
+export const MessageModel = model<Message>(
+  DOCUMENT_NAME,
+  schema,
+  COLLECTION_NAME,
+);

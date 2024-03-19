@@ -30,7 +30,6 @@ class AuthService {
   }
 
   async signup({ username, email, password }: signUpInput) {
-    const now = new Date();
     const salt = await generateSalt();
     const hashedPassword = await hashPassword(password, salt);
     const user: User = {
@@ -40,8 +39,6 @@ class AuthService {
       verified: true,
       isActive: true,
       salt: salt,
-      createdAt: now,
-      updatedAt: now,
     };
     await userRepository.createUser(user);
   }

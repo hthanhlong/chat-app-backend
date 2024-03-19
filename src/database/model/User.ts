@@ -11,8 +11,6 @@ export default interface User {
   verified: boolean;
   isActive: boolean;
   salt: string;
-  createdAt?: Date;
-  updatedAt?: Date;
 }
 
 const schema = new Schema<User>(
@@ -51,24 +49,13 @@ const schema = new Schema<User>(
       type: Schema.Types.String,
       default: '',
     },
-    createdAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
-    updatedAt: {
-      type: Schema.Types.Date,
-      required: true,
-      select: false,
-    },
   },
   {
     versionKey: false,
+    timestamps: true,
   },
 );
 
-schema.index({ _id: 1, status: 1 });
-schema.index({ email: 1 });
-schema.index({ status: 1 });
+schema.index({ _id: 1, email: 1 });
 
 export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME);
