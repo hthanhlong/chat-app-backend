@@ -29,12 +29,14 @@ class AuthService {
     return checkPassword(password, hashedPassword, salt);
   }
 
-  async signup({ username, email, password }: signUpInput) {
+  async signup({ nickname, username, email, password, caption }: signUpInput) {
     const salt = await generateSalt();
     const hashedPassword = await hashPassword(password, salt);
     const user: User = {
+      nickname,
       username,
       email,
+      caption,
       password: hashedPassword,
       verified: true,
       isActive: true,

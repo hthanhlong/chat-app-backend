@@ -1,7 +1,9 @@
 interface signUpInput {
+  nickname: string;
   username: string;
   email: string;
   password: string;
+  caption?: string;
 }
 
 interface LoginInput {
