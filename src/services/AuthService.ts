@@ -1,6 +1,6 @@
 import { checkPassword, generateSalt, hashPassword } from './../utils';
 import User from '../database/model/User';
-import userRepository from '../repositories/userRepository';
+import UserRepository from '../repositories/UserRepository';
 import { generateToken } from '../core/JWT';
 class AuthService {
   async ValidatePassword(
@@ -24,7 +24,7 @@ class AuthService {
       isActive: true,
       salt: salt,
     };
-    await userRepository.createUser(user);
+    await UserRepository.createUser(user);
   }
 
   async login(user: User) {

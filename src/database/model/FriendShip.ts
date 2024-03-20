@@ -4,18 +4,18 @@ export const DOCUMENT_NAME = 'FriendShip';
 export const COLLECTION_NAME = 'friendships'; // display on database
 
 export default interface FriendShip {
-  userId_1: string;
-  userId_2: string;
+  senderId: string;
+  receiveId: string;
   status: string;
 }
 
 const schema = new Schema<FriendShip>(
   {
-    userId_1: {
+    senderId: {
       type: Schema.Types.String,
       ref: 'User',
     },
-    userId_2: {
+    receiveId: {
       type: Schema.Types.String,
       ref: 'User',
     },
@@ -30,8 +30,8 @@ const schema = new Schema<FriendShip>(
   },
 );
 
-schema.index({ _id: 1, userId_1: 1 });
-schema.index({ userId_1: 1, userId_2: 1 }, { unique: true });
+schema.index({ _id: 1, senderId: 1 });
+schema.index({ senderId: 1, receiveId: 1 }, { unique: true });
 
 export const FriendShipModel = model<FriendShip>(
   DOCUMENT_NAME,

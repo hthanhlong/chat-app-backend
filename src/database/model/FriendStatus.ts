@@ -12,8 +12,8 @@ const schema = new Schema<FriendStatus>(
     status: {
       type: Schema.Types.String,
       unique: true,
-      default: 'pending',
-      value: ['pending', 'accepted', 'rejected', 'blocked'],
+      default: 'PENDING',
+      value: ['PENDING', 'FRIEND', 'UNFRIEND'],
     },
   },
   {

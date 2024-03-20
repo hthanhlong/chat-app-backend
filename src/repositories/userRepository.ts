@@ -1,8 +1,10 @@
 import User, { UserModel } from '../database/model/User';
 
 class UserRepository {
-  async getAllUsers(): Promise<{ users: User[] }> {
-    const users = await UserModel.find();
+  async getAllUsers(id: string): Promise<{ users: User[] }> {
+    const users = await UserModel.find({
+      _id: { $not: { $eq: id } },
+    }).limit(20);
     return { users: users.map((user) => ({ ...user.toObject() })) };
   }
 

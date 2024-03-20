@@ -16,3 +16,9 @@ declare module Express {
     decoded: any;
   }
 }
+
+interface FriendRequest {
+  senderId: string;
+  receiverId: string;
+  status: 'PENDING' | 'FRIEND' | 'UNFRIEND';
+}

@@ -1,12 +1,34 @@
+import FriendService from '../services/FriendService';
 import { Request, Response } from 'express';
 import UserService from '../services/UserService';
+import { BadRequestError } from '../core/ApiError';
 
-export const getAllUsers = async (req: Request, res: Response) => {
-  const users = await UserService.getAllUsers();
+export const getUsersOrGetOneUser = async (req: Request, res: Response) => {
+  if (
+    !req.query.type ||
+    ['all', 'one'].indexOf(req.query.type as string) === -1
+  ) {
+    throw new BadRequestError('Invalid type');
+  }
+
+  let users = null;
+  let message = null;
+
+  if (req.query.type === 'all') {
+    users = await FriendService.getAllUsersNonFriends(req.params.id);
+
+    message = 'Get all users';
+  }
+
+  if (req.query.type === 'one') {
+    users = await UserService.findUserById(req.params.id);
+    message = 'Get a user';
+  }
+
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
-    message: 'Get all users',
+    message: message,
     data: users,
   });
 };

@@ -12,3 +12,9 @@ export const loginSchema = Joi.object({
   username: Joi.string().required().min(3).max(64),
   password: Joi.string().required().min(6).max(64),
 });
+
+export const sendFriendRequestSchema = Joi.object({
+  senderId: Joi.string().required(),
+  receiverId: Joi.string().required(),
+  status: Joi.string().required(),
+});
