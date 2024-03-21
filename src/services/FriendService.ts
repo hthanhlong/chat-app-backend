@@ -12,6 +12,14 @@ class FriendService {
   getFriendRequest(id: string) {
     return FriendRepository.GetFriendRequests(id);
   }
+
+  getMyFriends(id: string) {
+    return FriendRepository.getMyFriends(id);
+  }
+
+  updateStatusFriend(data: FriendRequest) {
+    return FriendRepository.updateStatusFriend(data);
+  }
 }
 
 export default new FriendService();

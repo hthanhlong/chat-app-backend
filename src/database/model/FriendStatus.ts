@@ -13,7 +13,7 @@ const schema = new Schema<FriendStatus>(
       type: Schema.Types.String,
       unique: true,
       default: 'PENDING',
-      value: ['PENDING', 'FRIEND', 'UNFRIEND'],
+      value: ['PENDING', 'FRIEND', 'UNFRIEND', 'REJECT'],
     },
   },
   {

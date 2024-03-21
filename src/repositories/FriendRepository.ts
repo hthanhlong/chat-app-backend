@@ -1,6 +1,7 @@
+import { dataSelectedByKeys } from './../database/utils';
 import { FriendShipModel } from './../database/model/FriendShip';
 import UserService from '../services/UserService';
-import User from '../database/model/User';
+import User, { UserModel } from '../database/model/User';
 
 class FriendRepository {
   async SendFriendRequest(data: {
@@ -8,32 +9,39 @@ class FriendRepository {
     receiverId: string;
     status: string;
   }) {
-    const result = await FriendShipModel.create({
+    await FriendShipModel.create({
       senderId: data.senderId,
       receiveId: data.receiverId,
       status: data.status,
     });
-    console.log('result', result);
   }
 
   async GetAllUsersNonFriends(id: string) {
     const friendListIds = await FriendShipModel.find({
-      senderId: id,
-    }).select('receiveId');
+      $or: [{ senderId: id }, { receiveId: id }],
+    });
 
-    const allUsers = await UserService.getAllUsers(id);
+    const friendIds = friendListIds.map(function (user) {
+      if (user.senderId.toString() === id.toString()) {
+        return user.receiveId;
+      }
+      if (user.receiveId.toString() === id.toString()) {
+        return user.senderId;
+      }
+    });
+
+    let nonFriends = await UserService.getAllUsers(id);
     if (Array.isArray(friendListIds) && friendListIds.length > 0) {
-      if (!allUsers) return [];
-      const result = allUsers.filter((user: User) => {
-        return !friendListIds.some(
+      if (!nonFriends) return [];
+      nonFriends = nonFriends.filter((user: User) => {
+        return !friendIds.some(
           // @ts-ignore
-          (friend) => friend.receiveId.toString() === user._id.toString(),
+          (id) => id.toString() === user._id.toString(),
         );
       });
-      return result;
+      return nonFriends;
     }
-
-    return allUsers;
+    return nonFriends;
   }
 
   async GetFriendRequests(id: string) {
@@ -42,9 +50,43 @@ class FriendRepository {
       status: 'PENDING',
     }).select('senderId');
 
-    console.log('friendListIds', friendListIds);
+    const senderIds = friendListIds.map(function (user) {
+      return user.senderId;
+    });
 
-    return friendListIds;
+    const result = await UserModel.find({ _id: { $in: senderIds } });
+
+    return dataSelectedByKeys(result, ['_id', 'nickname', 'username']);
+  }
+
+  async getMyFriends(id: string) {
+    const friendListIds = await FriendShipModel.find({
+      $or: [{ senderId: id }, { receiveId: id }],
+      $and: [{ status: 'FRIEND' }],
+    });
+
+    const friendIds = friendListIds.map(function (user) {
+      if (user.senderId.toString() === id.toString()) {
+        return user.receiveId;
+      }
+      if (user.receiveId.toString() === id.toString()) {
+        return user.senderId;
+      }
+    });
+
+    const result = await UserModel.find({ _id: { $in: friendIds } });
+    return dataSelectedByKeys(result, ['_id', 'nickname', 'username']);
+  }
+
+  async updateStatusFriend(data: {
+    senderId: string;
+    receiverId: string;
+    status: string;
+  }) {
+    await FriendShipModel.updateOne(
+      { senderId: data.senderId, receiveId: data.receiverId },
+      { status: data.status },
+    );
   }
 }
 

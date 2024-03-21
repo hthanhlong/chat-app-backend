@@ -11,6 +11,8 @@ import { getUsersOrGetOneUser } from '../controller/userController';
 import {
   sendFriendRequest,
   getFriendRequest,
+  getMyFriends,
+  updateStatusFriend,
 } from '../controller/friendController';
 const router = express.Router();
 
@@ -29,5 +31,7 @@ router.post(
   asyncHandler(sendFriendRequest),
 );
 router.get('/friend-requests/:id', asyncHandler(getFriendRequest));
+router.get('/get-friends/:id', asyncHandler(getMyFriends));
+router.post('/update-status-friend', asyncHandler(updateStatusFriend));
 
 export default router;
