@@ -20,6 +20,13 @@ class FriendService {
   updateStatusFriend(data: FriendRequest) {
     return FriendRepository.updateStatusFriend(data);
   }
+
+  searchFriendByKeyword({ id, keyword }: { id: string; keyword: string }) {
+    return FriendRepository.searchFriendByKeyword({
+      id,
+      keyword,
+    });
+  }
 }
 
 export default new FriendService();

@@ -2,6 +2,7 @@ import { dataSelectedByKeys } from './../database/utils';
 import { FriendShipModel } from './../database/model/FriendShip';
 import UserService from '../services/UserService';
 import User, { UserModel } from '../database/model/User';
+import { filterFriendsById } from './helper';
 
 class FriendRepository {
   async SendFriendRequest(data: {
@@ -60,21 +61,8 @@ class FriendRepository {
   }
 
   async getMyFriends(id: string) {
-    const friendListIds = await FriendShipModel.find({
-      $or: [{ senderId: id }, { receiveId: id }],
-      $and: [{ status: 'FRIEND' }],
-    });
-
-    const friendIds = friendListIds.map(function (user) {
-      if (user.senderId.toString() === id.toString()) {
-        return user.receiveId;
-      }
-      if (user.receiveId.toString() === id.toString()) {
-        return user.senderId;
-      }
-    });
-
-    const result = await UserModel.find({ _id: { $in: friendIds } });
+    const friendListIds = await filterFriendsById(id);
+    const result = await UserModel.find({ _id: { $in: friendListIds } });
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username']);
   }
 
@@ -87,6 +75,21 @@ class FriendRepository {
       { senderId: data.senderId, receiveId: data.receiverId },
       { status: data.status },
     );
+  }
+
+  async searchFriendByKeyword({
+    id,
+    keyword,
+  }: {
+    id: string;
+    keyword: string;
+  }) {
+    const friendListIds = await filterFriendsById(id);
+    const result = await UserModel.find({
+      nickname: { $regex: keyword },
+      _id: { $in: friendListIds },
+    });
+    return dataSelectedByKeys(result, ['_id', 'nickname', 'username']);
   }
 }
 

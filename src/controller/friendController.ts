@@ -57,3 +57,25 @@ export const getMyFriends = async (req: Request, res: Response) => {
     data: users,
   });
 };
+
+export const searchFriendByKeyword = async (req: Request, res: Response) => {
+  if (!req.query.q || !req.params.id) {
+    res.status(400).json({
+      isSuccess: false,
+      errorCode: '400',
+      message: 'Invalid query',
+      data: null,
+    });
+    return;
+  }
+  const users = await FriendService.searchFriendByKeyword({
+    id: req.params.id,
+    keyword: req.query.q as string,
+  });
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'Get all users',
+    data: users,
+  });
+};
