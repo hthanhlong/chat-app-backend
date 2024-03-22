@@ -1,6 +1,7 @@
 import UserService from '../services/UserService';
 import { NotificationModel } from '../database/model/Notification';
 import User from '../database/model/User';
+import WsService from '../services/WsService';
 
 class NotificationRepository {
   async createNotification({
@@ -11,6 +12,7 @@ class NotificationRepository {
     receiverId: string;
   }) {
     const user = (await UserService.findUserById(senderId)) as User;
+
     const notification = {
       senderId,
       receiverId,
@@ -19,6 +21,14 @@ class NotificationRepository {
       status: 'UNREAD',
     };
     await NotificationModel.create(notification);
+
+    WsService.sendDataToId({
+      receiverId: receiverId,
+      data: {
+        type: 'HAS_NEW_NOTIFICATION',
+        payload: '',
+      },
+    });
   }
 
   async updateNotification({
@@ -33,7 +43,6 @@ class NotificationRepository {
 
   async getAllNotificationsById(id: string) {
     const allNotifications = await NotificationModel.find({ receiverId: id });
-    console.log('allNotifications', allNotifications);
     return allNotifications;
   }
 }

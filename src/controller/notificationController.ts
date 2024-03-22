@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import NotificationService from '../services/NotificationService';
 
 export const getAllNotificationsById = async (req: Request, res: Response) => {
-  console.log('req.params.id', req.params.id);
   const notifications = await NotificationService.getAllNotificationsById(
     req.params.id,
   );

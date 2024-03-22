@@ -30,3 +30,11 @@ interface NotificationInput {
   content: string;
   status: 'UNREAD' | 'READ';
 }
+
+interface sendDataToIdByWs {
+  receiverId: string;
+  data: {
+    type: string;
+    payload?: unknown;
+  };
+}
