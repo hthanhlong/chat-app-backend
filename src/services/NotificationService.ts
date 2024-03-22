@@ -1,31 +1,31 @@
 import NotificationRepository from '../repositories/NotificationRepository';
 
 class NotificationService {
-  createNotification({
+  async createNotification({
     senderId,
     receiverId,
   }: {
     senderId: string;
     receiverId: string;
   }) {
-    return NotificationRepository.createNotification({
+    return await NotificationRepository.createNotification({
       senderId,
       receiverId,
     });
   }
 
-  updateNotification({
+  async updateNotification({
     id,
     status,
   }: {
     id: string;
     status: 'READ' | 'UNREAD';
   }) {
-    return NotificationRepository.updateNotification({ id, status });
+    return await NotificationRepository.updateNotification({ id, status });
   }
 
-  getAllNotificationsById(id: string) {
-    return NotificationRepository.getAllNotificationsById(id);
+  async getAllNotificationsById(id: string) {
+    return await NotificationRepository.getAllNotificationsById(id);
   }
 }
 

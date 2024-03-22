@@ -28,6 +28,7 @@ class WsService {
     const { type } = data;
     switch (type) {
       case 'INIT':
+        console.log('INIT', user.id);
         // console.log(user.id, user.username, 'connected');
         // @ts-ignore
         WsService.socket.clientId = user.id;
@@ -36,6 +37,7 @@ class WsService {
         WsService.clients[user.id] = { id: user.id, socket: WsService.socket };
         break;
       case 'GET_ONLINE_USERS':
+        console.log('GET_ONLINE_USERS', user.id);
         WsService.sendDataToClientById({
           id: user.id,
           data: {

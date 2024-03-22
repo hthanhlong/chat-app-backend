@@ -19,6 +19,7 @@ import {
   getAllNotificationsById,
   updateNotification,
 } from '../controller/notificationController';
+import { getAllMessages } from '../controller/messageController';
 const router = express.Router();
 
 //router common
@@ -41,5 +42,6 @@ router.post('/update-status-friend', asyncHandler(updateStatusFriend));
 router.get('/search-friend/:id', asyncHandler(searchFriendByKeyword));
 router.patch('/notifications', asyncHandler(updateNotification));
 router.get('/notifications/:id', asyncHandler(getAllNotificationsById));
+router.get('/get-messages/:partner_id', asyncHandler(getAllMessages));
 
 export default router;
