@@ -35,6 +35,15 @@ class WsService {
         WsService.socket.username = user.username;
         WsService.clients[user.id] = { id: user.id, socket: WsService.socket };
         break;
+      case 'GET_ONLINE_USERS':
+        WsService.sendDataToClientById({
+          id: user.id,
+          data: {
+            type: 'ONLINE_USERS',
+            payload: observers,
+          },
+        });
+        break;
       case 'CLOSE_CONNECTION':
         const currentSocket = WsService.clients[user.id];
         if (currentSocket) {
