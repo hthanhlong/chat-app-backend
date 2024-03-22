@@ -15,6 +15,10 @@ import {
   updateStatusFriend,
   searchFriendByKeyword,
 } from '../controller/friendController';
+import {
+  getAllNotificationsById,
+  updateNotification,
+} from '../controller/notificationController';
 const router = express.Router();
 
 //router common
@@ -35,5 +39,7 @@ router.get('/friend-requests/:id', asyncHandler(getFriendRequest));
 router.get('/get-friends/:id', asyncHandler(getMyFriends));
 router.post('/update-status-friend', asyncHandler(updateStatusFriend));
 router.get('/search-friend/:id', asyncHandler(searchFriendByKeyword));
+router.patch('/notifications', asyncHandler(updateNotification));
+router.get('/notifications/:id', asyncHandler(getAllNotificationsById));
 
 export default router;

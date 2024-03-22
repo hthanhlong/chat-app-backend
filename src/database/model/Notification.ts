@@ -23,7 +23,7 @@ const schema = new Schema<Notification>(
     },
     type: {
       type: Schema.Types.String,
-      value: ['friend', 'message', 'post'],
+      value: ['FRIEND', 'MESSAGE', 'POST'],
     },
     content: {
       type: Schema.Types.String,
@@ -31,8 +31,8 @@ const schema = new Schema<Notification>(
     },
     status: {
       type: Schema.Types.String,
-      default: 'unread',
-      value: ['unread', 'read'],
+      default: 'UNREAD',
+      value: ['UNREAD', 'READ'],
     },
   },
   {

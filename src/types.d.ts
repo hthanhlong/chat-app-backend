@@ -22,3 +22,11 @@ interface FriendRequest {
   receiverId: string;
   status: 'PENDING' | 'FRIEND' | 'UNFRIEND';
 }
+
+interface NotificationInput {
+  senderId: string;
+  receiverId: string;
+  type: 'FRIEND' | 'MESSAGE' | 'POST';
+  content: string;
+  status: 'UNREAD' | 'READ';
+}

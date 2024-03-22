@@ -3,6 +3,7 @@ import { FriendShipModel } from './../database/model/FriendShip';
 import UserService from '../services/UserService';
 import User, { UserModel } from '../database/model/User';
 import { filterFriendsById } from './helper';
+import NotificationService from '../services/NotificationService';
 
 class FriendRepository {
   async SendFriendRequest(data: {
@@ -14,6 +15,11 @@ class FriendRepository {
       senderId: data.senderId,
       receiveId: data.receiverId,
       status: data.status,
+    });
+
+    await NotificationService.createNotification({
+      senderId: data.senderId,
+      receiverId: data.receiverId,
     });
   }
 
