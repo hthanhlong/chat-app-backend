@@ -1,19 +1,24 @@
+import { Server } from 'ws';
 import { validateTokenWS } from './../core/JWT';
+interface CustomWebSocket extends Server {
+  clientId: string;
+  username: string;
+}
 class WsService {
-  static socket: WebSocket | null = null;
+  static socket: CustomWebSocket;
   static clients: any = {};
 
   static onConnection(socket: any): void {
     WsService.socket = socket;
-    socket.on('message', WsService._onMessage);
-    socket.on('close', WsService._onClose);
-    socket.on('error', (err: any) => {
+    WsService.socket.on('message', WsService._onMessage);
+    WsService.socket.on('error', (err: any) => {
       console.error('Socket error', err);
     });
   }
 
   static _onMessage(message: string): void {
-    // console.log('======>');
+    const observers = Object.keys(WsService.clients);
+    console.log('observers', observers, Math.floor(Math.random() * 1000000));
     const { accessToken, data } = JSON.parse(message);
     if (!accessToken) return;
     const user = validateTokenWS('ACCESS', accessToken) as {
@@ -30,28 +35,18 @@ class WsService {
         WsService.socket.username = user.username;
         WsService.clients[user.id] = { id: user.id, socket: WsService.socket };
         break;
-      default:
-        break;
-    }
-  }
-
-  static _onClose(): void {
-    // get close from client
-    // @ts-ignore
-    const { clientId } = WsService.socket;
-    if (clientId) {
-      // console.log(clientId, username, 'disconnected');
-      delete WsService.clients[clientId];
-      if (WsService.socket) {
-        WsService.socket.close();
-      }
+      case 'CLOSE_CONNECTION':
+        const currentSocket = WsService.clients[user.id];
+        if (currentSocket) {
+          delete WsService.clients[user.id];
+          currentSocket.socket.close();
+        }
     }
   }
 
   static sendDataToClientById({ id, data }: sendDataToIdByWs) {
     const client = WsService.clients[id];
     if (!client) return;
-    // console.log('client.id', client.id);
     client.socket.send(JSON.stringify(data));
   }
 }
