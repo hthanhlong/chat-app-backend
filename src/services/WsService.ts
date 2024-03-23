@@ -1,5 +1,6 @@
 import { Server } from 'ws';
 import { validateTokenWS } from './../core/JWT';
+import MessageService from './MessageService';
 interface CustomWebSocket extends Server {
   clientId: string;
   username: string;
@@ -16,7 +17,7 @@ class WsService {
     });
   }
 
-  static _onMessage(message: string): void {
+  static async _onMessage(message: string): Promise<void> {
     const observers = Object.keys(WsService.clients);
     console.log('observers', observers, Math.floor(Math.random() * 1000000));
     const { accessToken, data } = JSON.parse(message);
@@ -25,7 +26,7 @@ class WsService {
       id: string;
       username: string;
     };
-    const { type } = data;
+    const { type, payload } = data;
     switch (type) {
       case 'INIT':
         console.log('INIT', user.id);
@@ -37,12 +38,22 @@ class WsService {
         WsService.clients[user.id] = { id: user.id, socket: WsService.socket };
         break;
       case 'GET_ONLINE_USERS':
-        console.log('GET_ONLINE_USERS', user.id);
         WsService.sendDataToClientById({
           id: user.id,
           data: {
             type: 'ONLINE_USERS',
             payload: observers,
+          },
+        });
+        break;
+      case 'SEND_MESSAGE':
+        const { senderId, receiverId, message } = payload;
+        await MessageService.createMessage({ senderId, receiverId, message });
+        WsService.sendDataToClientById({
+          id: receiverId,
+          data: {
+            type: 'HAS_NEW_MESSAGE',
+            payload: '',
           },
         });
         break;

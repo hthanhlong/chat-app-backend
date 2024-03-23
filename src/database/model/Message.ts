@@ -6,7 +6,7 @@ export const COLLECTION_NAME = 'messages'; // display on database
 export default interface Message {
   senderId: Types.ObjectId;
   receiverId: Types.ObjectId;
-  text: string;
+  message: string;
   file?: string;
 }
 
@@ -20,7 +20,7 @@ const schema = new Schema<Message>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
-    text: {
+    message: {
       type: Schema.Types.String,
     },
     file: {
