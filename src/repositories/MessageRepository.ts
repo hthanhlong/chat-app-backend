@@ -6,9 +6,10 @@ class MessageRepository {
       senderId: { $in: [userId, partner_id] },
       receiverId: { $in: [userId, partner_id] },
     })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(100);
-    return result;
+    const reversedResult = result.reverse();
+    return reversedResult;
   }
 
   async createMessage({
