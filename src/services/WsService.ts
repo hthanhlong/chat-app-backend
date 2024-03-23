@@ -1,6 +1,7 @@
 import { Server } from 'ws';
 import { validateTokenWS } from './../core/JWT';
 import MessageService from './MessageService';
+import FriendService from './FriendService';
 interface CustomWebSocket extends Server {
   clientId: string;
   username: string;
@@ -29,8 +30,6 @@ class WsService {
     const { type, payload } = data;
     switch (type) {
       case 'INIT':
-        console.log('INIT', user.id);
-        // console.log(user.id, user.username, 'connected');
         // @ts-ignore
         WsService.socket.clientId = user.id;
         // @ts-ignore
@@ -38,11 +37,15 @@ class WsService {
         WsService.clients[user.id] = { id: user.id, socket: WsService.socket };
         break;
       case 'GET_ONLINE_USERS':
+        const friends = await FriendService.getMyFriends(user.id);
+        const usersOnline = observers.filter((id: string) =>
+          friends?.some((friend: any) => friend._id.toString() === id),
+        );
         WsService.sendDataToClientById({
           id: user.id,
           data: {
             type: 'ONLINE_USERS',
-            payload: observers,
+            payload: usersOnline,
           },
         });
         break;
