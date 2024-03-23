@@ -73,6 +73,6 @@ const schema = new Schema<User>(
   },
 );
 
-schema.index({ _id: 1, email: 1 });
+schema.index({ email: 1 });
 
 export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME);

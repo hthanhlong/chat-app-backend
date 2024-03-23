@@ -33,8 +33,6 @@ const schema = new Schema<Message>(
   },
 );
 
-schema.index({ _id: 1 });
-
 export const MessageModel = model<Message>(
   DOCUMENT_NAME,
   schema,

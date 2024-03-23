@@ -41,8 +41,6 @@ const schema = new Schema<Notification>(
   },
 );
 
-schema.index({ _id: 1 });
-
 export const NotificationModel = model<Notification>(
   DOCUMENT_NAME,
   schema,

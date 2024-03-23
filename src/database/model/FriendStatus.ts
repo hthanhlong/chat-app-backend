@@ -22,8 +22,6 @@ const schema = new Schema<FriendStatus>(
   },
 );
 
-schema.index({ _id: 1 });
-
 export const FriendStatusModel = model<FriendStatus>(
   DOCUMENT_NAME,
   schema,

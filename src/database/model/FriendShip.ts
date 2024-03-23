@@ -30,7 +30,6 @@ const schema = new Schema<FriendShip>(
   },
 );
 
-schema.index({ _id: 1, senderId: 1 });
 schema.index({ senderId: 1, receiveId: 1 }, { unique: true });
 
 export const FriendShipModel = model<FriendShip>(
