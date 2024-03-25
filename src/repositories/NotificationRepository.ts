@@ -42,7 +42,11 @@ class NotificationRepository {
   }
 
   async getAllNotificationsById(id: string) {
-    const allNotifications = await NotificationModel.find({ receiverId: id });
+    const allNotifications = await NotificationModel.find({
+      receiverId: id,
+    })
+      .sort({ createdAt: -1 })
+      .limit(50);
     return allNotifications;
   }
 }
