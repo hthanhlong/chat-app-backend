@@ -27,6 +27,7 @@ class WsService {
       id: string;
       username: string;
     };
+    if (!user) return;
     const { type, payload } = data;
     switch (type) {
       case 'INIT':

@@ -6,7 +6,7 @@ import {
   loginController,
 } from '../controller/authController';
 import asyncHandler from '../helpers/asyncHandler';
-import { validateToken } from '../core/JWT';
+import { validateAccessToken } from '../core/JWT';
 import { getUsersOrGetOneUser } from '../controller/userController';
 import {
   sendFriendRequest,
@@ -27,7 +27,7 @@ router.post('/signup', validator(signupSchema), asyncHandler(signupController));
 router.post('/login', validator(loginSchema), asyncHandler(loginController));
 
 //middlewares
-router.use(validateToken('ACCESS'));
+router.use(validateAccessToken());
 
 //router for authentication
 router.get('/users/:id', asyncHandler(getUsersOrGetOneUser));

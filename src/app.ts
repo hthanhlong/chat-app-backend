@@ -23,7 +23,12 @@ app.use(handleNotFoundRoute);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
   if (err instanceof ApiError) {
-    ApiError.handle(err, res);
+    res.status(err.status).json({
+      isSuccess: false,
+      errorCode: err.type,
+      message: err.message,
+      data: null,
+    });
   } else {
     if (environment === 'development') {
       Logger.error(err);

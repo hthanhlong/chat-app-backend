@@ -6,39 +6,41 @@ import {
   REFRESH_TOKEN_TIME,
 } from '../config';
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError } from './ApiError';
+import { AccessTokenError, BadTokenError, TokenExpiredError } from './ApiError';
 
 export const generateToken = (payload: any) => {
   const accessToken = jwt.sign(payload, JWT_SECRET_ACCESS, {
     expiresIn: ACCESS_TOKEN_TIME,
   });
-
   const refreshToken = jwt.sign(payload, JWT_SECRET_REFRESH, {
     expiresIn: REFRESH_TOKEN_TIME,
   });
-
   return { accessToken, refreshToken };
 };
 
-// export const async decode = (token: string) =>  {}
-
-export const validateToken =
-  (type: string = 'ACCESS') =>
-  (req: Request, res: Response, next: NextFunction) => {
+export const validateAccessToken =
+  () => (req: Request, res: Response, next: NextFunction) => {
     {
       try {
-        const k = type === 'ACCESS' ? JWT_SECRET_ACCESS : JWT_SECRET_REFRESH;
+        const k = JWT_SECRET_ACCESS;
+        if (!k) return console.log('k is not defined');
         const token = req.headers.authorization?.split(' ')[1];
-        if (!token) throw new BadRequestError('Token not found');
+        if (!token) throw new BadTokenError();
         const decoded = jwt.verify(token, k);
         req.decoded = decoded;
         next();
-      } catch (error) {
-        next(error);
+      } catch (error: Error | any) {
+        if (error.message === 'Token is not valid') {
+          next(new AccessTokenError());
+        }
+        if (error.message === 'jwt expired') {
+          next(new TokenExpiredError());
+        }
       }
     }
   };
 
+//middleware to validate token
 export const validateTokenWS = (
   type: string = 'ACCESS',
   accessToken: string,
@@ -50,7 +52,6 @@ export const validateTokenWS = (
     const decoded = jwt.verify(token, k);
     return decoded;
   } catch (error: Error | any) {
-    console.log('error', error?.message);
     return null;
   }
 };
