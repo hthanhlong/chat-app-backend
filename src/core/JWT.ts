@@ -7,10 +7,9 @@ import {
 } from '../config';
 import { Request, Response, NextFunction } from 'express';
 import {
-  AccessTokenError,
   AccessTokenExpired,
   BadTokenError,
-  TokenExpiredError,
+  RefreshTokenExpired,
 } from './ApiError';
 
 export const generateToken = (payload: any) => {
@@ -39,7 +38,7 @@ export const validateAccessToken = (
       next();
     } catch (error: Error | any) {
       if (error.message === 'Token is not valid') {
-        next(new AccessTokenError());
+        next(new BadTokenError());
       }
       if (error.message === 'jwt expired') {
         next(new AccessTokenExpired());
@@ -64,10 +63,10 @@ export const validateRefreshToken = (
       next();
     } catch (error: Error | any) {
       if (error.message === 'Token is not valid') {
-        next(new AccessTokenError());
+        next(new BadTokenError());
       }
       if (error.message === 'jwt expired') {
-        next(new TokenExpiredError());
+        next(new RefreshTokenExpired());
       }
     }
   }

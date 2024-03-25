@@ -22,6 +22,7 @@ export const urlConfigEncode = {
 
 export const JWT_SECRET_ACCESS = process.env.JWT_SECRET_ACCESS || 'secret';
 export const JWT_SECRET_REFRESH = process.env.JWT_SECRET_REFRESH || 'secret123';
-export const ACCESS_TOKEN_TIME = process.env.ACCESS_TOKEN_VALIDITY_SEC || 20;
+export const ACCESS_TOKEN_TIME =
+  process.env.ACCESS_TOKEN_VALIDITY_SEC || 1800000; // 30 minutes
 export const REFRESH_TOKEN_TIME =
-  process.env.REFRESH_TOKEN_VALIDITY_SEC || 604800; // 7 days
+  process.env.REFRESH_TOKEN_VALIDITY_SEC || '90d'; // 90 days
