@@ -4,9 +4,10 @@ import { loginSchema, sendFriendRequestSchema, signupSchema } from '../schema';
 import {
   signupController,
   loginController,
+  refreshTokenController,
 } from '../controller/authController';
 import asyncHandler from '../helpers/asyncHandler';
-import { validateAccessToken } from '../core/JWT';
+import { validateAccessToken, validateRefreshToken } from '../core/JWT';
 import { getUsersOrGetOneUser } from '../controller/userController';
 import {
   sendFriendRequest,
@@ -25,9 +26,14 @@ const router = express.Router();
 //router common
 router.post('/signup', validator(signupSchema), asyncHandler(signupController));
 router.post('/login', validator(loginSchema), asyncHandler(loginController));
+router.post(
+  '/refresh-token',
+  validateRefreshToken,
+  asyncHandler(refreshTokenController),
+);
 
 //middlewares
-router.use(validateAccessToken());
+router.use(validateAccessToken);
 
 //router for authentication
 router.get('/users/:id', asyncHandler(getUsersOrGetOneUser));

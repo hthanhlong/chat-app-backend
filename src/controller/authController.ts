@@ -63,3 +63,14 @@ export const loginController = async (req: Request, res: Response) => {
     data: data,
   });
 };
+
+export const refreshTokenController = async (req: Request, res: Response) => {
+  const decoded = req.decoded;
+  const data = await AuthService.refreshToken(decoded);
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'refresh token successful',
+    data: data,
+  });
+};

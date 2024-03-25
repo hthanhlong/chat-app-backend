@@ -1,6 +1,8 @@
 export enum ErrorType {
   BAD_TOKEN = 'BadTokenError',
   TOKEN_EXPIRED = 'TokenExpiredError',
+  ACCESS_TOKEN_EXPIRED = 'AccessTokenExpiredError',
+  REFRESH_TOKEN_EXPIRED = 'RefreshTokenExpiredError',
   UNAUTHORIZED = 'AuthFailureError',
   ACCESS_TOKEN = 'AccessTokenError',
   INTERNAL = 'InternalError',
@@ -11,7 +13,7 @@ export enum ErrorType {
   FORBIDDEN = 'ForbiddenError',
 }
 
-export abstract class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     public status: number,
     public type: ErrorType,
@@ -66,6 +68,17 @@ export class BadTokenError extends ApiError {
 export class TokenExpiredError extends ApiError {
   constructor(message = 'jwt expired') {
     super(401, ErrorType.TOKEN_EXPIRED, message);
+  }
+}
+
+export class AccessTokenExpired extends ApiError {
+  constructor(message = 'jwt expired') {
+    super(401, ErrorType.ACCESS_TOKEN_EXPIRED, message);
+  }
+}
+export class RefreshTokenExpired extends ApiError {
+  constructor(message = 'jwt expired') {
+    super(401, ErrorType.REFRESH_TOKEN_EXPIRED, message);
   }
 }
 

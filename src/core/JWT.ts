@@ -6,7 +6,12 @@ import {
   REFRESH_TOKEN_TIME,
 } from '../config';
 import { Request, Response, NextFunction } from 'express';
-import { AccessTokenError, BadTokenError, TokenExpiredError } from './ApiError';
+import {
+  AccessTokenError,
+  AccessTokenExpired,
+  BadTokenError,
+  TokenExpiredError,
+} from './ApiError';
 
 export const generateToken = (payload: any) => {
   const accessToken = jwt.sign(payload, JWT_SECRET_ACCESS, {
@@ -18,27 +23,55 @@ export const generateToken = (payload: any) => {
   return { accessToken, refreshToken };
 };
 
-export const validateAccessToken =
-  () => (req: Request, res: Response, next: NextFunction) => {
-    {
-      try {
-        const k = JWT_SECRET_ACCESS;
-        if (!k) return console.log('k is not defined');
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) throw new BadTokenError();
-        const decoded = jwt.verify(token, k);
-        req.decoded = decoded;
-        next();
-      } catch (error: Error | any) {
-        if (error.message === 'Token is not valid') {
-          next(new AccessTokenError());
-        }
-        if (error.message === 'jwt expired') {
-          next(new TokenExpiredError());
-        }
+export const validateAccessToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  {
+    try {
+      const k = JWT_SECRET_ACCESS;
+      if (!k) return console.log('k is not defined');
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) throw new BadTokenError();
+      const decoded = jwt.verify(token, k);
+      req.decoded = decoded;
+      next();
+    } catch (error: Error | any) {
+      if (error.message === 'Token is not valid') {
+        next(new AccessTokenError());
+      }
+      if (error.message === 'jwt expired') {
+        next(new AccessTokenExpired());
       }
     }
-  };
+  }
+};
+
+export const validateRefreshToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  {
+    try {
+      const k = JWT_SECRET_REFRESH;
+      if (!k) return console.log('k is not defined');
+      const token = req.body.refreshToken;
+      if (!token) throw new BadTokenError();
+      const decoded = jwt.verify(token, k);
+      req.decoded = decoded;
+      next();
+    } catch (error: Error | any) {
+      if (error.message === 'Token is not valid') {
+        next(new AccessTokenError());
+      }
+      if (error.message === 'jwt expired') {
+        next(new TokenExpiredError());
+      }
+    }
+  }
+};
 
 //middleware to validate token
 export const validateTokenWS = (

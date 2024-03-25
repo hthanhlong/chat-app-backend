@@ -1,7 +1,9 @@
+import jwt from 'jsonwebtoken';
 import { checkPassword, generateSalt, hashPassword } from './../utils';
 import User from '../database/model/User';
 import UserRepository from '../repositories/UserRepository';
 import { generateToken } from '../core/JWT';
+import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../config';
 class AuthService {
   async ValidatePassword(
     password: string,
@@ -37,6 +39,14 @@ class AuthService {
     const { accessToken, refreshToken } = generateToken(payload);
     const result = Object.assign(payload, { accessToken, refreshToken });
     return result;
+  }
+
+  async refreshToken(decoded: { id: string; username: string }) {
+    const { id, username } = decoded;
+    const accessToken = jwt.sign({ id, username }, JWT_SECRET_ACCESS, {
+      expiresIn: ACCESS_TOKEN_TIME,
+    });
+    return { accessToken };
   }
 }
 
