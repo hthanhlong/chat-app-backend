@@ -3,8 +3,9 @@ import Logger from './core/Logger';
 import cors from 'cors';
 import './database'; // import database connection
 import { environment, urlConfigEncode } from './config';
-import { NotFoundError, ApiError } from './core/ApiError';
+import { ApiError } from './core/ApiError';
 import routes from './routes';
+import { handleNotFoundRoute } from './core/core';
 
 process.on('uncaughtException', (e) => {
   Logger.error(e);
@@ -17,10 +18,7 @@ app.use(express.urlencoded(urlConfigEncode));
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 //routes
 app.use('/api/v1', routes);
-// not found error
-app.use((req: Request, res: Response, next: NextFunction) =>
-  next(new NotFoundError()),
-);
+app.use(handleNotFoundRoute);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {

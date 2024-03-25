@@ -18,3 +18,7 @@ export const sendFriendRequestSchema = Joi.object({
   receiverId: Joi.string().required(),
   status: Joi.string().required(),
 });
+
+export const refreshTokenSchema = Joi.object({
+  refreshToken: Joi.string().required(),
+});
