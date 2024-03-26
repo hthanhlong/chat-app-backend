@@ -32,3 +32,16 @@ export const getUsersOrGetOneUser = async (req: Request, res: Response) => {
     data: users,
   });
 };
+
+export const updateUserById = async (req: Request, res: Response) => {
+  const user = await UserService.updateUserById(req.params.id, req.body);
+  if (!user) {
+    throw new BadRequestError('Update user failed');
+  }
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'Update user successful',
+    data: user,
+  });
+};

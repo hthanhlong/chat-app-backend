@@ -22,3 +22,8 @@ export const sendFriendRequestSchema = Joi.object({
 export const refreshTokenSchema = Joi.object({
   refreshToken: Joi.string().required(),
 });
+
+export const userUpdateSchema = Joi.object({
+  caption: Joi.string().max(1000).optional(),
+  nickname: Joi.string().required().min(3).max(64),
+});

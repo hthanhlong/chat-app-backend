@@ -1,6 +1,11 @@
 import express from 'express';
 import validator from '../helpers/validator';
-import { loginSchema, sendFriendRequestSchema, signupSchema } from '../schema';
+import {
+  loginSchema,
+  sendFriendRequestSchema,
+  signupSchema,
+  userUpdateSchema,
+} from '../schema';
 import {
   signupController,
   loginController,
@@ -8,7 +13,10 @@ import {
 } from '../controller/authController';
 import asyncHandler from '../helpers/asyncHandler';
 import { validateAccessToken, validateRefreshToken } from '../core/JWT';
-import { getUsersOrGetOneUser } from '../controller/userController';
+import {
+  getUsersOrGetOneUser,
+  updateUserById,
+} from '../controller/userController';
 import {
   sendFriendRequest,
   getFriendRequest,
@@ -37,6 +45,11 @@ router.use(validateAccessToken);
 
 //router for authentication
 router.get('/users/:id', asyncHandler(getUsersOrGetOneUser));
+router.put(
+  '/users/:id',
+  validator(userUpdateSchema),
+  asyncHandler(updateUserById),
+);
 router.post(
   '/send-friend-request',
   validator(sendFriendRequestSchema),

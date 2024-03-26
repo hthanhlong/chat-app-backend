@@ -15,8 +15,8 @@ class UserService {
     return response;
   }
 
-  async updateUserById(id: string, user: User) {
-    const result = await userRepository.updateUserById(id, user);
+  async updateUserById(id: string, newDataOfUser: User) {
+    const result = await userRepository.updateUserById(id, newDataOfUser);
     if (!result.user) return null;
     return result.user;
   }
