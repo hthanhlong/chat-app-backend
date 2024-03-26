@@ -14,6 +14,8 @@ export const db = {
   maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE || '10'),
 };
 
+export const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+
 export const urlConfigEncode = {
   limit: '10mb',
   extended: true,
