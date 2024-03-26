@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import Logger from './core/Logger';
 import cors from 'cors';
 import './database'; // import database connection
+import './services/RedisService'; // import redis service
+import './ws'; // import websocket
 import { environment, urlConfigEncode } from './config';
 import { ApiError } from './core/ApiError';
 import routes from './routes';
