@@ -1,17 +1,17 @@
-import { createLogger, transports, format } from 'winston';
-import fs from 'fs';
-import path from 'path';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import { environment, logDirectory } from '../config';
+import { createLogger, transports, format } from 'winston'
+import fs from 'fs'
+import path from 'path'
+import DailyRotateFile from 'winston-daily-rotate-file'
+import { environment, logDirectory } from '../config'
 
-let dir = logDirectory;
-if (!dir) dir = path.resolve('logs');
+let dir = logDirectory
+if (!dir) dir = path.resolve('logs')
 
 if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir);
+  fs.mkdirSync(dir)
 }
 
-const logLevel = environment === 'development' ? 'debug' : 'warn';
+const logLevel = environment === 'development' ? 'debug' : 'warn'
 
 const dailyRotateFile = new DailyRotateFile({
   level: logLevel,
@@ -24,9 +24,9 @@ const dailyRotateFile = new DailyRotateFile({
   format: format.combine(
     format.errors({ stack: true }),
     format.timestamp(),
-    format.json(),
-  ),
-});
+    format.json()
+  )
+})
 
 export default createLogger({
   transports: [
@@ -34,11 +34,11 @@ export default createLogger({
       level: logLevel,
       format: format.combine(
         format.errors({ stack: true }),
-        format.prettyPrint(),
-      ),
+        format.prettyPrint()
+      )
     }),
-    dailyRotateFile,
+    dailyRotateFile
   ],
   exceptionHandlers: [dailyRotateFile],
-  exitOnError: false, // do not exit on handled exceptions
-});
+  exitOnError: false // do not exit on handled exceptions
+})

@@ -1,39 +1,39 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose'
 
-export const DOCUMENT_NAME = 'FriendShip';
-export const COLLECTION_NAME = 'friendships'; // display on database
+export const DOCUMENT_NAME = 'FriendShip'
+export const COLLECTION_NAME = 'friendships' // display on database
 
 export default interface FriendShip {
-  senderId: string;
-  receiveId: string;
-  status: string;
+  senderId: string
+  receiveId: string
+  status: string
 }
 
 const schema = new Schema<FriendShip>(
   {
     senderId: {
       type: Schema.Types.String,
-      ref: 'User',
+      ref: 'User'
     },
     receiveId: {
       type: Schema.Types.String,
-      ref: 'User',
+      ref: 'User'
     },
     status: {
       type: Schema.Types.String,
-      ref: 'FriendStatus',
-    },
+      ref: 'FriendStatus'
+    }
   },
   {
     versionKey: false,
-    timestamps: true,
-  },
-);
+    timestamps: true
+  }
+)
 
-schema.index({ senderId: 1, receiveId: 1 }, { unique: true });
+schema.index({ senderId: 1, receiveId: 1 }, { unique: true })
 
 export const FriendShipModel = model<FriendShip>(
   DOCUMENT_NAME,
   schema,
-  COLLECTION_NAME,
-);
+  COLLECTION_NAME
+)

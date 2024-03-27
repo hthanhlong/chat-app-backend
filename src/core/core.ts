@@ -1,10 +1,10 @@
-import { NextFunction, Response, Request } from 'express';
-import { NotFoundError } from './ApiError';
+import { NextFunction, Response, Request } from 'express'
+import { NotFoundError } from './ApiError'
 
 export const handleNotFoundRoute = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
-  next(new NotFoundError());
-};
+  next(new NotFoundError())
+}

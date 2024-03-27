@@ -1,9 +1,9 @@
-import Logger from './core/Logger';
-import { port } from './config';
-import app from './app';
+import Logger from './core/Logger'
+import { port } from './config'
+import app from './app'
 
 app
   .listen(port, () => {
-    Logger.info(`server running on port : ${port}`);
+    Logger.info(`server running on port : ${port}`)
   })
-  .on('error', (e: Error) => Logger.error(e));
+  .on('error', (e: Error) => Logger.error(e))

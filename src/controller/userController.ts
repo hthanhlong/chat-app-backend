@@ -1,47 +1,47 @@
-import FriendService from '../services/FriendService';
-import { Request, Response } from 'express';
-import UserService from '../services/UserService';
-import { BadRequestError } from '../core/ApiError';
+import FriendService from '../services/FriendService'
+import { Request, Response } from 'express'
+import UserService from '../services/UserService'
+import { BadRequestError } from '../core/ApiError'
 
 export const getUsersOrGetOneUser = async (req: Request, res: Response) => {
   if (
     !req.query.type ||
     ['all', 'one'].indexOf(req.query.type as string) === -1
   ) {
-    throw new BadRequestError('Invalid type');
+    throw new BadRequestError('Invalid type')
   }
 
-  let users = null;
-  let message = null;
+  let users = null
+  let message = null
 
   if (req.query.type === 'all') {
-    users = await FriendService.getAllUsersNonFriends(req.params.id);
+    users = await FriendService.getAllUsersNonFriends(req.params.id)
 
-    message = 'Get all users';
+    message = 'Get all users'
   }
 
   if (req.query.type === 'one') {
-    users = await UserService.findUserById(req.params.id);
-    message = 'Get a user';
+    users = await UserService.findUserById(req.params.id)
+    message = 'Get a user'
   }
 
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: message,
-    data: users,
-  });
-};
+    data: users
+  })
+}
 
 export const updateUserById = async (req: Request, res: Response) => {
-  const user = await UserService.updateUserById(req.params.id, req.body);
+  const user = await UserService.updateUserById(req.params.id, req.body)
   if (!user) {
-    throw new BadRequestError('Update user failed');
+    throw new BadRequestError('Update user failed')
   }
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Update user successful',
-    data: user,
-  });
-};
+    data: user
+  })
+}

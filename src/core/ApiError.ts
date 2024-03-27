@@ -10,86 +10,86 @@ export enum ErrorType {
   NO_ENTRY = 'NoEntryError',
   NO_DATA = 'NoDataError',
   BAD_REQUEST = 'BadRequestError',
-  FORBIDDEN = 'ForbiddenError',
+  FORBIDDEN = 'ForbiddenError'
 }
 
 export class ApiError extends Error {
   constructor(
     public status: number,
     public type: ErrorType,
-    public message: string = 'error',
+    public message: string = 'error'
   ) {
-    super(type);
+    super(type)
   }
 }
 
 export class AuthFailureError extends ApiError {
   constructor(message = 'Invalid Credentials') {
-    super(400, ErrorType.UNAUTHORIZED, message);
+    super(400, ErrorType.UNAUTHORIZED, message)
   }
 }
 
 export class InternalError extends ApiError {
   constructor(message = 'Internal error') {
-    super(400, ErrorType.INTERNAL, message);
+    super(400, ErrorType.INTERNAL, message)
   }
 }
 
 export class BadRequestError extends ApiError {
   constructor(message = 'Bad Request') {
-    super(400, ErrorType.BAD_REQUEST, message);
+    super(400, ErrorType.BAD_REQUEST, message)
   }
 }
 
 export class NotFoundError extends ApiError {
   constructor(message = 'Not Found') {
-    super(400, ErrorType.NOT_FOUND, message);
+    super(400, ErrorType.NOT_FOUND, message)
   }
 }
 
 export class ForbiddenError extends ApiError {
   constructor(message = 'Permission denied') {
-    super(400, ErrorType.FORBIDDEN, message);
+    super(400, ErrorType.FORBIDDEN, message)
   }
 }
 
 export class NoEntryError extends ApiError {
   constructor(message = "Entry don't exists") {
-    super(400, ErrorType.NO_ENTRY, message);
+    super(400, ErrorType.NO_ENTRY, message)
   }
 }
 
 export class BadTokenError extends ApiError {
   constructor(message = 'Token is not valid') {
-    super(401, ErrorType.BAD_TOKEN, message);
+    super(401, ErrorType.BAD_TOKEN, message)
   }
 }
 
 export class TokenExpiredError extends ApiError {
   constructor(message = 'jwt expired') {
-    super(401, ErrorType.TOKEN_EXPIRED, message);
+    super(401, ErrorType.TOKEN_EXPIRED, message)
   }
 }
 
 export class AccessTokenExpired extends ApiError {
   constructor(message = 'jwt expired') {
-    super(401, ErrorType.ACCESS_TOKEN_EXPIRED, message);
+    super(401, ErrorType.ACCESS_TOKEN_EXPIRED, message)
   }
 }
 export class RefreshTokenExpired extends ApiError {
   constructor(message = 'jwt expired') {
-    super(401, ErrorType.REFRESH_TOKEN_EXPIRED, message);
+    super(401, ErrorType.REFRESH_TOKEN_EXPIRED, message)
   }
 }
 
 export class NoDataError extends ApiError {
   constructor(message = 'No data available') {
-    super(400, ErrorType.NO_DATA, message);
+    super(400, ErrorType.NO_DATA, message)
   }
 }
 
 export class AccessTokenError extends ApiError {
   constructor(message = 'Invalid access token') {
-    super(400, ErrorType.ACCESS_TOKEN, message);
+    super(400, ErrorType.ACCESS_TOKEN, message)
   }
 }

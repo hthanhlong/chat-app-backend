@@ -1,62 +1,62 @@
-import { Request, Response } from 'express';
-import FriendService from '../services/FriendService';
+import { Request, Response } from 'express'
+import FriendService from '../services/FriendService'
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
-  const { senderId, receiverId, status } = req.body;
-  FriendService.sendFriendRequest({ senderId, receiverId, status });
+  const { senderId, receiverId, status } = req.body
+  FriendService.sendFriendRequest({ senderId, receiverId, status })
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Friend request sent',
-    data: null,
-  });
-};
+    data: null
+  })
+}
 
 export const getFriendRequest = async (req: Request, res: Response) => {
-  const users = await FriendService.getFriendRequest(req.params.id);
+  const users = await FriendService.getFriendRequest(req.params.id)
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Get all users',
-    data: users,
-  });
-};
+    data: users
+  })
+}
 
 export const updateStatusFriend = async (req: Request, res: Response) => {
-  const { senderId, receiverId, status } = req.body;
+  const { senderId, receiverId, status } = req.body
   const users = await FriendService.updateStatusFriend({
     senderId,
     receiverId,
-    status,
-  });
+    status
+  })
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Get all users',
-    data: users,
-  });
-};
+    data: users
+  })
+}
 
 export const getAllUsersNonFriends = async (req: Request, res: Response) => {
-  const { userId } = req.body;
-  const users = await FriendService.getAllUsersNonFriends(userId);
+  const { userId } = req.body
+  const users = await FriendService.getAllUsersNonFriends(userId)
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Get all users',
-    data: users,
-  });
-};
+    data: users
+  })
+}
 
 export const getMyFriends = async (req: Request, res: Response) => {
-  const users = await FriendService.getMyFriends(req.params.id);
+  const users = await FriendService.getMyFriends(req.params.id)
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Get all users',
-    data: users,
-  });
-};
+    data: users
+  })
+}
 
 export const searchFriendByKeyword = async (req: Request, res: Response) => {
   if (!req.query.q || !req.params.id) {
@@ -64,18 +64,18 @@ export const searchFriendByKeyword = async (req: Request, res: Response) => {
       isSuccess: false,
       errorCode: '400',
       message: 'Invalid query',
-      data: null,
-    });
-    return;
+      data: null
+    })
+    return
   }
   const users = await FriendService.searchFriendByKeyword({
     id: req.params.id,
-    keyword: req.query.q as string,
-  });
+    keyword: req.query.q as string
+  })
   res.status(200).json({
     isSuccess: true,
     errorCode: null,
     message: 'Get all users',
-    data: users,
-  });
-};
+    data: users
+  })
+}
