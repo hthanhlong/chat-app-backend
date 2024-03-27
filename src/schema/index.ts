@@ -25,5 +25,5 @@ export const refreshTokenSchema = Joi.object({
 
 export const userUpdateSchema = Joi.object({
   caption: Joi.string().max(1000).optional(),
-  nickname: Joi.string().required().min(3).max(64)
+  nickname: Joi.string().required().min(3).max(64).optional()
 })
