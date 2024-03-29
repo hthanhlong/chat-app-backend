@@ -77,9 +77,11 @@ class FriendRepository {
     receiverId: string
     status: string
   }) {
-    await FriendShipModel.updateOne(
+    const options = { upsert: true, new: true, runValidators: true }
+    await FriendShipModel.findOneAndUpdate(
       { senderId: data.senderId, receiveId: data.receiverId },
-      { status: data.status }
+      { $set: { status: data.status } },
+      options
     )
   }
 

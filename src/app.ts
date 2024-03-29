@@ -8,6 +8,7 @@ import { environment, urlConfigEncode } from './config'
 import { ApiError } from './core/ApiError'
 import routes from './routes'
 import { handleNotFoundRoute } from './core/core'
+import './seed'
 
 process.on('uncaughtException', (e) => {
   Logger.error(e)
@@ -31,7 +32,7 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     })
   } else {
     if (environment === 'development') {
-      Logger.error(err)
+      Logger.error(err.message)
       return res
     }
   }

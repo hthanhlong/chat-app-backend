@@ -4,6 +4,8 @@ import User from '../database/model/User'
 import UserRepository from '../repositories/UserRepository'
 import { generateToken } from '../core/JWT'
 import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../config'
+import FriendService from './FriendService'
+
 class AuthService {
   async ValidatePassword(
     password: string,
@@ -26,7 +28,17 @@ class AuthService {
       isActive: true,
       salt: salt
     }
-    await UserRepository.createUser(user)
+    const result = await UserRepository.createUser(user)
+    const myAI = await UserRepository.findUserByEmail('MyAI@gmail.com')
+    if (myAI && result) {
+      await FriendService.updateStatusFriend({
+        // @ts-ignore
+        senderId: myAI.user._id.toString(),
+        // @ts-ignore
+        receiverId: result.user._id.toString(),
+        status: 'FRIEND'
+      })
+    }
   }
 
   async login(user: User) {
