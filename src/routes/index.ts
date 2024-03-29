@@ -28,7 +28,7 @@ import {
   getAllNotificationsById,
   updateNotification
 } from '../controller/notificationController'
-import { getAllMessages } from '../controller/messageController'
+import { getAllMessages, getLastMessage } from '../controller/messageController'
 const router = express.Router()
 
 //router common
@@ -62,5 +62,6 @@ router.get('/search-friend/:id', asyncHandler(searchFriendByKeyword))
 router.patch('/notifications', asyncHandler(updateNotification))
 router.get('/notifications/:id', asyncHandler(getAllNotificationsById))
 router.get('/get-messages/:partner_id', asyncHandler(getAllMessages))
+router.get('/get-last-message/:partner_id', asyncHandler(getLastMessage))
 
 export default router

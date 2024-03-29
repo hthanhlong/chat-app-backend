@@ -27,6 +27,15 @@ class MessageRepository {
       message
     })
   }
+
+  async getLastMessage(userId: string, partnerId: string) {
+    return await MessageModel.findOne({
+      senderId: { $in: [userId, partnerId] },
+      receiverId: { $in: [userId, partnerId] }
+    })
+      .sort({ createdAt: -1 })
+      .limit(1)
+  }
 }
 
 export default new MessageRepository()

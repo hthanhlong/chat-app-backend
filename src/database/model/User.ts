@@ -45,7 +45,7 @@ const schema = new Schema<User>(
       type: Schema.Types.String,
       trim: true,
       max_length: 1000,
-      default: 'This is my caption.'
+      default: `Hi!, I'm thinking...`
     },
     profilePicUrl: {
       type: Schema.Types.String,

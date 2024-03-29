@@ -20,3 +20,17 @@ export const getAllMessages = async (req: CustomRequest, res: Response) => {
     data: messages
   })
 }
+
+export const getLastMessage = async (req: CustomRequest, res: Response) => {
+  const { partner_id } = req.params
+  const lastMessage = await MessageService.getLastMessage(
+    req.decoded.id,
+    partner_id
+  )
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'Get last message',
+    data: lastMessage
+  })
+}

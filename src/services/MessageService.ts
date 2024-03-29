@@ -20,6 +20,10 @@ class MessageService {
       message
     })
   }
+
+  async getLastMessage(userId: string, partnerId: string) {
+    return await MessageRepository.getLastMessage(userId, partnerId)
+  }
 }
 
 export default new MessageService()
