@@ -12,16 +12,13 @@ class WsService {
 
   static onConnection(socket: any): void {
     WsService.socket = socket
-    WsService.socket.on('message', WsService._onMessage)
-    WsService.socket.on('error', (err: any) => {
-      console.error('Socket error', err)
-    })
+    socket.on('message', WsService._onMessage)
+    socket.on('error', (err: any) => console.error('Socket', err))
   }
 
   static async _onMessage(message: string): Promise<void> {
     try {
       const observers = Object.keys(WsService.clients)
-      console.log('observers', observers, Math.floor(Math.random() * 1000000))
       const { accessToken, data } = JSON.parse(message)
       if (!accessToken) return
       const user = validateTokenWS('ACCESS', accessToken) as {
@@ -44,7 +41,7 @@ class WsService {
             friends?.some((friend: any) => friend._id.toString() === id)
           )
           WsService.sendDataToClientById({
-            id: user.id,
+            socketId: user.id,
             data: {
               type: 'ONLINE_USERS',
               payload: usersOnline
@@ -55,7 +52,7 @@ class WsService {
           const { senderId, receiverId, message } = payload
           await MessageService.createMessage({ senderId, receiverId, message })
           WsService.sendDataToClientById({
-            id: receiverId,
+            socketId: receiverId,
             data: {
               type: 'HAS_NEW_MESSAGE',
               payload: ''
@@ -68,14 +65,16 @@ class WsService {
             delete WsService.clients[user.id]
             currentSocket.socket.close()
           }
+          break
       }
+      console.log('observers', observers, Math.floor(Math.random() * 1000000))
     } catch (error: Error | any) {
       console.log('error.message', error.message)
     }
   }
 
-  static sendDataToClientById({ id, data }: sendDataToIdByWs) {
-    const client = WsService.clients[id]
+  static sendDataToClientById({ socketId, data }: sendDataToIdByWs) {
+    const client = WsService.clients[socketId]
     if (!client) return
     client.socket.send(JSON.stringify(data))
   }
