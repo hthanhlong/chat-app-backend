@@ -4,3 +4,5 @@ keys/
 logs/
 node_modules/
 *.md
+public
+dist/
