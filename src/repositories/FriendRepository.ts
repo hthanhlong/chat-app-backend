@@ -28,7 +28,10 @@ class FriendRepository {
       $or: [{ senderId: id }, { receiveId: id }]
     })
 
-    const friendIds = friendListIds.map(function (user) {
+    const friendIds = friendListIds.map(function (user: {
+      senderId: string
+      receiveId: string
+    }) {
       if (user.senderId.toString() === id.toString()) {
         return user.receiveId
       }
@@ -57,7 +60,10 @@ class FriendRepository {
       status: 'PENDING'
     }).select('senderId')
 
-    const senderIds = friendListIds.map(function (user) {
+    const senderIds = friendListIds.map(function (user: {
+      senderId: string
+      receiveId: string
+    }) {
       return user.senderId
     })
 
