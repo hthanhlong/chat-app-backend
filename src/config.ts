@@ -28,3 +28,10 @@ export const ACCESS_TOKEN_TIME =
   process.env.ACCESS_TOKEN_VALIDITY_SEC || 1800000 // 30 minutes
 export const REFRESH_TOKEN_TIME =
   process.env.REFRESH_TOKEN_VALIDITY_SEC || '90d' // 90 days
+
+export const rateLimitOptions = {
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 200, // Limit each IP to 100 requests per `window` (here, per 1 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false // Disable the `X-RateLimit-*` headers
+}
