@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit' // Import express-rate-limit
 import Logger from './core/Logger'
 import cors from 'cors'
 import './database' // import database connection
-import './services/RedisService' // import RedisService
+// import './services/RedisService' // import RedisService
 import './ws' // import websocket¬
 import { environment, rateLimitOptions, urlConfigEncode } from './config'
 import { ApiError } from './core/ApiError'

@@ -1,19 +1,29 @@
-import { createClient } from 'redis'
+import { createClient, RedisClientType } from 'redis'
 import Logger from '../core/Logger'
 
-const initRedis = async () => {
-  try {
-    const client = await createClient({
-      url: 'redis://54.219.186.74:6379'
-    })
-      .on('connect', () => Logger.info('Connected to Redis'))
-      .on('error', (err) => console.log('Redis Client Error', err))
-      .connect()
-    return client
-  } catch (error) {
-    Logger.error('Error initializing Redis', error)
+class RedisService {
+  private static client: RedisClientType | null = null
+
+  public static async initialize(): Promise<void> {
+    if (!this.client) {
+      this.client = createClient({
+        url: 'redis://54.219.186.74:6379'
+      })
+      this.client.on('connect', () => Logger.info('Connected to Redis'))
+      this.client.on('error', (err) => Logger.error('Redis Client Error', err))
+      try {
+        await this.client.connect()
+      } catch (error) {
+        Logger.error('Error initializing Redis', error)
+        this.client = null
+      }
+    }
+  }
+
+  public static getClient(): RedisClientType | null {
+    return this.client
   }
 }
 
-const redisClient = initRedis()
-export default redisClient
+RedisService.initialize()
+export default RedisService
