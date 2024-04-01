@@ -1,33 +1,19 @@
-import { RedisClientType, createClient } from 'redis'
-import { redisUrl } from '../config'
+import { createClient } from 'redis'
+import Logger from '../core/Logger'
 
-class RedisService {
-  public client: RedisClientType
-
-  constructor(url: string) {
-    this.client = createClient({ url })
-    this.client.on('connect', () => {
-      console.log('Connected to Redis')
+const initRedis = async () => {
+  try {
+    const client = await createClient({
+      url: 'redis://54.219.186.74:6379'
     })
-
-    this.client.on('error', (err: Error | any) => {
-      console.error('Error connecting to Redis:', err)
-    })
-  }
-
-  async get(key: string): Promise<string | null> {
-    return await this.client.get(key)
-  }
-
-  async set(key: string, value: string): Promise<void> {
-    await this.client.set(key, value)
+      .on('connect', () => Logger.info('Connected to Redis'))
+      .on('error', (err) => console.log('Redis Client Error', err))
+      .connect()
+    return client
+  } catch (error) {
+    Logger.error('Error initializing Redis', error)
   }
 }
 
-const instance = new RedisService(redisUrl)
-
-process.on('SIGINT', () => {
-  instance.client.quit()
-})
-
-export default instance
+const redisClient = initRedis()
+export default redisClient
