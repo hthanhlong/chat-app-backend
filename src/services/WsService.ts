@@ -40,22 +40,27 @@ class WsService {
           const usersOnline = observers.filter((id: string) =>
             friends?.some((friend: any) => friend._id.toString() === id)
           )
-          WsService.sendDataToClientById({
-            socketId: user.id,
-            data: {
-              type: 'ONLINE_USERS',
-              payload: usersOnline
-            }
+          WsService.sendDataToClientById(user.id, {
+            type: 'ONLINE_USERS',
+            payload: usersOnline
           })
           break
         case 'SEND_MESSAGE':
-          const { senderId, receiverId, message } = payload
-          await MessageService.createMessage({ senderId, receiverId, message })
-          WsService.sendDataToClientById({
-            socketId: receiverId,
-            data: {
-              type: 'HAS_NEW_MESSAGE',
-              payload: ''
+          const { _id, senderId, receiverId, message, createdAt } = payload
+          await MessageService.createMessage({
+            senderId,
+            receiverId,
+            message,
+            createdAt
+          })
+          WsService.sendDataToClientById(receiverId, {
+            type: 'HAS_NEW_MESSAGE',
+            payload: {
+              _id,
+              senderId,
+              receiverId,
+              message,
+              createdAt
             }
           })
           break
@@ -73,7 +78,7 @@ class WsService {
     }
   }
 
-  static sendDataToClientById({ socketId, data }: sendDataToIdByWs) {
+  static sendDataToClientById(socketId: string, data: sendDataToIdByWs) {
     const client = WsService.clients[socketId]
     if (!client) return
     client.socket.send(JSON.stringify(data))

@@ -22,12 +22,9 @@ class NotificationRepository {
     }
     await NotificationModel.create(notification)
 
-    WsService.sendDataToClientById({
-      socketId: receiverId,
-      data: {
-        type: 'HAS_NEW_NOTIFICATION',
-        payload: ''
-      }
+    WsService.sendDataToClientById(receiverId, {
+      type: 'HAS_NEW_NOTIFICATION',
+      payload: notification
     })
   }
 

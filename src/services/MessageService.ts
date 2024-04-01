@@ -8,16 +8,19 @@ class MessageService {
   async createMessage({
     senderId,
     receiverId,
-    message
+    message,
+    createdAt
   }: {
     senderId: string
     receiverId: string
     message: string
+    createdAt: Date
   }) {
     return await MessageRepository.createMessage({
       senderId,
       receiverId,
-      message
+      message,
+      createdAt
     })
   }
 

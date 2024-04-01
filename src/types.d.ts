@@ -32,9 +32,6 @@ interface NotificationInput {
 }
 
 interface sendDataToIdByWs {
-  socketId: string
-  data: {
-    type: string
-    payload?: unknown
-  }
+  type: string
+  payload?: unknown
 }
