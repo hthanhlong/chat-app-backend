@@ -1,24 +1,26 @@
-import UserService from '../services/UserService'
 import { NotificationModel } from '../database/model/Notification'
-import User from '../database/model/User'
 import WsService from '../services/WsService'
 
 class NotificationRepository {
   async createNotification({
     senderId,
-    receiverId
+    receiverId,
+    type,
+    content,
+    status
   }: {
     senderId: string
     receiverId: string
+    type: 'FRIEND' | 'MESSAGE' | 'POST'
+    content: string
+    status: 'READ' | 'UNREAD'
   }) {
-    const user = (await UserService.findUserById(senderId)) as User
-
     const notification = {
       senderId,
       receiverId,
-      type: 'FRIEND',
-      content: `You have a new friend request from ${user.nickname}`,
-      status: 'UNREAD'
+      type: type,
+      content: content,
+      status: status
     }
     await NotificationModel.create(notification)
 

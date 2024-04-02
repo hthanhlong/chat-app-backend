@@ -17,9 +17,14 @@ class FriendRepository {
       status: data.status
     })
 
+    const user = (await UserService.findUserById(data.senderId)) as User
+
     await NotificationService.createNotification({
       senderId: data.senderId,
-      receiverId: data.receiverId
+      receiverId: data.receiverId,
+      type: 'FRIEND',
+      content: `${user.nickname} has sent you a friend request`,
+      status: 'UNREAD'
     })
   }
 
@@ -89,6 +94,18 @@ class FriendRepository {
       { $set: { status: data.status } },
       options
     )
+    const user = (await UserService.findUserById(data.receiverId)) as User
+
+    // to do more
+    if (data.status === 'FRIEND') {
+      await NotificationService.createNotification({
+        senderId: data.receiverId,
+        receiverId: data.senderId,
+        type: 'FRIEND',
+        content: `${user.nickname} has accepted your friend request`,
+        status: 'UNREAD'
+      })
+    }
   }
 
   async searchFriendByKeyword({

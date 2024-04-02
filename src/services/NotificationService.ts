@@ -3,14 +3,23 @@ import NotificationRepository from '../repositories/NotificationRepository'
 class NotificationService {
   async createNotification({
     senderId,
-    receiverId
+    receiverId,
+    type,
+    content,
+    status
   }: {
     senderId: string
     receiverId: string
+    type: 'FRIEND' | 'MESSAGE' | 'POST'
+    content: string
+    status: 'READ' | 'UNREAD'
   }) {
     return await NotificationRepository.createNotification({
       senderId,
-      receiverId
+      receiverId,
+      type,
+      content,
+      status
     })
   }
 
