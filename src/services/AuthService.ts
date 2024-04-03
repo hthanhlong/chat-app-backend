@@ -5,6 +5,7 @@ import UserRepository from '../repositories/UserRepository'
 import { generateToken } from '../core/JWT'
 import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../config'
 import FriendService from './FriendService'
+import { ObjectId } from 'mongoose'
 
 class AuthService {
   async ValidatePassword(
@@ -39,14 +40,15 @@ class AuthService {
         status: 'FRIEND'
       })
     }
+    return result
   }
 
-  async login(user: User) {
-    if (!user) return null
+  async login({ id, username }: { id: ObjectId; username: string }) {
+    if (!username) return null
     const payload = {
       //@ts-ignore
-      id: user._id.toString(),
-      username: user.username
+      id: id.toString(),
+      username: username
     }
     const { accessToken, refreshToken } = generateToken(payload)
     const result = Object.assign(payload, { accessToken, refreshToken })

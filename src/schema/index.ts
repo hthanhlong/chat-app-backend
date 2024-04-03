@@ -27,3 +27,9 @@ export const userUpdateSchema = Joi.object({
   caption: Joi.string().max(1000).optional(),
   nickname: Joi.string().required().min(3).max(64).optional()
 })
+
+export const googleLoginSchema = Joi.object({
+  credential: Joi.string().required(),
+  clientId: Joi.string().required(),
+  select_by: Joi.string().required()
+})

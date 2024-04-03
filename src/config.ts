@@ -38,3 +38,6 @@ export const rateLimitOptions = {
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false // Disable the `X-RateLimit-*` headers
 }
+
+export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || ''
+export const PASSWORD_KEY = process.env.PASSWORD_KEY || ''

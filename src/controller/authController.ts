@@ -2,6 +2,10 @@ import { Request, Response } from 'express'
 import AuthService from '../services/AuthService'
 import UserService from '../services/UserService'
 import { BadRequestError } from '../core/ApiError'
+import { OAuth2Client, TokenPayload } from 'google-auth-library'
+import { GOOGLE_CLIENT_ID, PASSWORD_KEY } from '../config'
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID)
 
 export const signupController = async (req: Request, res: Response) => {
   const { username, email } = req.body
@@ -54,7 +58,11 @@ export const loginController = async (req: Request, res: Response) => {
     throw new BadRequestError('Email or Password was not correctly')
   }
 
-  const data = await AuthService.login(user)
+  const data = await AuthService.login({
+    // @ts-ignore
+    id: user._id,
+    username: user.username
+  })
 
   res.status(200).json({
     isSuccess: true,
@@ -71,6 +79,44 @@ export const refreshTokenController = async (req: Request, res: Response) => {
     isSuccess: true,
     errorCode: null,
     message: 'refresh token successful',
+    data: data
+  })
+}
+
+export const googleLoginController = async (req: Request, res: Response) => {
+  const { credential } = req.body
+  console.log('req.body', req.body)
+  const ticket = await client.verifyIdToken({
+    idToken: credential,
+    audience: GOOGLE_CLIENT_ID // Specify the CLIENT_ID of the app that accesses the backend
+  })
+  const payload = ticket.getPayload()
+  if (!payload) {
+    throw new BadRequestError('Invalid Google token')
+  }
+  const { email, name } = payload as TokenPayload
+  let user = await UserService.findUserByEmail(email as string)
+  if (!user) {
+    const { user: newUser } = await AuthService.signup({
+      email: email as string,
+      username: email as string,
+      nickname: name as string,
+      password: (PASSWORD_KEY + email) as string
+    })
+
+    user = newUser
+  }
+
+  const data = await AuthService.login({
+    // @ts-ignore
+    id: user._id,
+    username: user.username
+  })
+
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'login successful',
     data: data
   })
 }

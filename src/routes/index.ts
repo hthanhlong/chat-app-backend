@@ -1,6 +1,7 @@
 import express from 'express'
 import validator from '../helpers/validator'
 import {
+  googleLoginSchema,
   loginSchema,
   sendFriendRequestSchema,
   signupSchema,
@@ -9,7 +10,8 @@ import {
 import {
   signupController,
   loginController,
-  refreshTokenController
+  refreshTokenController,
+  googleLoginController
 } from '../controller/authController'
 import asyncHandler from '../helpers/asyncHandler'
 import { validateAccessToken, validateRefreshToken } from '../core/JWT'
@@ -38,6 +40,11 @@ router.post(
   '/refresh-token',
   validateRefreshToken,
   asyncHandler(refreshTokenController)
+)
+router.post(
+  '/auth/google',
+  validator(googleLoginSchema),
+  asyncHandler(googleLoginController)
 )
 
 //middlewares
