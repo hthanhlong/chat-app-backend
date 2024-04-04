@@ -85,7 +85,6 @@ export const refreshTokenController = async (req: Request, res: Response) => {
 
 export const googleLoginController = async (req: Request, res: Response) => {
   const { credential } = req.body
-  console.log('req.body', req.body)
   const ticket = await client.verifyIdToken({
     idToken: credential,
     audience: GOOGLE_CLIENT_ID // Specify the CLIENT_ID of the app that accesses the backend
