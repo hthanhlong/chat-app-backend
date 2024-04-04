@@ -122,6 +122,21 @@ class FriendRepository {
     })
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
+
+  async unfriend({
+    senderId,
+    receiverId
+  }: {
+    senderId: string
+    receiverId: string
+  }) {
+    await FriendShipModel.findOneAndDelete({
+      $or: [
+        { senderId: senderId, receiveId: receiverId },
+        { senderId: receiverId, receiveId: senderId }
+      ]
+    })
+  }
 }
 
 export default new FriendRepository()

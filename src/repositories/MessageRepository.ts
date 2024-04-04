@@ -39,6 +39,13 @@ class MessageRepository {
       .sort({ createdAt: -1 })
       .limit(1)
   }
+
+  async deleteAllMessage(senderId: string, receiverId: string) {
+    await MessageModel.deleteMany({
+      senderId: { $in: [senderId, receiverId] },
+      receiverId: { $in: [senderId, receiverId] }
+    })
+  }
 }
 
 export default new MessageRepository()

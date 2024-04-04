@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import FriendService from '../services/FriendService'
+import MessageService from '../services/MessageService'
+import WsService from '../services/WsService'
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
   const { senderId, receiverId, status } = req.body
@@ -77,5 +79,22 @@ export const searchFriendByKeyword = async (req: Request, res: Response) => {
     errorCode: null,
     message: 'Get all users',
     data: users
+  })
+}
+
+export const unfriend = async (req: Request, res: Response) => {
+  const { senderId, receiverId } = req.body
+  await FriendService.unfriend({ senderId, receiverId })
+  await MessageService.deleteAllMessage(senderId, receiverId)
+
+  WsService.sendDataToClientById(receiverId, {
+    type: 'UPDATE_FRIEND_LIST'
+  })
+
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'Unfriend',
+    data: null
   })
 }

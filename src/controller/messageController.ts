@@ -34,3 +34,14 @@ export const getLastMessage = async (req: CustomRequest, res: Response) => {
     data: lastMessage
   })
 }
+
+export const deleteAllMessage = async (req: CustomRequest, res: Response) => {
+  const { senderId, receiverId } = req.body
+  await MessageService.deleteAllMessage(senderId, receiverId)
+  res.status(200).json({
+    isSuccess: true,
+    errorCode: null,
+    message: 'Delete all message',
+    data: null
+  })
+}

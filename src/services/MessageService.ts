@@ -27,6 +27,10 @@ class MessageService {
   async getLastMessage(userId: string, partnerId: string) {
     return await MessageRepository.getLastMessage(userId, partnerId)
   }
+
+  async deleteAllMessage(senderId: string, receiverId: string) {
+    return await MessageRepository.deleteAllMessage(senderId, receiverId)
+  }
 }
 
 export default new MessageService()

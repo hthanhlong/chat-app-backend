@@ -33,6 +33,19 @@ class FriendService {
       keyword
     })
   }
+
+  async unfriend({
+    senderId,
+    receiverId
+  }: {
+    senderId: string
+    receiverId: string
+  }) {
+    return await FriendRepository.unfriend({
+      senderId,
+      receiverId
+    })
+  }
 }
 
 export default new FriendService()

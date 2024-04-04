@@ -24,13 +24,18 @@ import {
   getFriendRequest,
   getMyFriends,
   updateStatusFriend,
-  searchFriendByKeyword
+  searchFriendByKeyword,
+  unfriend
 } from '../controller/friendController'
 import {
   getAllNotificationsById,
   updateNotification
 } from '../controller/notificationController'
-import { getAllMessages, getLastMessage } from '../controller/messageController'
+import {
+  getAllMessages,
+  getLastMessage,
+  deleteAllMessage
+} from '../controller/messageController'
 const router = express.Router()
 
 //router common
@@ -70,5 +75,7 @@ router.patch('/notifications', asyncHandler(updateNotification))
 router.get('/notifications/:id', asyncHandler(getAllNotificationsById))
 router.get('/get-messages/:partner_id', asyncHandler(getAllMessages))
 router.get('/get-last-message/:partner_id', asyncHandler(getLastMessage))
+router.post('/unfriend', asyncHandler(unfriend))
+router.post('/delete-all-message', asyncHandler(deleteAllMessage))
 
 export default router
