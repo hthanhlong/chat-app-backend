@@ -12,19 +12,17 @@ import routes from './routes'
 import { handleNotFoundRoute } from './core/core'
 import './seed'
 
-process.on('uncaughtException', (e) => {
-  Logger.error(e)
-})
-
+process.on('uncaughtException', (e) => Logger.error(e))
 const app = express()
 
 // middlewares
-app.use(helmet())
+
 const limiter = rateLimit(rateLimitOptions)
 app.use(limiter)
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded(urlConfigEncode))
-app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
+app.use(cors({ origin: '*' }))
+app.use(helmet())
 //routes
 app.use('/api/v1', routes)
 app.use(handleNotFoundRoute)
