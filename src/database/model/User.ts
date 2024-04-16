@@ -74,5 +74,6 @@ const schema = new Schema<User>(
 )
 
 schema.index({ email: 1 })
+schema.index({ username: 1 }, { name: 'user_name_index' })
 
 export const UserModel = model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME)
