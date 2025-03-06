@@ -27,22 +27,19 @@ export const validateAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  {
-    try {
-      const k = JWT_SECRET_ACCESS
-      if (!k) return console.log('k is not defined')
-      const token = req.headers.authorization?.split(' ')[1]
-      if (!token) throw new BadTokenError()
-      const decoded = jwt.verify(token, k)
-      req.decoded = decoded
-      next()
-    } catch (error: Error | any) {
-      if (error.message === 'Token is not valid') {
-        next(new BadTokenError())
-      }
-      if (error.message === 'jwt expired') {
-        next(new AccessTokenExpired())
-      }
+  try {
+    const k = JWT_SECRET_ACCESS
+    if (!k) return null
+    const token = req.headers.authorization?.split(' ')[1]
+    if (!token) return null
+    const decoded = jwt.verify(token, k)
+    req.decoded = decoded as JWT_PAYLOAD
+  } catch (error: Error | any) {
+    if (error.message === 'Token is not valid') {
+      next(new BadTokenError())
+    }
+    if (error.message === 'jwt expired') {
+      next(new AccessTokenExpired())
     }
   }
 }
@@ -76,13 +73,13 @@ export const validateRefreshToken = (
 export const validateTokenWS = (
   type: string = 'ACCESS',
   accessToken: string
-) => {
+): JWT_PAYLOAD | null => {
   try {
     const k = type === 'ACCESS' ? JWT_SECRET_ACCESS : JWT_SECRET_REFRESH
     const token = accessToken
     if (!token) return null
     const decoded = jwt.verify(token, k)
-    return decoded
+    return decoded as JWT_PAYLOAD
   } catch (error: Error | any) {
     return null
   }

@@ -1,12 +1,13 @@
-import Logger from '../core/Logger'
 import AuthService from '../services/AuthService'
 import UserService from '../services/UserService'
+import logger from '../core/Logger'
+const _logger = logger('seed')
 
 const createMyAIAccount = async () => {
   const isExistMyAIAccount = await UserService.findUserByEmail('MyAI@gmail.com')
 
   if (isExistMyAIAccount) {
-    Logger.info('createMyAIAccount was created')
+    _logger.info('createMyAIAccount was created')
     return
   }
 
@@ -18,7 +19,7 @@ const createMyAIAccount = async () => {
     caption: 'I will help you'
   })
 
-  console.log('createMyAIAccount is done')
+  _logger.info('createMyAIAccount is done')
 }
 
-createMyAIAccount()
+export default createMyAIAccount

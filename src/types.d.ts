@@ -35,3 +35,8 @@ interface sendDataToIdByWs {
   type: string
   payload?: unknown
 }
+
+interface JWT_PAYLOAD {
+  id: string
+  username: string
+}

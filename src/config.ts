@@ -8,16 +8,14 @@ export const timezone = process.env.TZ
 export const logDirectory = process.env.LOG_DIR
 
 export const db = {
-  host: process.env.DB_HOST || '',
-  port: process.env.DB_PORT || '',
-  user: process.env.DB_USER || '',
-  password: process.env.DB_USER_PWD || '',
-  name: process.env.DB_NAME || '',
-  minPoolSize: parseInt(process.env.DB_MIN_POOL_SIZE || '5'),
-  maxPoolSize: parseInt(process.env.DB_MAX_POOL_SIZE || '10')
+  user: process.env.MONGO_INITDB_ROOT_USERNAME || '',
+  password: process.env.MONGO_INITDB_ROOT_PASSWORD || '',
+  dbName: process.env.MONGO_DB_NAME || ''
 }
 
-export const redisUrl = process.env.REDIS_URL || 'redis://54.219.186.74:6379'
+export const mongoUrl = `mongodb://${db.user}:${db.password}@localhost:27017/${db.dbName}?authsource=admin`
+
+export const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
 
 export const urlConfigEncode = {
   limit: '10mb',

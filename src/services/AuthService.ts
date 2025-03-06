@@ -49,7 +49,7 @@ class AuthService {
       //@ts-ignore
       id: id.toString(),
       username: username
-    }
+    } as JWT_PAYLOAD
     const { accessToken, refreshToken } = generateToken(payload)
     const result = Object.assign(payload, { accessToken, refreshToken })
     return result

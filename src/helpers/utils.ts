@@ -1,5 +1,6 @@
 import { Request } from 'express'
-import Logger from '../core/Logger'
+import logger from '../core/Logger'
+const _logger = logger('utils')
 
 export function findIpAddress(req: Request) {
   try {
@@ -10,7 +11,7 @@ export function findIpAddress(req: Request) {
     }
     return req.ip
   } catch (e) {
-    Logger.error(e)
+    _logger.error(e)
     return undefined
   }
 }

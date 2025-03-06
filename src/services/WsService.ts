@@ -1,51 +1,50 @@
-import { Server } from 'ws'
 import { validateTokenWS } from './../core/JWT'
 import MessageService from './MessageService'
 import FriendService from './FriendService'
-interface CustomWebSocket extends Server {
-  clientId: string
-  username: string
-}
-class WsService {
-  static socket: CustomWebSocket
-  static clients: any = {}
+import logger from '../core/Logger'
+const _logger = logger('WsService')
+import { Request } from 'express'
+import { SOCKET_EVENTS } from '../events'
 
-  static onConnection(socket: any): void {
-    WsService.socket = socket
+class WsService {
+  static clients: Map<string, WebSocket> = new Map()
+
+  static onConnection(socket: any, req: Request): void {
+    const accessToken = req.url?.split('?')[1].split('accessToken=')[1]
+    if (!accessToken) {
+      socket.close()
+      return
+    }
+    const data: JWT_PAYLOAD | null = validateTokenWS('ACCESS', accessToken)
+    if (!data) {
+      socket.close()
+      return
+    }
+    WsService.clients.set(data.id, socket)
     socket.on('message', WsService._onMessage)
-    socket.on('error', (err: any) => console.error('Socket', err))
+    socket.on('error', (err: any) => _logger.error('Socket', err))
   }
 
   static async _onMessage(message: string): Promise<void> {
     try {
-      const observers = Object.keys(WsService.clients)
-      const { accessToken, data } = JSON.parse(message)
-      if (!accessToken) return
-      const user = validateTokenWS('ACCESS', accessToken) as {
-        id: string
-        username: string
-      }
-      if (!user) return
+      const clientIds = Object.keys(WsService.clients)
+      const { data } = JSON.parse(message)
       const { type, payload } = data
       switch (type) {
-        case 'INIT':
-          // @ts-ignore
-          WsService.socket.clientId = user.id
-          // @ts-ignore
-          WsService.socket.username = user.username
-          WsService.clients[user.id] = { id: user.id, socket: WsService.socket }
-          break
-        case 'GET_ONLINE_USERS':
-          const friends = await FriendService.getMyFriends(user.id)
-          const usersOnline = observers.filter((id: string) =>
+        case SOCKET_EVENTS.GET_ONLINE_USERS:
+          const userId = payload.userId
+          const user = WsService.clients.get(userId)
+          if (!user) return
+          const friends = await FriendService.getMyFriends(userId)
+          const onlineUsers = clientIds.filter((id: string) =>
             friends?.some((friend: any) => friend._id.toString() === id)
           )
-          WsService.sendDataToClientById(user.id, {
-            type: 'ONLINE_USERS',
-            payload: usersOnline
+          WsService.sendDataToClientById(userId, {
+            type: SOCKET_EVENTS.GET_ONLINE_USERS,
+            payload: onlineUsers
           })
           break
-        case 'SEND_MESSAGE':
+        case SOCKET_EVENTS.SEND_MESSAGE:
           const { _id, senderId, receiverId, message, createdAt } = payload
           await MessageService.createMessage({
             senderId,
@@ -54,7 +53,7 @@ class WsService {
             createdAt
           })
           WsService.sendDataToClientById(receiverId, {
-            type: 'HAS_NEW_MESSAGE',
+            type: SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
               _id,
               senderId,
@@ -64,24 +63,15 @@ class WsService {
             }
           })
           break
-        case 'CLOSE_CONNECTION':
-          const currentSocket = WsService.clients[user.id]
-          if (currentSocket) {
-            delete WsService.clients[user.id]
-            currentSocket.socket.close()
-          }
-          break
       }
-      console.log('observers', observers, Math.floor(Math.random() * 1000000))
     } catch (error: Error | any) {
-      console.log('error.message', error.message)
+      _logger.error('error.message', error.message)
     }
   }
 
-  static sendDataToClientById(socketId: string, data: sendDataToIdByWs) {
-    const client = WsService.clients[socketId]
-    if (!client) return
-    client.socket.send(JSON.stringify(data))
+  static sendDataToClientById(userId: string, data: sendDataToIdByWs) {
+    const client = WsService.clients.get(userId)
+    client?.send(JSON.stringify(data))
   }
 }
 

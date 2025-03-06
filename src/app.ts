@@ -1,29 +1,25 @@
 import express, { Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit' // Import express-rate-limit
-import Logger from './core/Logger'
+import logger from './core/Logger'
 import cors from 'cors'
-import './database' // import database connection
-// import './services/RedisService' // import RedisService
 import './ws' // import websocket¬
 import { environment, rateLimitOptions, urlConfigEncode } from './config'
 import { ApiError } from './core/ApiError'
 import routes from './routes'
 import { handleNotFoundRoute } from './core/core'
-import './seed'
+import connectDB from './database'
 
-process.on('uncaughtException', (e) => Logger.error(e))
+const _logger = logger('app')
+
 const app = express()
-
-// middlewares
-
+connectDB()
 const limiter = rateLimit(rateLimitOptions)
 app.use(limiter)
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded(urlConfigEncode))
 app.use(cors())
 app.use(helmet())
-//routes
 app.use('/api/v1', routes)
 app.use(handleNotFoundRoute)
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
@@ -36,7 +32,7 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     })
   } else {
     if (environment === 'development') {
-      Logger.error(err.message)
+      _logger.error(err.message)
       return res
     }
   }
