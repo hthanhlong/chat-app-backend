@@ -1,7 +1,6 @@
-import logger from './core/Logger'
 import { port } from './config'
 import app from './app'
-
+import logger from './utils/logger'
 const _logger = logger('server')
 
 app

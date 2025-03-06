@@ -1,15 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit' // Import express-rate-limit
-import logger from './core/Logger'
 import cors from 'cors'
 import './ws' // import websocket¬
 import { environment, rateLimitOptions, urlConfigEncode } from './config'
-import { ApiError } from './core/ApiError'
+import { ApiError } from './utils/httpExceptions'
 import routes from './routes'
-import { handleNotFoundRoute } from './core/core'
+import { handleNotFoundRoute } from './utils/index'
 import connectDB from './database'
-
+import logger from './utils/logger'
 const _logger = logger('app')
 
 const app = express()

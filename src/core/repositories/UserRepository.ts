@@ -1,20 +1,20 @@
-import User, { UserModel } from '../database/model/User'
+import { User } from '../../database/model'
 
 class UserRepository {
   async getAllUsers(id: string): Promise<{ users: User[] }> {
-    const users = await UserModel.find({
+    const users = await User.find({
       _id: { $not: { $eq: id } }
     }).limit(20)
     return { users: users.map((user) => ({ ...user.toObject() })) }
   }
 
   async createUser(user: User): Promise<{ user: User }> {
-    const createdUser = await UserModel.create(user)
+    const createdUser = await User.create(user)
     return { user: { ...createdUser.toObject() } }
   }
 
   async updateUserById(id: string, user: User): Promise<{ user: User | null }> {
-    const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, user, {
+    const updatedUser = await User.findOneAndUpdate({ _id: id }, user, {
       new: true
     })
     if (!updatedUser) {
@@ -24,7 +24,7 @@ class UserRepository {
   }
 
   async findUserByEmail(email: string): Promise<{ user: User | null }> {
-    const user = await UserModel.find({ email })
+    const user = await User.find({ email })
     if (user.length === 0) {
       return { user: null }
     }
@@ -32,7 +32,7 @@ class UserRepository {
   }
 
   async findUserById(id: string): Promise<{ user: User | null }> {
-    const user = await UserModel.findById(id)
+    const user = await User.findById(id)
     if (!user) {
       return { user: null }
     }
@@ -40,7 +40,7 @@ class UserRepository {
   }
 
   async findUserByUsername(username: string): Promise<{ user: User | null }> {
-    const user = await UserModel.find({ username })
+    const user = await User.find({ username })
     if (user.length === 0) {
       return { user: null }
     }

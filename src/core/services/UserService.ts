@@ -1,6 +1,5 @@
-import { dataSelectedByKeys } from '../database/utils'
-import User from '../database/model/User'
-import UserRepository from '../repositories/UserRepository'
+import { dataSelectedByKeys } from '../../utils'
+import { UserRepository } from '../repositories'
 
 class UserService {
   async getAllUsers(id: string) {

@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
-import AuthService from '../services/AuthService'
-import UserService from '../services/UserService'
-import { BadRequestError } from '../core/ApiError'
+import { BadRequestError } from '../../utils/httpExceptions'
 import { OAuth2Client, TokenPayload } from 'google-auth-library'
-import { GOOGLE_CLIENT_ID, PASSWORD_KEY } from '../config'
-
+import { GOOGLE_CLIENT_ID, PASSWORD_KEY } from '../../config'
+import { UserService, AuthService } from '../services'
 const client = new OAuth2Client(GOOGLE_CLIENT_ID)
 
 export const signupController = async (req: Request, res: Response) => {
@@ -95,6 +93,7 @@ export const googleLoginController = async (req: Request, res: Response) => {
   }
   const { email, name } = payload as TokenPayload
   let user = await UserService.findUserByEmail(email as string)
+
   if (!user) {
     const { user: newUser } = await AuthService.signup({
       email: email as string,
@@ -109,6 +108,7 @@ export const googleLoginController = async (req: Request, res: Response) => {
   const data = await AuthService.login({
     // @ts-ignore
     id: user._id,
+    // @ts-ignore
     username: user.username
   })
 

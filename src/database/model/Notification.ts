@@ -3,7 +3,7 @@ import { model, Schema, Types } from 'mongoose'
 export const DOCUMENT_NAME = 'Notification'
 export const COLLECTION_NAME = 'notifications' // display on database
 
-export default interface Notification {
+interface Notification {
   senderId: Types.ObjectId
   receiverId: Types.ObjectId
   type: string
@@ -41,8 +41,4 @@ const schema = new Schema<Notification>(
   }
 )
 
-export const NotificationModel = model<Notification>(
-  DOCUMENT_NAME,
-  schema,
-  COLLECTION_NAME
-)
+export default model<Notification>(DOCUMENT_NAME, schema, COLLECTION_NAME)

@@ -1,5 +1,5 @@
 import ws from 'ws'
-import WsService from './services/WsService'
+import WsService from './core/services/WsService'
 import { Request } from 'express'
 
 const wss = new ws.WebSocketServer({ port: 8081 })

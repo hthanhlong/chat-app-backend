@@ -1,6 +1,6 @@
-import AuthService from '../services/AuthService'
-import UserService from '../services/UserService'
-import logger from '../core/Logger'
+import AuthService from '../../core/services/AuthService'
+import UserService from '../../core/services/UserService'
+import logger from '../../utils/logger'
 const _logger = logger('seed')
 
 const createMyAIAccount = async () => {

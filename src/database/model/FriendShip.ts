@@ -3,12 +3,6 @@ import { model, Schema } from 'mongoose'
 export const DOCUMENT_NAME = 'FriendShip'
 export const COLLECTION_NAME = 'friendships' // display on database
 
-export default interface FriendShip {
-  senderId: string
-  receiveId: string
-  status: string
-}
-
 const schema = new Schema<FriendShip>(
   {
     senderId: {
@@ -32,8 +26,4 @@ const schema = new Schema<FriendShip>(
 
 schema.index({ senderId: 1, receiveId: 1 }, { unique: true })
 
-export const FriendShipModel = model<FriendShip>(
-  DOCUMENT_NAME,
-  schema,
-  COLLECTION_NAME
-)
+export default model<FriendShip>(DOCUMENT_NAME, schema, COLLECTION_NAME)

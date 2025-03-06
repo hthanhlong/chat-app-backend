@@ -1,8 +1,8 @@
-import { MessageModel } from '../database/model/Message'
+import { Message } from '../../database/model'
 
 class MessageRepository {
   async getAllMessages(userId: string, partner_id: string) {
-    const result = await MessageModel.find({
+    const result = await Message.find({
       senderId: { $in: [userId, partner_id] },
       receiverId: { $in: [userId, partner_id] }
     })
@@ -23,7 +23,7 @@ class MessageRepository {
     message: string
     createdAt: Date
   }) {
-    await MessageModel.create({
+    await Message.create({
       senderId,
       receiverId,
       message,
@@ -32,7 +32,7 @@ class MessageRepository {
   }
 
   async getLastMessage(userId: string, partnerId: string) {
-    return await MessageModel.findOne({
+    return await Message.findOne({
       senderId: { $in: [userId, partnerId] },
       receiverId: { $in: [userId, partnerId] }
     })
@@ -41,7 +41,7 @@ class MessageRepository {
   }
 
   async deleteAllMessage(senderId: string, receiverId: string) {
-    await MessageModel.deleteMany({
+    await Message.deleteMany({
       senderId: { $in: [senderId, receiverId] },
       receiverId: { $in: [senderId, receiverId] }
     })

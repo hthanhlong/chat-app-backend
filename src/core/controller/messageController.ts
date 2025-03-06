@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import MessageService from '../services/MessageService'
+import { MessageService } from '../services'
 
 interface CustomRequest extends Request {
   decoded: {

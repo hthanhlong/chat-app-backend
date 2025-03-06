@@ -1,5 +1,4 @@
-import MessageRepository from '../repositories/MessageRepository'
-
+import { MessageRepository } from '../repositories'
 class MessageService {
   async getAllMessages(userId: string, partnerId: string) {
     return await MessageRepository.getAllMessages(userId, partnerId)

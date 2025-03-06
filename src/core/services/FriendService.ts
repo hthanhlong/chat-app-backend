@@ -1,5 +1,4 @@
-import FriendRepository from '../repositories/FriendRepository'
-
+import { FriendRepository } from '../repositories'
 class FriendService {
   async sendFriendRequest(data: FriendRequest) {
     return await FriendRepository.SendFriendRequest(data)

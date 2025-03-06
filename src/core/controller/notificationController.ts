@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import NotificationService from '../services/NotificationService'
+import { NotificationService } from '../services'
 
 export const getAllNotificationsById = async (req: Request, res: Response) => {
   const notifications = await NotificationService.getAllNotificationsById(

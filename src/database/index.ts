@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { mongoUrl } from '../config'
-import createMyAIAccount from '../seed'
-import logger from '../core/Logger'
+import createMyAIAccount from './seed'
+import logger from '../utils/logger'
 const _logger = logger('database')
 
 const connectDB = async () => {

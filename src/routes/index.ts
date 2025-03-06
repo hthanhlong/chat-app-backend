@@ -1,24 +1,24 @@
 import express from 'express'
-import validator from '../helpers/validator'
+import validator from '../validation'
 import {
   googleLoginSchema,
   loginSchema,
   sendFriendRequestSchema,
   signupSchema,
   userUpdateSchema
-} from '../schema'
+} from '../validation/schema'
 import {
   signupController,
   loginController,
   refreshTokenController,
   googleLoginController
-} from '../controller/authController'
+} from '../core/controller/authController'
 import asyncHandler from '../helpers/asyncHandler'
-import { validateAccessToken, validateRefreshToken } from '../core/JWT'
+import { validateAccessToken, validateRefreshToken } from '../utils'
 import {
   getUsersOrGetOneUser,
   updateUserById
-} from '../controller/userController'
+} from '../core/controller/userController'
 import {
   sendFriendRequest,
   getFriendRequest,
@@ -26,16 +26,16 @@ import {
   updateStatusFriend,
   searchFriendByKeyword,
   unfriend
-} from '../controller/friendController'
+} from '../core/controller/friendController'
 import {
   getAllNotificationsById,
   updateNotification
-} from '../controller/notificationController'
+} from '../core/controller/notificationController'
 import {
   getAllMessages,
   getLastMessage,
   deleteAllMessage
-} from '../controller/messageController'
+} from '../core/controller/messageController'
 const router = express.Router()
 
 //router common

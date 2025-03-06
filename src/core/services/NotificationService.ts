@@ -1,4 +1,4 @@
-import NotificationRepository from '../repositories/NotificationRepository'
+import { NotificationRepository } from '../repositories'
 
 class NotificationService {
   async createNotification({

@@ -1,23 +1,16 @@
-import { model, Schema, Types } from 'mongoose'
+import { model, Schema } from 'mongoose'
 
 export const DOCUMENT_NAME = 'Message'
 export const COLLECTION_NAME = 'messages' // display on database
 
-export default interface Message {
-  senderId: Types.ObjectId
-  receiverId: Types.ObjectId
-  message: string
-  file?: string
-}
-
 const schema = new Schema<Message>(
   {
     senderId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.String,
       ref: 'User'
     },
     receiverId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.String,
       ref: 'User'
     },
     message: {
@@ -33,8 +26,4 @@ const schema = new Schema<Message>(
   }
 )
 
-export const MessageModel = model<Message>(
-  DOCUMENT_NAME,
-  schema,
-  COLLECTION_NAME
-)
+export default model<Message>(DOCUMENT_NAME, schema, COLLECTION_NAME)

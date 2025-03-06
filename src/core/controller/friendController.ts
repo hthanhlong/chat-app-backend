@@ -1,7 +1,5 @@
 import { Request, Response } from 'express'
-import FriendService from '../services/FriendService'
-import MessageService from '../services/MessageService'
-import WsService from '../services/WsService'
+import { FriendService, MessageService, WsService } from '../services'
 
 export const sendFriendRequest = async (req: Request, res: Response) => {
   const { senderId, receiverId, status } = req.body

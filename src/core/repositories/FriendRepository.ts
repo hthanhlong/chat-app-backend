@@ -1,9 +1,6 @@
-import { dataSelectedByKeys } from './../database/utils'
-import { FriendShipModel } from './../database/model/FriendShip'
-import UserService from '../services/UserService'
-import User, { UserModel } from '../database/model/User'
-import { filterFriendsById } from './helper'
-import NotificationService from '../services/NotificationService'
+import { dataSelectedByKeys } from '../../utils'
+import { User, FriendShip } from '../../database/model'
+import { UserService, NotificationService } from '../services'
 
 class FriendRepository {
   async SendFriendRequest(data: {
@@ -11,7 +8,7 @@ class FriendRepository {
     receiverId: string
     status: string
   }) {
-    await FriendShipModel.create({
+    await FriendShip.create({
       senderId: data.senderId,
       receiveId: data.receiverId,
       status: data.status
@@ -29,7 +26,7 @@ class FriendRepository {
   }
 
   async GetAllUsersNonFriends(id: string) {
-    const friendListIds = await FriendShipModel.find({
+    const friendListIds = await FriendShip.find({
       $or: [{ senderId: id }, { receiveId: id }]
     })
 
@@ -48,7 +45,7 @@ class FriendRepository {
     let nonFriends = await UserService.getAllUsers(id)
     if (Array.isArray(friendListIds) && friendListIds.length > 0) {
       if (!nonFriends) return []
-      nonFriends = nonFriends.filter((user: User) => {
+      nonFriends = nonFriends.filter((user: typeof User) => {
         return !friendIds.some(
           // @ts-ignore
           (id) => id.toString() === user._id.toString()
@@ -60,7 +57,7 @@ class FriendRepository {
   }
 
   async GetFriendRequests(id: string) {
-    const friendListIds = await FriendShipModel.find({
+    const friendListIds = await FriendShip.find({
       receiveId: id,
       status: 'PENDING'
     }).select('senderId')
@@ -72,14 +69,14 @@ class FriendRepository {
       return user.senderId
     })
 
-    const result = await UserModel.find({ _id: { $in: senderIds } })
+    const result = await User.find({ _id: { $in: senderIds } })
 
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
 
   async getMyFriends(id: string) {
-    const friendListIds = await filterFriendsById(id)
-    const result = await UserModel.find({ _id: { $in: friendListIds } })
+    const friendListIds = await this._filterFriendsById(id)
+    const result = await User.find({ _id: { $in: friendListIds } })
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
 
@@ -89,7 +86,7 @@ class FriendRepository {
     status: string
   }) {
     const options = { upsert: true, new: true, runValidators: true }
-    await FriendShipModel.findOneAndUpdate(
+    await FriendShip.findOneAndUpdate(
       { senderId: data.senderId, receiveId: data.receiverId },
       { $set: { status: data.status } },
       options
@@ -115,8 +112,8 @@ class FriendRepository {
     id: string
     keyword: string
   }) {
-    const friendListIds = await filterFriendsById(id)
-    const result = await UserModel.find({
+    const friendListIds = await this._filterFriendsById(id)
+    const result = await User.find({
       nickname: { $regex: keyword },
       _id: { $in: friendListIds }
     })
@@ -130,12 +127,32 @@ class FriendRepository {
     senderId: string
     receiverId: string
   }) {
-    await FriendShipModel.findOneAndDelete({
+    await FriendShip.findOneAndDelete({
       $or: [
         { senderId: senderId, receiveId: receiverId },
         { senderId: receiverId, receiveId: senderId }
       ]
     })
+  }
+
+  async _filterFriendsById(id: string) {
+    const friendListIds = await FriendShip.find({
+      $or: [{ senderId: id }, { receiveId: id }],
+      $and: [{ status: 'FRIEND' }]
+    })
+
+    const friendIds = friendListIds.map(function (user: {
+      senderId: string
+      receiveId: string
+    }) {
+      if (user.senderId.toString() === id.toString()) {
+        return user.receiveId
+      }
+      if (user.receiveId.toString() === id.toString()) {
+        return user.senderId
+      }
+    })
+    return friendIds
   }
 }
 

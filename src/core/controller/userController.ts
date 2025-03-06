@@ -1,7 +1,6 @@
-import FriendService from '../services/FriendService'
 import { Request, Response } from 'express'
-import UserService from '../services/UserService'
-import { BadRequestError } from '../core/ApiError'
+import { BadRequestError } from '../../utils/httpExceptions'
+import { FriendService, UserService } from '../services'
 
 export const getUsersOrGetOneUser = async (req: Request, res: Response) => {
   if (

@@ -1,10 +1,11 @@
-import { validateTokenWS } from './../core/JWT'
+import { validateTokenWS } from '../../utils'
 import MessageService from './MessageService'
 import FriendService from './FriendService'
-import logger from '../core/Logger'
-const _logger = logger('WsService')
+import logger from '../../utils/logger'
 import { Request } from 'express'
-import { SOCKET_EVENTS } from '../events'
+import { SOCKET_EVENTS } from '../../events'
+
+const _logger = logger('WsService')
 
 class WsService {
   static clients: Map<string, WebSocket> = new Map()

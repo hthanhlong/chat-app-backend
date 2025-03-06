@@ -1,12 +1,14 @@
 import jwt from 'jsonwebtoken'
-import { checkPassword, generateSalt, hashPassword } from './../utils'
-import User from '../database/model/User'
-import UserRepository from '../repositories/UserRepository'
-import { generateToken } from '../core/JWT'
-import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../config'
-import FriendService from './FriendService'
+import {
+  checkPassword,
+  generateSalt,
+  hashPassword,
+  generateToken
+} from '../../utils'
+import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../../config'
 import { ObjectId } from 'mongoose'
-
+import { UserRepository } from '../repositories'
+import { FriendService } from '.'
 class AuthService {
   async ValidatePassword(
     password: string,
