@@ -1,81 +1,92 @@
 import express from 'express'
-import validator from '../validation'
 import {
-  googleLoginSchema,
-  loginSchema,
+  googleSignInSchema,
+  signInSchema,
   sendFriendRequestSchema,
-  signupSchema,
-  userUpdateSchema
-} from '../validation/schema'
+  userUpdateSchema,
+  signUpSchema
+} from '../validation'
 import {
-  signupController,
-  loginController,
-  refreshTokenController,
-  googleLoginController
-} from '../core/controller/authController'
-import asyncHandler from '../helpers/asyncHandler'
-import { validateAccessToken, validateRefreshToken } from '../utils'
+  AuthController,
+  FriendController,
+  MessageController,
+  NotificationController,
+  UserController
+} from '../core/controller'
 import {
-  getUsersOrGetOneUser,
-  updateUserById
-} from '../core/controller/userController'
-import {
-  sendFriendRequest,
-  getFriendRequest,
-  getMyFriends,
-  updateStatusFriend,
-  searchFriendByKeyword,
-  unfriend
-} from '../core/controller/friendController'
-import {
-  getAllNotificationsById,
-  updateNotification
-} from '../core/controller/notificationController'
-import {
-  getAllMessages,
-  getLastMessage,
-  deleteAllMessage
-} from '../core/controller/messageController'
+  validateAccessToken,
+  validateRefreshToken,
+  validatorInput
+} from '../core/middlewares'
+import { asyncHandler } from '../helpers'
+
 const router = express.Router()
 
 //router common
-router.post('/signup', validator(signupSchema), asyncHandler(signupController))
-router.post('/login', validator(loginSchema), asyncHandler(loginController))
+router.post(
+  '/sign-up',
+  validatorInput(signUpSchema),
+  asyncHandler(AuthController.signUp)
+)
+router.post(
+  '/sign-in',
+  validatorInput(signInSchema),
+  asyncHandler(AuthController.signIn)
+)
 router.post(
   '/refresh-token',
   validateRefreshToken,
-  asyncHandler(refreshTokenController)
+  asyncHandler(AuthController.refreshToken)
 )
 router.post(
   '/auth/google',
-  validator(googleLoginSchema),
-  asyncHandler(googleLoginController)
+  validatorInput(googleSignInSchema),
+  asyncHandler(AuthController.googleSignIn)
 )
 
 //middlewares
 router.use(validateAccessToken)
-
-//router for authentication
-router.get('/users/:id', asyncHandler(getUsersOrGetOneUser))
+router.get('/users', asyncHandler(UserController.getUsersOrGetOneUser))
 router.put(
   '/users/:id',
-  validator(userUpdateSchema),
-  asyncHandler(updateUserById)
+  validatorInput(userUpdateSchema),
+  asyncHandler(UserController.updateUserById)
 )
 router.post(
   '/send-friend-request',
-  validator(sendFriendRequestSchema),
-  asyncHandler(sendFriendRequest)
+  validatorInput(sendFriendRequestSchema),
+  asyncHandler(FriendController.sendFriendRequest)
 )
-router.get('/friend-requests/:id', asyncHandler(getFriendRequest))
-router.get('/get-friends/:id', asyncHandler(getMyFriends))
-router.post('/update-status-friend', asyncHandler(updateStatusFriend))
-router.get('/search-friend/:id', asyncHandler(searchFriendByKeyword))
-router.patch('/notifications', asyncHandler(updateNotification))
-router.get('/notifications/:id', asyncHandler(getAllNotificationsById))
-router.get('/get-messages/:partner_id', asyncHandler(getAllMessages))
-router.get('/get-last-message/:partner_id', asyncHandler(getLastMessage))
-router.post('/unfriend', asyncHandler(unfriend))
-router.post('/delete-all-message', asyncHandler(deleteAllMessage))
+router.get(
+  '/friend-requests/:id',
+  asyncHandler(FriendController.getFriendRequest)
+)
+router.get('/get-friends', asyncHandler(FriendController.getMyFriends))
+router.post(
+  '/update-status-friend',
+  asyncHandler(FriendController.updateStatusFriend)
+)
+router.get(
+  '/search-friend/:id',
+  asyncHandler(FriendController.searchFriendByKeyword)
+)
+router.post('/unfriend', asyncHandler(FriendController.unFriend))
+router.patch(
+  '/notifications',
+  asyncHandler(NotificationController.updateNotification)
+)
+router.get(
+  '/notifications/:id',
+  asyncHandler(NotificationController.getAllNotificationsById)
+)
+router.get('/get-messages', asyncHandler(MessageController.getAllMessages))
+router.get(
+  '/get-latest-message',
+  asyncHandler(MessageController.getLatestMessage)
+)
+router.post(
+  '/delete-all-message',
+  asyncHandler(MessageController.deleteAllMessage)
+)
 
 export default router

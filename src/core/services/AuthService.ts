@@ -1,16 +1,11 @@
-import jwt from 'jsonwebtoken'
-import {
-  checkPassword,
-  generateSalt,
-  hashPassword,
-  generateToken
-} from '../../utils'
-import { ACCESS_TOKEN_TIME, JWT_SECRET_ACCESS } from '../../config'
 import { ObjectId } from 'mongoose'
+import { checkPassword, generateSalt, hashPassword } from '../../utils'
 import { UserRepository } from '../repositories'
-import { FriendService } from '.'
+import { FriendService, JWTService } from '.'
+import { signUpInput, User, JWT_PAYLOAD } from '../../types'
+
 class AuthService {
-  async ValidatePassword(
+  async validatePassword(
     password: string,
     hashedPassword: string,
     salt: string
@@ -18,15 +13,16 @@ class AuthService {
     return checkPassword(password, hashedPassword, salt)
   }
 
-  async signup({ nickname, username, email, password, caption }: signUpInput) {
+  async signUp({ nickname, username, email, password, caption }: signUpInput) {
     const salt = await generateSalt()
     const hashedPassword = await hashPassword(password, salt)
-    const user: User = {
+
+    const user: Omit<User, '_id'> = {
       nickname,
       username,
       email,
-      caption,
       password: hashedPassword,
+      caption,
       verified: true,
       isActive: true,
       salt: salt
@@ -35,9 +31,7 @@ class AuthService {
     const myAI = await UserRepository.findUserByEmail('MyAI@gmail.com')
     if (myAI && result) {
       await FriendService.updateStatusFriend({
-        // @ts-ignore
         senderId: myAI.user._id.toString(),
-        // @ts-ignore
         receiverId: result.user._id.toString(),
         status: 'FRIEND'
       })
@@ -45,23 +39,20 @@ class AuthService {
     return result
   }
 
-  async login({ id, username }: { id: ObjectId; username: string }) {
+  async signIn({ id, username }: { id: ObjectId; username: string }) {
     if (!username) return null
     const payload = {
-      //@ts-ignore
       id: id.toString(),
       username: username
     } as JWT_PAYLOAD
-    const { accessToken, refreshToken } = generateToken(payload)
+    const { accessToken, refreshToken } = JWTService.generateToken(payload)
     const result = Object.assign(payload, { accessToken, refreshToken })
     return result
   }
 
   async refreshToken(decoded: { id: string; username: string }) {
     const { id, username } = decoded
-    const accessToken = jwt.sign({ id, username }, JWT_SECRET_ACCESS, {
-      expiresIn: ACCESS_TOKEN_TIME
-    })
+    const accessToken = JWTService.signAccessToken({ id, username })
     return { accessToken }
   }
 }

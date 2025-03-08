@@ -1,3 +1,4 @@
+import { FriendRequest } from '../../types'
 import { FriendRepository } from '../repositories'
 class FriendService {
   async sendFriendRequest(data: FriendRequest) {

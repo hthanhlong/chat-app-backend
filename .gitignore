@@ -15,7 +15,7 @@ node_modules
 *.pem
 
 # Ignore built files
-build
+dist
 
 # ignore test converage
 coverage

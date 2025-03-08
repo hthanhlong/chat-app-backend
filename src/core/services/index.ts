@@ -1,15 +1,17 @@
 import AuthService from './AuthService'
-import FriendService from './FriendService'
-import MessageService from './MessageService'
 import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'
+import JWTService from './JWTService'
+import FriendService from './FriendService'
+import MessageService from './MessageService'
 
 export {
   AuthService,
-  FriendService,
-  MessageService,
   NotificationService,
   UserService,
-  WsService
+  WsService,
+  JWTService,
+  FriendService,
+  MessageService
 }

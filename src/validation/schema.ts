@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-export const signupSchema = Joi.object({
+export const signUpSchema = Joi.object({
   caption: Joi.string().max(1000).optional(),
   nickname: Joi.string().required().min(3).max(64),
   username: Joi.string().required().min(3).max(64),
@@ -8,7 +8,7 @@ export const signupSchema = Joi.object({
   password: Joi.string().required().min(6).max(64)
 })
 
-export const loginSchema = Joi.object({
+export const signInSchema = Joi.object({
   username: Joi.string().required().min(3).max(64),
   password: Joi.string().required().min(6).max(64)
 })
@@ -28,7 +28,7 @@ export const userUpdateSchema = Joi.object({
   nickname: Joi.string().required().min(3).max(64).optional()
 })
 
-export const googleLoginSchema = Joi.object({
+export const googleSignInSchema = Joi.object({
   credential: Joi.string().required(),
   clientId: Joi.string().required(),
   select_by: Joi.string().required()

@@ -1,10 +1,10 @@
 import { Message } from '../../database/model'
 
 class MessageRepository {
-  async getAllMessages(userId: string, partner_id: string) {
+  async getAllMessages(userId: string, partnerId: string) {
     const result = await Message.find({
-      senderId: { $in: [userId, partner_id] },
-      receiverId: { $in: [userId, partner_id] }
+      senderId: { $in: [userId, partnerId] },
+      receiverId: { $in: [userId, partnerId] }
     })
       .sort({ createdAt: -1 })
       .limit(100)
@@ -31,7 +31,7 @@ class MessageRepository {
     })
   }
 
-  async getLastMessage(userId: string, partnerId: string) {
+  async getLatestMessage(userId: string, partnerId: string) {
     return await Message.findOne({
       senderId: { $in: [userId, partnerId] },
       receiverId: { $in: [userId, partnerId] }

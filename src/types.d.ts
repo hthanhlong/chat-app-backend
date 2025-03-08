@@ -1,3 +1,10 @@
+import { ObjectId } from 'mongoose'
+import { Request } from 'express'
+
+interface IRequest extends Request {
+  decoded: JWT_PAYLOAD
+}
+
 interface signUpInput {
   nickname: string
   username: string
@@ -6,15 +13,9 @@ interface signUpInput {
   caption?: string
 }
 
-interface LoginInput {
+interface SignInInput {
   email: string
   password: string
-}
-
-declare module Express {
-  export interface Request {
-    decoded: any
-  }
 }
 
 interface FriendRequest {
@@ -43,6 +44,7 @@ interface JWT_PAYLOAD {
 
 // models
 interface User {
+  _id: ObjectId
   username: string
   profilePicUrl?: string
   email: string
@@ -73,4 +75,59 @@ interface Notification {
   type: string
   content: string
   status: string
+}
+
+interface WebSocketEvent {
+  type: string
+  payload?: unknown
+}
+
+interface ISocketEventGetOnlineUsers {
+  userId: string
+}
+
+interface ISocketEventSendMessage {
+  _id: string
+  senderId: string
+  receiverId: string
+  message: string
+  createdAt: Date
+}
+
+interface ISocketEventHasNewMessage {
+  senderId: string
+  receiverId: string
+  message: string
+  createdAt: Date
+}
+
+interface ISocketEventUpdateFriendList {
+  userId: string
+}
+
+interface ISocketEventCloseConnection {
+  userId: string
+}
+
+interface ISocketEventGetFriendList {
+  userId: string
+}
+
+interface ISocketEventGetFriendRequest {
+  userId: string
+}
+
+interface ISocketEventSendFriendRequest {
+  senderId: string
+  receiverId: string
+}
+
+interface ISocketEventAcceptFriendRequest {
+  senderId: string
+  receiverId: string
+}
+
+interface ISocketEventRejectFriendRequest {
+  senderId: string
+  receiverId: string
 }

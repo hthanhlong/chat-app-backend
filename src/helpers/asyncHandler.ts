@@ -1,12 +1,16 @@
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
+import { IRequest } from '../types'
 
-type AsyncFunction = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => Promise<any>
-
-export default (execution: AsyncFunction) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    execution(req, res, next).catch(next)
+const asyncHandler =
+  (
+    callback: (req: IRequest, res: Response, next: NextFunction) => Promise<any>
+  ) =>
+  (req: IRequest, res: Response, next: NextFunction) => {
+    try {
+      callback(req, res, next).catch(next)
+    } catch (error) {
+      next(error)
+    }
   }
+
+export default asyncHandler

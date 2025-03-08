@@ -23,8 +23,8 @@ class MessageService {
     })
   }
 
-  async getLastMessage(userId: string, partnerId: string) {
-    return await MessageRepository.getLastMessage(userId, partnerId)
+  async getLatestMessage(userId: string, partnerId: string) {
+    return await MessageRepository.getLatestMessage(userId, partnerId)
   }
 
   async deleteAllMessage(senderId: string, receiverId: string) {

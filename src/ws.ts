@@ -1,8 +1,17 @@
 import ws from 'ws'
 import WsService from './core/services/WsService'
-import { Request } from 'express'
+import { IRequest } from './types'
+import envConfig from './config'
 
-const wss = new ws.WebSocketServer({ port: 8081 })
-wss.on('connection', (socket, req: Request) =>
-  WsService.onConnection(socket, req)
-)
+class WebSocketInstance {
+  private wss!: ws.Server
+
+  init = () => {
+    this.wss = new ws.Server({ port: Number(envConfig.SOCKET_PORT) })
+    this.wss.on('connection', (socket: ws.WebSocket, req: IRequest) =>
+      WsService.onConnection(socket, req)
+    )
+  }
+}
+
+export default new WebSocketInstance()
