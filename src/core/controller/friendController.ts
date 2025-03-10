@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { WsService, FriendService, MessageService } from '../services'
-import { BadRequestError } from '../../utils/httpExceptions'
+import HttpException from '../../utils/httpExceptions'
 import { IRequest } from '../../types'
 class FriendController {
   async sendFriendRequest(req: IRequest, res: Response) {
@@ -53,7 +53,7 @@ class FriendController {
   getMyFriends = async (req: IRequest, res: Response) => {
     const userId = req.query.id as string
     if (!userId) {
-      throw new BadRequestError('Invalid id')
+      throw HttpException.badRequestError()
     }
     const users = await FriendService.getMyFriends(userId)
     res.status(200).json({

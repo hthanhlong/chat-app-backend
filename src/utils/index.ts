@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import logger from './logger'
-import { ForbiddenError } from './httpExceptions'
+import HttpException from './httpExceptions'
 import { IRequest } from '../types'
 const _logger = logger('utils')
 
@@ -75,6 +75,6 @@ export function findIpAddress(req: IRequest) {
 export function restrictIpAddress(req: IRequest, ipAddress: string) {
   if (ipAddress === '*') return
   const ip = findIpAddress(req)
-  if (!ip) throw new ForbiddenError('IP Address Not Recognized')
-  if (ipAddress !== ip) throw new ForbiddenError('Permission Denied')
+  if (!ip) throw HttpException.forbiddenError()
+  if (ipAddress !== ip) throw HttpException.forbiddenError()
 }

@@ -1,9 +1,11 @@
 import { Response } from 'express'
-import { BadRequestError } from '../../utils/httpExceptions'
+import HttpException from '../../utils/httpExceptions'
 import { OAuth2Client, TokenPayload } from 'google-auth-library'
 import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
 import { JWT_PAYLOAD, IRequest } from '../../types'
+import { IUser } from '../../database/model/User'
+
 const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID)
 
 class AuthController {
@@ -41,26 +43,27 @@ class AuthController {
   }
 
   signIn = async (req: IRequest, res: Response) => {
-    const user = await UserService.findUserByUsername(req.body.username)
+    const { username, password } = req.body
+
+    const user = await UserService.findUserByUsername(username)
     if (user === null) {
-      throw new BadRequestError('Email or Password was not correctly')
+      throw HttpException.badRequestError()
     }
 
-    const { password: hashedPassword, salt } = user
+    const { password: hashedPassword, salt } = user as IUser
 
     const isRightPassword = await AuthService.validatePassword(
-      req.body.password,
+      password,
       hashedPassword,
       salt
     )
 
     if (!isRightPassword) {
-      throw new BadRequestError('Email or Password was not correctly')
+      throw HttpException.badRequestError()
     }
 
     const data = await AuthService.signIn({
-      // @ts-ignore
-      id: user._id,
+      id: user._id.toString(),
       username: user.username
     })
 
@@ -73,13 +76,13 @@ class AuthController {
   }
 
   refreshToken = async (req: IRequest, res: Response) => {
-    const decoded = req.decoded as JWT_PAYLOAD
-    const data = await AuthService.refreshToken(decoded)
+    const refreshToken = req.refreshToken as JWT_PAYLOAD
+    const newAccessToken = await AuthService.refreshToken(refreshToken)
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
       message: 'Refresh token successful',
-      data: data
+      data: { accessToken: newAccessToken }
     })
   }
 
@@ -91,13 +94,13 @@ class AuthController {
     })
     const payload = ticket.getPayload()
     if (!payload) {
-      throw new BadRequestError('Invalid Google token')
+      throw HttpException.badRequestError()
     }
     const { email, name } = payload as TokenPayload
     let user = await UserService.findUserByEmail(email as string)
 
     if (!user) {
-      const { user: newUser } = await AuthService.signUp({
+      const newUser = await AuthService.signUp({
         email: email as string,
         username: email as string,
         nickname: name as string,
@@ -108,7 +111,7 @@ class AuthController {
     }
 
     const data = await AuthService.signIn({
-      id: user._id,
+      id: user._id.toString(),
       username: user.username
     })
 

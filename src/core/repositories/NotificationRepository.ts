@@ -1,4 +1,4 @@
-import { Notification } from '../../database/model'
+import { NotificationModel } from '../../database/model'
 import { WsService } from '../services'
 
 class NotificationRepository {
@@ -22,7 +22,7 @@ class NotificationRepository {
       content: content,
       status: status
     }
-    await Notification.create(notification)
+    await NotificationModel.create(notification)
 
     WsService.sendDataToClientById(receiverId, {
       type: 'HAS_NEW_NOTIFICATION',
@@ -37,11 +37,11 @@ class NotificationRepository {
     id: string
     status: 'READ' | 'UNREAD'
   }) {
-    await Notification.findByIdAndUpdate(id, { status })
+    await NotificationModel.findByIdAndUpdate(id, { status })
   }
 
   async getAllNotificationsById(id: string) {
-    const allNotifications = await Notification.find({
+    const allNotifications = await NotificationModel.find({
       receiverId: id
     })
       .sort({ createdAt: -1 })

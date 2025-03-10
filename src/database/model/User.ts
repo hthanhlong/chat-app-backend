@@ -4,7 +4,20 @@ import { model, Schema } from 'mongoose'
 export const DOCUMENT_NAME = 'User'
 export const COLLECTION_NAME = 'users'
 
-const schema = new Schema<User>(
+export interface IUser {
+  _id: string
+  username: string
+  nickname: string
+  email: string
+  password: string
+  caption: string
+  profilePicUrl: string
+  verified: boolean
+  isActive: boolean
+  salt: string
+}
+
+const schema = new Schema<IUser>(
   {
     username: {
       type: Schema.Types.String,
@@ -64,4 +77,6 @@ const schema = new Schema<User>(
 schema.index({ email: 1 })
 schema.index({ username: 1 }, { name: 'user_name_index' })
 
-export default model<User>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+const UserModel = model<IUser>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+
+export default UserModel

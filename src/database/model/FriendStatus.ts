@@ -3,11 +3,13 @@ import { model, Schema } from 'mongoose'
 export const DOCUMENT_NAME = 'FriendStatus'
 export const COLLECTION_NAME = 'friendstatus' // display on database
 
-interface FriendStatus {
+export interface IFriendStatus {
   status: string
+  createdAt: Date
+  updatedAt: Date
 }
 
-const schema = new Schema<FriendStatus>(
+const schema = new Schema<IFriendStatus>(
   {
     status: {
       type: Schema.Types.String,
@@ -18,8 +20,14 @@ const schema = new Schema<FriendStatus>(
   },
   {
     versionKey: false,
-    timestamps: false
+    timestamps: true
   }
 )
 
-export default model<FriendStatus>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+const FriendStatusModel = model<IFriendStatus>(
+  DOCUMENT_NAME,
+  schema,
+  COLLECTION_NAME
+)
+
+export default FriendStatusModel

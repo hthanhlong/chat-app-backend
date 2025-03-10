@@ -1,8 +1,7 @@
-import { ObjectId } from 'mongoose'
 import { checkPassword, generateSalt, hashPassword } from '../../utils'
-import { UserRepository } from '../repositories'
-import { FriendService, JWTService } from '.'
-import { signUpInput, User, JWT_PAYLOAD } from '../../types'
+import { FriendService, JWTService, UserService } from '.'
+import { signUpInput, JWT_PAYLOAD } from '../../types'
+import { IUser } from '../../database/model/User'
 
 class AuthService {
   async validatePassword(
@@ -17,32 +16,34 @@ class AuthService {
     const salt = await generateSalt()
     const hashedPassword = await hashPassword(password, salt)
 
-    const user: Omit<User, '_id'> = {
+    const user = {
       nickname,
       username,
       email,
       password: hashedPassword,
-      caption,
+      caption: caption || '',
       verified: true,
       isActive: true,
-      salt: salt
+      salt: salt,
+      profilePicUrl: ''
     }
-    const result = await UserRepository.createUser(user)
-    const myAI = await UserRepository.findUserByEmail('MyAI@gmail.com')
+
+    const result = await UserService.createUser(user as IUser)
+    const myAI = await UserService.findUserByEmail('MyAI@gmail.com')
     if (myAI && result) {
       await FriendService.updateStatusFriend({
-        senderId: myAI.user._id.toString(),
-        receiverId: result.user._id.toString(),
+        senderId: myAI._id.toString(),
+        receiverId: result._id.toString(),
         status: 'FRIEND'
       })
     }
     return result
   }
 
-  async signIn({ id, username }: { id: ObjectId; username: string }) {
+  async signIn({ id, username }: { id: string; username: string }) {
     if (!username) return null
     const payload = {
-      id: id.toString(),
+      id: id,
       username: username
     } as JWT_PAYLOAD
     const { accessToken, refreshToken } = JWTService.generateToken(payload)
@@ -50,10 +51,10 @@ class AuthService {
     return result
   }
 
-  async refreshToken(decoded: { id: string; username: string }) {
-    const { id, username } = decoded
+  async refreshToken(refreshToken: JWT_PAYLOAD): Promise<string> {
+    const { id, username } = refreshToken
     const accessToken = JWTService.signAccessToken({ id, username })
-    return { accessToken }
+    return accessToken
   }
 }
 

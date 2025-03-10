@@ -1,8 +1,8 @@
-import { ObjectId } from 'mongoose'
 import { Request } from 'express'
 
 interface IRequest extends Request {
   decoded: JWT_PAYLOAD
+  refreshToken: JWT_PAYLOAD
 }
 
 interface signUpInput {
@@ -40,41 +40,6 @@ interface sendDataToIdByWs {
 interface JWT_PAYLOAD {
   id: string
   username: string
-}
-
-// models
-interface User {
-  _id: ObjectId
-  username: string
-  profilePicUrl?: string
-  email: string
-  password: string
-  nickname?: string
-  caption?: string
-  verified: boolean
-  isActive: boolean
-  salt: string
-}
-
-interface FriendShip {
-  senderId: string
-  receiveId: string
-  status: string
-}
-
-interface Message {
-  senderId: any
-  receiverId: any
-  message: string
-  file?: string
-}
-
-interface Notification {
-  senderId: any
-  receiverId: any
-  type: string
-  content: string
-  status: string
 }
 
 interface WebSocketEvent {

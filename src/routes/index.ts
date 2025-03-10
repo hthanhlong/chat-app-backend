@@ -35,7 +35,7 @@ router.post(
 )
 router.post(
   '/refresh-token',
-  validateRefreshToken,
+  asyncHandler(validateRefreshToken),
   asyncHandler(AuthController.refreshToken)
 )
 router.post(
@@ -45,7 +45,8 @@ router.post(
 )
 
 //middlewares
-router.use(validateAccessToken)
+router.use(asyncHandler(validateAccessToken))
+
 router.get('/users', asyncHandler(UserController.getUsersOrGetOneUser))
 router.put(
   '/users/:id',

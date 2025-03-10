@@ -1,21 +1,22 @@
 import { Response } from 'express'
 import { IRequest } from '../../types'
-import { BadRequestError } from '../../utils/httpExceptions'
+import HttpException from '../../utils/httpExceptions'
 import { UserService, FriendService } from '../services'
+
 class UserController {
   getUsersOrGetOneUser = async (req: IRequest, res: Response) => {
     if (
       !req.query.type ||
       ['all', 'one'].indexOf(req.query.type as string) === -1
     ) {
-      throw new BadRequestError('Invalid type')
+      throw HttpException.badRequestError()
     }
 
     let users = null
     let message = null
     const userId = req.query.id as string
     if (!userId) {
-      throw new BadRequestError('Invalid id')
+      throw HttpException.badRequestError()
     }
 
     if (req.query.type === 'all') {
@@ -40,7 +41,7 @@ class UserController {
   updateUserById = async (req: IRequest, res: Response) => {
     const user = await UserService.updateUserById(req.params.id, req.body)
     if (!user) {
-      throw new BadRequestError('Update user failed')
+      throw HttpException.badRequestError()
     }
     res.status(200).json({
       isSuccess: true,

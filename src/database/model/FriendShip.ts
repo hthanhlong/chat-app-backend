@@ -1,9 +1,16 @@
 import { model, Schema } from 'mongoose'
-
 export const DOCUMENT_NAME = 'FriendShip'
 export const COLLECTION_NAME = 'friendships' // display on database
 
-const schema = new Schema<FriendShip>(
+export interface IFriendShip {
+  senderId: string
+  receiveId: string
+  status: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+const schema = new Schema<IFriendShip>(
   {
     senderId: {
       type: Schema.Types.String,
@@ -26,4 +33,10 @@ const schema = new Schema<FriendShip>(
 
 schema.index({ senderId: 1, receiveId: 1 }, { unique: true })
 
-export default model<FriendShip>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+const FriendShipModel = model<IFriendShip>(
+  DOCUMENT_NAME,
+  schema,
+  COLLECTION_NAME
+)
+
+export default FriendShipModel

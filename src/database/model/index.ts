@@ -1,7 +1,13 @@
-import User from './User'
-import FriendShip from './FriendShip'
-import FriendStatus from './FriendStatus'
-import Message from './Message'
-import Notification from './Notification'
+import UserModel from './User'
+import FriendShipModel from './FriendShip'
+import FriendStatusModel from './FriendStatus'
+import MessageModel from './Message'
+import NotificationModel from './Notification'
 
-export { User, FriendShip, FriendStatus, Message, Notification }
+export {
+  UserModel,
+  FriendShipModel,
+  FriendStatusModel,
+  MessageModel,
+  NotificationModel
+}

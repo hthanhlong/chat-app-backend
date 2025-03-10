@@ -1,6 +1,7 @@
 import { Response } from 'express'
 import { IRequest } from '../../types'
 import { NotificationService } from '../services'
+
 class NotificationController {
   getAllNotificationsById = async (req: IRequest, res: Response) => {
     const notifications = await NotificationService.getAllNotificationsById(

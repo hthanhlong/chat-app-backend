@@ -33,12 +33,12 @@ class WsService {
       socket.close()
       return
     }
-    const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-    if (!data) {
-      socket.close()
-      return
-    }
-    WsService.clients.set(data.id, socket)
+    // const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
+    // if (!data) {
+    //   socket.close()
+    //   return
+    // }
+    // WsService.clients.set(data.id, socket)
     socket.on('message', WsService._onMessage)
     socket.on('error', (err: any) => _logger.error('Socket', err))
   }

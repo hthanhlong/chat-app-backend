@@ -1,6 +1,7 @@
 import { dataSelectedByKeys } from '../../utils'
-import { User, FriendShip } from '../../database/model'
+import { UserModel, FriendShipModel } from '../../database/model'
 import { UserService, NotificationService } from '../services'
+import { IUser } from '../../database/model/User'
 
 class FriendRepository {
   async SendFriendRequest(data: {
@@ -8,25 +9,26 @@ class FriendRepository {
     receiverId: string
     status: string
   }) {
-    await FriendShip.create({
+    await FriendShipModel.create({
       senderId: data.senderId,
       receiveId: data.receiverId,
       status: data.status
     })
 
-    const user = (await UserService.findUserById(data.senderId)) as User
+    const user = await UserService.findUserById(data.senderId)
 
     await NotificationService.createNotification({
       senderId: data.senderId,
       receiverId: data.receiverId,
       type: 'FRIEND',
+      // @ts-ignore
       content: `${user.nickname} has sent you a friend request`,
       status: 'UNREAD'
     })
   }
 
   async GetAllUsersNonFriends(id: string) {
-    const friendListIds = await FriendShip.find({
+    const friendListIds = await FriendShipModel.find({
       $or: [{ senderId: id }, { receiveId: id }]
     })
 
@@ -45,7 +47,7 @@ class FriendRepository {
     let nonFriends = await UserService.getAllUsers(id)
     if (Array.isArray(friendListIds) && friendListIds.length > 0) {
       if (!nonFriends) return []
-      nonFriends = nonFriends.filter((user: typeof User) => {
+      nonFriends = nonFriends.filter((user: IUser) => {
         return !friendIds.some(
           // @ts-ignore
           (id) => id.toString() === user._id.toString()
@@ -57,7 +59,7 @@ class FriendRepository {
   }
 
   async GetFriendRequests(id: string) {
-    const friendListIds = await FriendShip.find({
+    const friendListIds = await FriendShipModel.find({
       receiveId: id,
       status: 'PENDING'
     }).select('senderId')
@@ -69,15 +71,17 @@ class FriendRepository {
       return user.senderId
     })
 
-    const result = await User.find({ _id: { $in: senderIds } })
+    const result = await UserModel.find({ _id: { $in: senderIds } })
 
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
 
   async getMyFriends(id: string) {
     const friendListIds = await this._filterFriendsById(id)
-    const result = await User.find({ _id: { $in: friendListIds } })
-    return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
+    if (!friendListIds) return []
+    // @ts-ignore
+    const friends = await UserModel.find({ _id: { $in: friendListIds } })
+    return dataSelectedByKeys(friends, ['_id', 'nickname', 'username'])
   }
 
   async updateStatusFriend(data: {
@@ -86,12 +90,12 @@ class FriendRepository {
     status: string
   }) {
     const options = { upsert: true, new: true, runValidators: true }
-    await FriendShip.findOneAndUpdate(
+    await FriendShipModel.findOneAndUpdate(
       { senderId: data.senderId, receiveId: data.receiverId },
       { $set: { status: data.status } },
       options
     )
-    const user = (await UserService.findUserById(data.receiverId)) as User
+    const user = await UserService.findUserById(data.receiverId)
 
     // to do more
     if (data.status === 'FRIEND') {
@@ -99,7 +103,7 @@ class FriendRepository {
         senderId: data.receiverId,
         receiverId: data.senderId,
         type: 'FRIEND',
-        content: `${user.nickname} has accepted your friend request`,
+        content: `${user?.nickname} has accepted your friend request`,
         status: 'UNREAD'
       })
     }
@@ -113,9 +117,10 @@ class FriendRepository {
     keyword: string
   }) {
     const friendListIds = await this._filterFriendsById(id)
-    const result = await User.find({
+    if (!friendListIds) return []
+    const result = await UserModel.find({
       nickname: { $regex: keyword },
-      _id: { $in: friendListIds }
+      _id: { $in: friendListIds.filter((id) => id !== undefined) }
     })
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
@@ -127,7 +132,7 @@ class FriendRepository {
     senderId: string
     receiverId: string
   }) {
-    await FriendShip.findOneAndDelete({
+    await FriendShipModel.findOneAndDelete({
       $or: [
         { senderId: senderId, receiveId: receiverId },
         { senderId: receiverId, receiveId: senderId }
@@ -136,7 +141,7 @@ class FriendRepository {
   }
 
   async _filterFriendsById(id: string) {
-    const friendListIds = await FriendShip.find({
+    const friendListIds = await FriendShipModel.find({
       $or: [{ senderId: id }, { receiveId: id }],
       $and: [{ status: 'FRIEND' }]
     })

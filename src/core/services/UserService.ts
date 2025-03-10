@@ -1,10 +1,16 @@
 import { dataSelectedByKeys } from '../../utils'
 import { UserRepository } from '../repositories'
+import { IUser } from '../../database/model/User'
 
 class UserService {
+  async createUser(user: IUser) {
+    const result = await UserRepository.createUser(user)
+    return result
+  }
+
   async getAllUsers(id: string) {
-    const result = await UserRepository.getAllUsers(id)
-    const response = dataSelectedByKeys(result.users, [
+    const users = await UserRepository.getAllUsers(id)
+    const response = dataSelectedByKeys(users, [
       '_id',
       'username',
       'email',
@@ -14,35 +20,24 @@ class UserService {
     return response
   }
 
-  async updateUserById(id: string, newDataOfUser: User) {
+  async updateUserById(id: string, newDataOfUser: IUser) {
     const result = await UserRepository.updateUserById(id, newDataOfUser)
-    if (!result.user) return null
-    return result.user
+    return result
   }
 
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string) {
     const result = await UserRepository.findUserByEmail(email)
-    if (!result.user) return null
-    return result.user
+    return result
   }
 
   async findUserById(id: string) {
     const result = await UserRepository.findUserById(id)
-    if (!result.user) return null
-    const response = dataSelectedByKeys(result.user, [
-      '_id',
-      'username',
-      'email',
-      'nickname',
-      'caption'
-    ])
-    return response
+    return result
   }
 
-  async findUserByUsername(username: string) {
-    const result = await UserRepository.findUserByUsername(username)
-    if (!result.user) return null
-    return result.user
+  async findUserByUsername(username: string): Promise<IUser | null> {
+    const user = await UserRepository.findUserByUsername(username)
+    return user
   }
 }
 

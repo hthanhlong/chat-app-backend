@@ -1,50 +1,37 @@
-import { User } from '../../database/model'
-
+import UserModel, { IUser } from '../../database/model/User'
 class UserRepository {
-  async getAllUsers(id: string): Promise<{ users: User[] }> {
-    const users = await User.find({
+  async getAllUsers(id: string) {
+    const users = await UserModel.find({
       _id: { $not: { $eq: id } }
     }).limit(20)
-    return { users: users.map((user) => ({ ...user.toObject() })) }
+    return users
   }
 
-  async createUser(user: User): Promise<{ user: User }> {
-    const createdUser = await User.create(user)
-    return { user: { ...createdUser.toObject() } }
+  async createUser(user: IUser) {
+    const createdUser = await UserModel.create(user)
+    return createdUser
   }
 
-  async updateUserById(id: string, user: User): Promise<{ user: User | null }> {
-    const updatedUser = await User.findOneAndUpdate({ _id: id }, user, {
+  async updateUserById(id: string, user: IUser) {
+    const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, user, {
       new: true
     })
-    if (!updatedUser) {
-      return { user: null }
-    }
-    return { user: updatedUser }
+    return updatedUser
   }
 
-  async findUserByEmail(email: string): Promise<{ user: User | null }> {
-    const user = await User.find({ email })
-    if (user.length === 0) {
-      return { user: null }
-    }
-    return { user: { ...user[0].toObject() } }
+  async findUserByEmail(email: string) {
+    const user = await UserModel.findOne({ email })
+    return user
   }
 
-  async findUserById(id: string): Promise<{ user: User | null }> {
-    const user = await User.findById(id)
-    if (!user) {
-      return { user: null }
-    }
-    return { user: { ...user.toObject() } }
+  async findUserById(id: string) {
+    const user = await UserModel.findById(id)
+    return user
   }
 
-  async findUserByUsername(username: string): Promise<{ user: User | null }> {
-    const user = await User.find({ username })
-    if (user.length === 0) {
-      return { user: null }
-    }
-    return { user: { ...user[0].toObject() } }
+  async findUserByUsername(username: string): Promise<IUser | null> {
+    const user = await UserModel.findOne({ username })
+    return user as IUser | null
   }
 }
 

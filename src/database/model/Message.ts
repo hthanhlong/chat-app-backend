@@ -3,7 +3,16 @@ import { model, Schema } from 'mongoose'
 export const DOCUMENT_NAME = 'Message'
 export const COLLECTION_NAME = 'messages' // display on database
 
-const schema = new Schema<Message>(
+export interface IMessage {
+  senderId: string
+  receiverId: string
+  message: string
+  file: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+const schema = new Schema<IMessage>(
   {
     senderId: {
       type: Schema.Types.String,
@@ -26,4 +35,6 @@ const schema = new Schema<Message>(
   }
 )
 
-export default model<Message>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+const MessageModel = model<IMessage>(DOCUMENT_NAME, schema, COLLECTION_NAME)
+
+export default MessageModel

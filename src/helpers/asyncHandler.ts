@@ -5,9 +5,9 @@ const asyncHandler =
   (
     callback: (req: IRequest, res: Response, next: NextFunction) => Promise<any>
   ) =>
-  (req: IRequest, res: Response, next: NextFunction) => {
+  async (req: IRequest, res: Response, next: NextFunction) => {
     try {
-      callback(req, res, next).catch(next)
+      await callback(req, res, next)
     } catch (error) {
       next(error)
     }

@@ -1,33 +1,19 @@
+import { refreshTokenSchema } from './../../validation/schema'
 import { NextFunction, Response } from 'express'
-import envConfig from '../../config'
-import { RefreshTokenExpired } from '../../utils/httpExceptions'
-import { BadTokenError } from '../../utils/httpExceptions'
+import HttpException from '../../utils/httpExceptions'
 import JWTService from '../services/JWTService'
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { IRequest } from '../../types'
 
-const validateRefreshToken = (
+const validateRefreshToken = async (
   req: IRequest,
   res: Response,
   next: NextFunction
 ) => {
-  {
-    try {
-      const k = envConfig.JWT_SECRET_REFRESH
-      if (!k) return console.log('k is not defined')
-      const token = req.body.refreshToken
-      if (!token) throw new BadTokenError()
-      const decoded = JWTService.verifyRefreshToken(token)
-      req.decoded = decoded
-      next()
-    } catch (error: Error | any) {
-      if (error instanceof JsonWebTokenError) {
-        throw new BadTokenError()
-      } else if (error instanceof TokenExpiredError) {
-        throw new RefreshTokenExpired()
-      }
-    }
-  }
+  const token = req.body.refreshToken
+  if (!token) throw HttpException.badTokenError()
+  const refreshToken = JWTService.verifyRefreshToken(token)
+  req.refreshToken = refreshToken
+  next()
 }
 
 export default validateRefreshToken
