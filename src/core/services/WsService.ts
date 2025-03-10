@@ -30,21 +30,23 @@ class WsService {
   static onConnection(socket: any, req: IRequest): void {
     const accessToken = req.url?.split('?')[1].split('accessToken=')[1]
     if (!accessToken) {
-      socket.close()
+      socket.close(1008, 'No access token provided')
       return
     }
-    // const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-    // if (!data) {
-    //   socket.close()
-    //   return
-    // }
-    // WsService.clients.set(data.id, socket)
-    socket.on('message', WsService._onMessage)
-    socket.on('error', (err: any) => _logger.error('Socket', err))
+    try {
+      const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
+      WsService.clients.set(data.id, socket)
+      socket.on('message', WsService._onMessage)
+      socket.on('error', (err: any) => _logger.error('Socket', err))
+    } catch (error: Error | any) {
+      socket.close(1008, 'INVALID_ACCESS_TOKEN')
+      _logger.error('error.message', error.message)
+    }
   }
 
-  static async _onMessage(data: WebSocketEvent): Promise<void> {
+  static async _onMessage(event: WebSocketEvent): Promise<void> {
     try {
+      const data = JSON.parse(event as any)
       if (!data.type || !data.payload) return
       const clientIds = Array.from(WsService.clients.keys())
       const { type, payload } = data
@@ -84,7 +86,6 @@ class WsService {
           break
       }
     } catch (error: Error | any) {
-      console.log('error', error)
       _logger.error('error.message', error.message)
     }
   }

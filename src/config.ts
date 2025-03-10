@@ -18,8 +18,8 @@ class EnvConfig {
 
   CORS_URL = process.env.CORS_URL || '*'
   ENVIRONMENT = process.env.NODE_ENV || 'development'
-  APP_PORT = process.env.APP_PORT || '3000'
-  SOCKET_PORT = process.env.SOCKET_PORT || '3000'
+  APP_PORT = process.env.APP_PORT || '8080'
+  SOCKET_PORT = process.env.SOCKET_PORT || '8081'
   LOG_DIR = process.env.LOG_DIR || 'logs'
   DB_USER = process.env.MONGO_INITDB_ROOT_USERNAME || 'root'
   DB_PASSWORD = process.env.MONGO_INITDB_ROOT_PASSWORD || 'root'
