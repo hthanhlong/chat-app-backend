@@ -47,7 +47,8 @@ router.post(
 //middlewares
 router.use(asyncHandler(validateAccessToken))
 
-router.get('/users', asyncHandler(UserController.getUsersOrGetOneUser))
+router.get('/users', asyncHandler(UserController.getUsers))
+router.get('/me', asyncHandler(UserController.getMe))
 router.put(
   '/users/:id',
   validatorInput(userUpdateSchema),

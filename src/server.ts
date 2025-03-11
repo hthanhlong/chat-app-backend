@@ -6,12 +6,15 @@ import routes from './routes'
 import { handleNotFoundRoute, limiter, errorHandler } from './core/middlewares'
 import envConfig from './config'
 import Database from './database'
-import WebSocketInstance from './ws'
-const _logger = logger('server')
+import WebSocketService from './ws'
+import RedisService from './redis'
 
+const _logger = logger('server')
+const APP_PORT = envConfig.APP_PORT
 const app = express()
 Database.init()
-WebSocketInstance.init()
+WebSocketService.init()
+RedisService.init()
 app.use(helmet())
 app.use(cors({ origin: envConfig.CORS_URL }))
 app.use(express.json({ limit: envConfig.JSON_LIMIT }))
@@ -20,6 +23,4 @@ app.use(limiter())
 app.use('/api/v1', routes)
 app.use(handleNotFoundRoute)
 app.use(errorHandler)
-app.listen(envConfig.APP_PORT, () =>
-  _logger.info(`server running on port : ${envConfig.APP_PORT}`)
-)
+app.listen(APP_PORT, () => _logger.info(`server running on port : ${APP_PORT}`))

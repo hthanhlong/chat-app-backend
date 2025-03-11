@@ -4,36 +4,33 @@ import HttpException from '../../utils/httpExceptions'
 import { UserService, FriendService } from '../services'
 
 class UserController {
-  getUsersOrGetOneUser = async (req: IRequest, res: Response) => {
-    if (
-      !req.query.type ||
-      ['all', 'one'].indexOf(req.query.type as string) === -1
-    ) {
-      throw HttpException.badRequestError()
-    }
-
-    let users = null
-    let message = null
+  getMe = async (req: IRequest, res: Response) => {
     const userId = req.query.id as string
     if (!userId) {
       throw HttpException.badRequestError()
     }
-
-    if (req.query.type === 'all') {
-      users = await FriendService.getAllUsersNonFriends(userId)
-
-      message = 'Get all users'
+    const user = await UserService.findUserById(userId)
+    if (!user) {
+      throw HttpException.badRequestError()
     }
-
-    if (req.query.type === 'one') {
-      users = await UserService.findUserById(userId)
-      message = 'Get a user'
-    }
-
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: message,
+      message: 'Get me successful',
+      data: user
+    })
+  }
+
+  getUsers = async (req: IRequest, res: Response) => {
+    const userId = req.query.id as string
+    if (!userId) {
+      throw HttpException.badRequestError()
+    }
+    const users = await FriendService.getAllUsersNonFriends(userId)
+    res.status(200).json({
+      isSuccess: true,
+      errorCode: null,
+      message: 'Get users successful',
       data: users
     })
   }

@@ -34,6 +34,8 @@ class EnvConfig {
   PASSWORD_KEY = process.env.PASSWORD_KEY || 'password'
   ACCESS_TOKEN_TIME = process.env.ACCESS_TOKEN_VALIDITY_SEC || 1800000 // 30 minutes
   REFRESH_TOKEN_TIME = process.env.REFRESH_TOKEN_VALIDITY_SEC || '90d' // 90 days
+  REDIS_PORT = process.env.REDIS_PORT || 6379
+  REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1'
 }
 
 export default new EnvConfig()

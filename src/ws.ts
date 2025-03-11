@@ -3,7 +3,7 @@ import WsService from './core/services/WsService'
 import { IRequest } from './types'
 import envConfig from './config'
 
-class WebSocketInstance {
+class WebSocketService {
   private wss!: ws.Server
 
   init = () => {
@@ -14,4 +14,4 @@ class WebSocketInstance {
   }
 }
 
-export default new WebSocketInstance()
+export default new WebSocketService()
