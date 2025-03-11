@@ -99,7 +99,6 @@ class WsService {
   static sendDataToClientById(userId: string, data: any) {
     const client = WsService.clients.get(userId)
     if (!client) return
-    _logger.info(`Sending data to client ${userId}`, data)
     client.send(JSON.stringify(data))
   }
 

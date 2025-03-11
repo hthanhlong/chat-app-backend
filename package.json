@@ -4,11 +4,10 @@
   "description": "backend for chat page",
   "main": "server.js",
   "scripts": {
-    "start": "npm run build && npm run serve",
-    "serve": "node -r dotenv/config dist/server.js",
+    "production": "npm run build && node dist/server.js",
     "build": "npm run clean && npm run build-ts",
     "dev": "npx concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-    "watch-node": "nodemon -r dotenv/config dist/server.js",
+    "watch-node": "nodemon -r dist/server.js",
     "clean": "rimraf ./dist",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",

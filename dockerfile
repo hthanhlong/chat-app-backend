@@ -1,5 +1,5 @@
 # Use Node.js LTS (Long Term Support) as the base image
-FROM node:20-slim
+FROM node:22.14.0-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
 # Copy app source code
 COPY . .
@@ -18,4 +18,4 @@ EXPOSE 8080
 EXPOSE 8081
 
 # Start the application
-CMD [ "node", "app.js" ]
+CMD [ "node", "dist/server.js" ]

@@ -32,10 +32,12 @@ class EnvConfig {
   ACCESS_TOKEN_TIME = process.env.ACCESS_TOKEN_VALIDITY_SEC || 1800000 // 30 minutes
   REFRESH_TOKEN_TIME = process.env.REFRESH_TOKEN_VALIDITY_SEC || '90d' // 90 days
   REDIS_PORT = process.env.REDIS_PORT || 6379
-  REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1'
+  REDIS_HOST = process.env.REDIS_HOST || 'localhost'
   REDIS_URL = `redis://${this.REDIS_HOST}:${this.REDIS_PORT}`
   CORS_URL = process.env.CORS_URL || '*'
   LOG_DIR = process.env.LOG_DIR || 'logs'
 }
 
-export default new EnvConfig()
+const envConfig = new EnvConfig()
+
+export default envConfig
