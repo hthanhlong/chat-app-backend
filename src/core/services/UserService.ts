@@ -1,6 +1,7 @@
 import { dataSelectedByKeys } from '../../utils'
 import { UserRepository } from '../repositories'
 import { IUser } from '../../database/model/User'
+import RedisService from '../../redis/RedisService'
 
 class UserService {
   async createUser(user: IUser) {
@@ -22,6 +23,9 @@ class UserService {
 
   async updateUserById(id: string, newDataOfUser: IUser) {
     const result = await UserRepository.updateUserById(id, newDataOfUser)
+    if (result) {
+      RedisService.setUser(id, result)
+    }
     return result
   }
 
@@ -31,7 +35,10 @@ class UserService {
   }
 
   async findUserById(id: string) {
+    const cachedUser = await RedisService.getUser(id)
+    if (cachedUser) return cachedUser
     const result = await UserRepository.findUserById(id)
+    if (result) RedisService.setUser(id, result)
     return result
   }
 

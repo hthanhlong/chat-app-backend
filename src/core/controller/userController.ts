@@ -13,6 +13,7 @@ class UserController {
     if (!user) {
       throw HttpException.badRequestError()
     }
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,

@@ -4,7 +4,8 @@ import {
   signInSchema,
   sendFriendRequestSchema,
   userUpdateSchema,
-  signUpSchema
+  signUpSchema,
+  signOutSchema
 } from '../validation'
 import {
   AuthController,
@@ -46,7 +47,11 @@ router.post(
 
 //middlewares
 router.use(asyncHandler(validateAccessToken))
-
+router.post(
+  '/sign-out',
+  validatorInput(signOutSchema),
+  asyncHandler(AuthController.signOut)
+)
 router.get('/users', asyncHandler(UserController.getUsers))
 router.get('/me', asyncHandler(UserController.getMe))
 router.put(

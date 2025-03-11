@@ -29,6 +29,11 @@ class Database {
       caption: 'I will help you'
     })
   }
+
+  close = async () => {
+    await mongoose.connection.close()
+    _logger.info('MongoDB disconnected successfully')
+  }
 }
 
 export default new Database()

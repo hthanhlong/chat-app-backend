@@ -26,12 +26,21 @@ class RedisService {
     this.redis.set(userId, JSON.stringify(user), 'EX', 180000)
   }
 
-  getUser(userId: string) {
-    return this.redis.get(userId)
+  async getUser(userId: string) {
+    const cachedUser = await this.redis.get(userId)
+    if (cachedUser) {
+      return JSON.parse(cachedUser)
+    }
+    return null
+  }
+
+  deleteUser(userId: string) {
+    this.redis.del(userId)
   }
 
   disconnect() {
     this.redis.disconnect()
+    _logger.info('Redis disconnected successfully')
   }
 }
 

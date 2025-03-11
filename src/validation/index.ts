@@ -4,7 +4,8 @@ import {
   sendFriendRequestSchema,
   refreshTokenSchema,
   userUpdateSchema,
-  googleSignInSchema
+  googleSignInSchema,
+  signOutSchema
 } from './schema'
 
 export {
@@ -13,5 +14,6 @@ export {
   sendFriendRequestSchema,
   refreshTokenSchema,
   userUpdateSchema,
-  googleSignInSchema
+  googleSignInSchema,
+  signOutSchema
 }

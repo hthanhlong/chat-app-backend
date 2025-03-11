@@ -22,7 +22,10 @@ class WsService {
     GET_FRIEND_REQUEST: 'GET_FRIEND_REQUEST',
     SEND_FRIEND_REQUEST: 'SEND_FRIEND_REQUEST',
     ACCEPT_FRIEND_REQUEST: 'ACCEPT_FRIEND_REQUEST',
-    REJECT_FRIEND_REQUEST: 'REJECT_FRIEND_REQUEST'
+    REJECT_FRIEND_REQUEST: 'REJECT_FRIEND_REQUEST',
+    HAS_NEW_NOTIFICATION: 'HAS_NEW_NOTIFICATION',
+    GET_NOTIFICATIONS: 'GET_NOTIFICATIONS',
+    UPDATE_NOTIFICATION: 'UPDATE_NOTIFICATION'
   }
 
   static clients: Map<string, WebSocket> = new Map()
@@ -38,6 +41,9 @@ class WsService {
       WsService.clients.set(data.id, socket)
       socket.on('message', WsService._onMessage)
       socket.on('error', (err: any) => _logger.error('Socket', err))
+      socket.on('close', () => {
+        WsService.clients.delete(data.id)
+      })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')
       _logger.error('error.message', error.message)
@@ -92,7 +98,9 @@ class WsService {
 
   static sendDataToClientById(userId: string, data: any) {
     const client = WsService.clients.get(userId)
-    client?.send(JSON.stringify(data))
+    if (!client) return
+    _logger.info(`Sending data to client ${userId}`, data)
+    client.send(JSON.stringify(data))
   }
 
   static closeConnection(userId: string) {

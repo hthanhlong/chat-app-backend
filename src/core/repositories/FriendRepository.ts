@@ -96,6 +96,7 @@ class FriendRepository {
       options
     )
     const user = await UserService.findUserById(data.receiverId)
+    if (!user) return
 
     // to do more
     if (data.status === 'FRIEND') {
@@ -103,7 +104,8 @@ class FriendRepository {
         senderId: data.receiverId,
         receiverId: data.senderId,
         type: 'FRIEND',
-        content: `${user?.nickname} has accepted your friend request`,
+        // @ts-ignore
+        content: `${user.nickname} has accepted your friend request`,
         status: 'UNREAD'
       })
     }

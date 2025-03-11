@@ -24,3 +24,18 @@ app.use('/api/v1', routes)
 app.use(handleNotFoundRoute)
 app.use(errorHandler)
 app.listen(APP_PORT, () => _logger.info(`server running on port : ${APP_PORT}`))
+process.removeAllListeners('warning') // todo: remove this
+
+process.on('SIGINT', async () => {
+  _logger.info('Server is shutting down')
+  await Database.close()
+  RedisService.disconnect()
+  process.exit(0)
+})
+
+process.on('SIGTERM', async () => {
+  _logger.info('Server is shutting down')
+  await Database.close()
+  RedisService.disconnect()
+  process.exit(0)
+})

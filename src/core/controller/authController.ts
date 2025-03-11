@@ -5,6 +5,7 @@ import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
 import { JWT_PAYLOAD, IRequest } from '../../types'
 import { IUser } from '../../database/model/User'
+import RedisService from '../../redis/RedisService'
 
 const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID)
 
@@ -120,6 +121,19 @@ class AuthController {
       errorCode: null,
       message: 'Google sign in successful',
       data: data
+    })
+  }
+
+  signOut = async (req: IRequest, res: Response) => {
+    const userId = req.body.id as string
+    if (!userId) {
+      throw HttpException.badRequestError()
+    }
+    RedisService.deleteUser(userId)
+    res.status(200).json({
+      isSuccess: true,
+      errorCode: null,
+      message: 'Sign out successful'
     })
   }
 }

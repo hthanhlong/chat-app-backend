@@ -33,3 +33,7 @@ export const googleSignInSchema = Joi.object({
   clientId: Joi.string().required(),
   select_by: Joi.string().required()
 })
+
+export const signOutSchema = Joi.object({
+  id: Joi.string().required()
+})

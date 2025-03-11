@@ -2,6 +2,7 @@ import { Response } from 'express'
 import { WsService, FriendService, MessageService } from '../services'
 import HttpException from '../../utils/httpExceptions'
 import { IRequest } from '../../types'
+
 class FriendController {
   async sendFriendRequest(req: IRequest, res: Response) {
     const { senderId, receiverId, status } = req.body
@@ -34,7 +35,7 @@ class FriendController {
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Get all users',
+      message: 'update status friend successfully',
       data: users
     })
   }
@@ -97,7 +98,7 @@ class FriendController {
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Unfriend',
+      message: 'Unfriend successfully',
       data: null
     })
   }
