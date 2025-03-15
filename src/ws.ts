@@ -8,9 +8,14 @@ class WebSocketService {
 
   init = () => {
     this.wss = new ws.Server({ port: Number(envConfig.SOCKET_PORT) })
-    this.wss.on('connection', (socket: ws.WebSocket, req: IRequest) =>
-      WsService.onConnection(socket, req)
-    )
+    this.wss.on('connection', (socket: ws.WebSocket, req: IRequest) => {
+      const url = req.url
+      if (url?.startsWith('/ws')) {
+        WsService.onConnection(socket, req)
+      } else {
+        socket.close()
+      }
+    })
   }
 }
 
