@@ -6,28 +6,51 @@ import { IUser } from '../database/model/User'
 const _logger = logger('RedisService')
 
 class RedisService {
-  private redis!: Redis
+  private redisPub!: Redis
+  private redisSub!: Redis
+
+  CHANNELS = {
+    clients_connected: 'clients_connected'
+  }
 
   init() {
-    this.redis = new Redis({
+    this.redisPub = new Redis({
       host: envConfig.REDIS_HOST,
       port: Number(envConfig.REDIS_PORT)
     })
-    this.redis.on('connect', () => {
+
+    this.redisPub.on('connect', () => {
       _logger.info('Redis connected successfully')
     })
-    this.redis.on('error', (err) => {
+    this.redisPub.on('error', (err) => {
       _logger.error('Redis error', err)
     })
-    return this.redis
+
+    this.redisSub = new Redis({
+      host: envConfig.REDIS_HOST,
+      port: Number(envConfig.REDIS_PORT)
+    })
+
+    this.redisSub.on('connect', () => {
+      _logger.info('Redis connected successfully')
+    })
+
+    this.redisSub.on('message', (channel, message) => {
+      if (channel === this.CHANNELS.clients_connected) {
+        const data = JSON.parse(message)
+        console.log(data)
+      }
+    })
+
+    this.subscribe(this.CHANNELS.clients_connected)
   }
 
   setUser(userId: string, user: IUser) {
-    this.redis.set(userId, JSON.stringify(user), 'EX', 180000)
+    this.redisPub.set(userId, JSON.stringify(user), 'EX', 180000)
   }
 
   async getUser(userId: string) {
-    const cachedUser = await this.redis.get(userId)
+    const cachedUser = await this.redisPub.get(userId)
     if (cachedUser) {
       return JSON.parse(cachedUser)
     }
@@ -35,12 +58,41 @@ class RedisService {
   }
 
   deleteUser(userId: string) {
-    this.redis.del(userId)
+    this.redisPub.del(userId)
   }
 
   disconnect() {
-    this.redis.disconnect()
+    this.redisPub.disconnect()
+    this.redisSub.disconnect()
     _logger.info('Redis disconnected successfully')
+  }
+
+  subscribe(channel: string) {
+    this.redisSub.subscribe(channel, (err) => {
+      if (err) {
+        _logger.error('Redis subscribe error', err)
+      }
+    })
+  }
+
+  unsubscribe(channel: string) {
+    this.redisSub.unsubscribe(channel, (err) => {
+      if (err) {
+        _logger.error('Redis unsubscribe error', err)
+      }
+    })
+  }
+
+  publishClients(message: string) {
+    this.redisPub.publish(this.CHANNELS.clients_connected, message, (err) => {
+      if (err) {
+        _logger.error('Redis publish error', err)
+      }
+    })
+  }
+
+  subOnMessage(callback: (channel: string, message: string) => void) {
+    this.redisSub.on('message', callback)
   }
 }
 

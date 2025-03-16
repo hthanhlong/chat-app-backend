@@ -9,6 +9,7 @@ import {
   ISocketEventGetOnlineUsers,
   ISocketEventSendMessage
 } from '../../types'
+import RedisService from '../../redis/RedisService'
 const _logger = logger('WsService')
 
 class WsService {
@@ -39,6 +40,26 @@ class WsService {
     try {
       const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
       WsService.clients.set(data.id, socket)
+      RedisService.publishClients(
+        JSON.stringify({
+          type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
+          payload: {
+            userId: data.id
+          }
+        })
+      )
+      RedisService.subOnMessage((channel, message) => {
+        if (channel === RedisService.CHANNELS.clients_connected) {
+          const data = JSON.parse(message)
+          const { type, payload } = data
+          if (type === WsService.SOCKET_EVENTS.GET_ONLINE_USERS) {
+            const { userId } = payload as ISocketEventGetOnlineUsers
+            if (!WsService.clients.has(userId)) {
+              WsService.clients.set(userId, socket)
+            }
+          }
+        }
+      })
       socket.on('message', WsService._onMessage)
       socket.on('error', (err: any) => _logger.error('Socket', err))
       socket.on('close', () => {
