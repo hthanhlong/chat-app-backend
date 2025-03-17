@@ -30,7 +30,7 @@ class FriendRepository {
   async GetAllUsersNonFriends(id: string) {
     const friendListIds = await FriendShipModel.find({
       $or: [{ senderId: id }, { receiveId: id }]
-    })
+    }).limit(100)
 
     const friendIds = friendListIds.map(function (user: {
       senderId: string
@@ -62,7 +62,10 @@ class FriendRepository {
     const friendListIds = await FriendShipModel.find({
       receiveId: id,
       status: 'PENDING'
-    }).select('senderId')
+    })
+      .select('senderId')
+      .skip(0)
+      .limit(100)
 
     const senderIds = friendListIds.map(function (user: {
       senderId: string

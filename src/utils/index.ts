@@ -67,7 +67,7 @@ export function findIpAddress(req: IRequest) {
     }
     return req.ip
   } catch (e) {
-    _logger.error(e)
+    _logger(req).error(e)
     return undefined
   }
 }

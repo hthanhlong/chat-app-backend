@@ -3,6 +3,7 @@ import { Request } from 'express'
 interface IRequest extends Request {
   decoded: JWT_PAYLOAD
   refreshToken: JWT_PAYLOAD
+  traceId: string
 }
 
 interface signUpInput {

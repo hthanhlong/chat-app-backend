@@ -13,26 +13,35 @@ class RedisService {
     clients_connected: 'clients_connected'
   }
 
-  init() {
+  initPub() {
     this.redisPub = new Redis({
       host: envConfig.REDIS_HOST,
       port: Number(envConfig.REDIS_PORT)
     })
 
     this.redisPub.on('connect', () => {
-      _logger.info('Redis connected successfully')
-    })
-    this.redisPub.on('error', (err) => {
-      _logger.error('Redis error', err)
+      _logger(null).info('Redis connected successfully')
     })
 
+    this.redisPub.on('error', (err) => {
+      _logger(null).error('Redis error', err)
+      process.exit(1)
+    })
+  }
+
+  initSub() {
     this.redisSub = new Redis({
       host: envConfig.REDIS_HOST,
       port: Number(envConfig.REDIS_PORT)
     })
 
     this.redisSub.on('connect', () => {
-      _logger.info('Redis connected successfully')
+      _logger(null).info('Redis connected successfully')
+    })
+
+    this.redisSub.on('error', (err) => {
+      _logger(null).error('Redis error', err)
+      process.exit(1)
     })
 
     this.redisSub.on('message', (channel, message) => {
@@ -41,8 +50,6 @@ class RedisService {
         console.log(data)
       }
     })
-
-    this.subscribe(this.CHANNELS.clients_connected)
   }
 
   setUser(userId: string, user: IUser) {
@@ -64,13 +71,13 @@ class RedisService {
   disconnect() {
     this.redisPub.disconnect()
     this.redisSub.disconnect()
-    _logger.info('Redis disconnected successfully')
+    _logger(null).info('Redis disconnected successfully')
   }
 
   subscribe(channel: string) {
     this.redisSub.subscribe(channel, (err) => {
       if (err) {
-        _logger.error('Redis subscribe error', err)
+        _logger(null).error('Redis subscribe error', err)
       }
     })
   }
@@ -78,7 +85,7 @@ class RedisService {
   unsubscribe(channel: string) {
     this.redisSub.unsubscribe(channel, (err) => {
       if (err) {
-        _logger.error('Redis unsubscribe error', err)
+        _logger(null).error('Redis unsubscribe error', err)
       }
     })
   }
@@ -86,7 +93,7 @@ class RedisService {
   publishClients(message: string) {
     this.redisPub.publish(this.CHANNELS.clients_connected, message, (err) => {
       if (err) {
-        _logger.error('Redis publish error', err)
+        _logger(null).error('Redis publish error', err)
       }
     })
   }

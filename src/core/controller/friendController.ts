@@ -2,11 +2,17 @@ import { Response } from 'express'
 import { WsService, FriendService, MessageService } from '../services'
 import HttpException from '../../utils/httpExceptions'
 import { IRequest } from '../../types'
+import logger from '../../utils/logger'
+
+const _logger = logger('FriendController')
 
 class FriendController {
   async sendFriendRequest(req: IRequest, res: Response) {
     const { senderId, receiverId, status } = req.body
     FriendService.sendFriendRequest({ senderId, receiverId, status })
+
+    _logger(req).info('Send friend request successful')
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -17,6 +23,11 @@ class FriendController {
 
   getFriendRequest = async (req: IRequest, res: Response) => {
     const users = await FriendService.getFriendRequest(req.params.id)
+
+    _logger(req).info('Get friend request successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -32,6 +43,11 @@ class FriendController {
       receiverId,
       status
     })
+
+    _logger(req).info('Update status friend successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -43,6 +59,11 @@ class FriendController {
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.body
     const users = await FriendService.getAllUsersNonFriends(userId)
+
+    _logger(req).info('Get all users non friends successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -57,6 +78,11 @@ class FriendController {
       throw HttpException.badRequestError()
     }
     const users = await FriendService.getMyFriends(userId)
+
+    _logger(req).info('Get my friends successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -67,6 +93,8 @@ class FriendController {
 
   searchFriendByKeyword = async (req: IRequest, res: Response) => {
     if (!req.query.q || !req.params.id) {
+      _logger(req).error('Invalid query')
+
       res.status(400).json({
         isSuccess: false,
         errorCode: '400',
@@ -79,6 +107,11 @@ class FriendController {
       id: req.params.id,
       keyword: req.query.q as string
     })
+
+    _logger(req).info('Search friend by keyword successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -94,6 +127,8 @@ class FriendController {
     WsService.sendDataToClientById(receiverId, {
       type: 'UPDATE_FRIEND_LIST'
     })
+
+    _logger(req).info('Unfriend successful')
 
     res.status(200).json({
       isSuccess: true,

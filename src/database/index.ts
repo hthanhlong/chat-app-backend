@@ -9,10 +9,10 @@ class Database {
   init = async () => {
     try {
       await mongoose.connect(envConfig.MONGO_URL)
-      _logger.info('MongoDB connected successfully')
+      _logger(null).info('MongoDB connected successfully')
       await this.createMyAIAccount()
     } catch (error) {
-      _logger.error('MongoDB connection error:', error)
+      _logger(null).error('MongoDB connection error:', error)
       process.exit(1)
     }
   }
@@ -32,7 +32,7 @@ class Database {
 
   close = async () => {
     await mongoose.connection.close()
-    _logger.info('MongoDB disconnected successfully')
+    _logger(null).info('MongoDB disconnected successfully')
   }
 }
 

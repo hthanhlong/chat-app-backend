@@ -6,6 +6,9 @@ import { UserService, AuthService } from '../services'
 import { JWT_PAYLOAD, IRequest } from '../../types'
 import { IUser } from '../../database/model/User'
 import RedisService from '../../redis/RedisService'
+import logger from '../../utils/logger'
+
+const _logger = logger('AuthController')
 
 const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID)
 
@@ -34,6 +37,10 @@ class AuthController {
     }
 
     await AuthService.signUp(req.body)
+
+    _logger(req).info('Signup successful', {
+      data: req.body
+    })
 
     res.status(201).json({
       isSuccess: true,
@@ -67,7 +74,9 @@ class AuthController {
       id: user._id.toString(),
       username: user.username
     })
-
+    _logger(req).info('Sign in successful', {
+      data: data
+    })
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -79,6 +88,9 @@ class AuthController {
   refreshToken = async (req: IRequest, res: Response) => {
     const refreshToken = req.refreshToken as JWT_PAYLOAD
     const newAccessToken = await AuthService.refreshToken(refreshToken)
+    _logger(req).info('Refresh token successful', {
+      data: { accessToken: newAccessToken }
+    })
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -115,6 +127,9 @@ class AuthController {
       id: user._id.toString(),
       username: user.username
     })
+    _logger(req).info('Google sign in successful', {
+      data: data
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -130,6 +145,11 @@ class AuthController {
       throw HttpException.badRequestError()
     }
     RedisService.deleteUser(userId)
+
+    _logger(req).info('Sign out successful', {
+      data: { userId }
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,

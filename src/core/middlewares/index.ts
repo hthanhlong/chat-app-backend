@@ -4,6 +4,7 @@ import validateRefreshToken from './validateRefreshToken'
 import handleNotFoundRoute from './handleNotFoundRoute'
 import limiter from './rateLimiter'
 import errorHandler from './errorHandler'
+import logTraceId from './logTraceId'
 
 export {
   validateAccessToken,
@@ -11,5 +12,6 @@ export {
   validateRefreshToken,
   handleNotFoundRoute,
   errorHandler,
-  limiter
+  limiter,
+  logTraceId
 }

@@ -17,11 +17,13 @@ import {
 import {
   validateAccessToken,
   validateRefreshToken,
-  validatorInput
+  validatorInput,
+  logTraceId
 } from '../core/middlewares'
 import { asyncHandler } from '../helpers'
 
 const router = express.Router()
+router.use(logTraceId)
 
 //router common
 router.post(

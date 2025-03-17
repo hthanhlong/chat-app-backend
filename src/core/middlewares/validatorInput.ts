@@ -1,14 +1,22 @@
 import { AnySchema } from 'joi'
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import HttpException from '../../utils/httpExceptions'
+import logger from '../../utils/logger'
+import { IRequest } from '../../types'
+
+const _logger = logger('validatorInput')
 
 const validatorInput =
   (schema: AnySchema) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: IRequest, res: Response, next: NextFunction) => {
     try {
       await schema.validateAsync(req.body)
+      _logger(req).info('Validation passed', {
+        data: req.body
+      })
       next()
     } catch (error: any) {
+      _logger(req).error(error)
       next(HttpException.validationError(error.message as string))
     }
   }

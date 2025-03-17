@@ -60,18 +60,20 @@ class WsService {
           }
         }
       })
-      socket.on('message', WsService._onMessage)
-      socket.on('error', (err: any) => _logger.error('Socket', err))
+      socket.on('message', (event: WebSocketEvent) =>
+        WsService._onMessage(event, req)
+      )
+      socket.on('error', (err: any) => _logger(req).error('Socket', err))
       socket.on('close', () => {
         WsService.clients.delete(data.id)
       })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')
-      _logger.error('error.message', error.message)
+      _logger(req).error('error.message', error.message)
     }
   }
 
-  static async _onMessage(event: WebSocketEvent): Promise<void> {
+  static async _onMessage(event: WebSocketEvent, req: IRequest): Promise<void> {
     try {
       const data = JSON.parse(event as any)
       if (!data.type || !data.payload) return
@@ -113,7 +115,7 @@ class WsService {
           break
       }
     } catch (error: Error | any) {
-      _logger.error('error.message', error.message)
+      _logger(req).error('error.message', error.message)
     }
   }
 

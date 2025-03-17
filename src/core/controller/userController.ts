@@ -2,6 +2,9 @@ import { Response } from 'express'
 import { IRequest } from '../../types'
 import HttpException from '../../utils/httpExceptions'
 import { UserService, FriendService } from '../services'
+import logger from '../../utils/logger'
+
+const _logger = logger('UserController')
 
 class UserController {
   getMe = async (req: IRequest, res: Response) => {
@@ -13,6 +16,10 @@ class UserController {
     if (!user) {
       throw HttpException.badRequestError()
     }
+
+    _logger(req).info('Get me successful', {
+      data: user
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -28,6 +35,11 @@ class UserController {
       throw HttpException.badRequestError()
     }
     const users = await FriendService.getAllUsersNonFriends(userId)
+
+    _logger(req).info('Get users successful', {
+      data: users
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -41,6 +53,11 @@ class UserController {
     if (!user) {
       throw HttpException.badRequestError()
     }
+
+    _logger(req).info('Update user successful', {
+      data: user
+    })
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
