@@ -1,7 +1,7 @@
-import JWTService from '../services/JWTService'
+import JWTService from '../core/services/JWTService'
 import { NextFunction, Response } from 'express'
-import { IRequest, JWT_PAYLOAD } from '../../types'
-import HttpException from '../../utils/httpExceptions'
+import { IRequest, JWT_PAYLOAD } from '../types'
+import HttpException from '../utils/httpExceptions'
 
 const validateAccessToken = async (
   req: IRequest,

@@ -1,19 +1,21 @@
 import {
   signUpSchema,
   signInSchema,
-  sendFriendRequestSchema,
+  addFriendSchema,
   refreshTokenSchema,
   userUpdateSchema,
   googleSignInSchema,
-  signOutSchema
+  updateFriendStatusSchema,
+  deleteAllMessageSchema
 } from './schema'
 
 export {
   signUpSchema,
   signInSchema,
-  sendFriendRequestSchema,
+  addFriendSchema,
   refreshTokenSchema,
   userUpdateSchema,
   googleSignInSchema,
-  signOutSchema
+  updateFriendStatusSchema,
+  deleteAllMessageSchema
 }

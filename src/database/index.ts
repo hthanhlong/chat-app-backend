@@ -19,12 +19,12 @@ class Database {
 
   // seed
   createMyAIAccount = async () => {
-    const user = await UserService.findUserByEmail('MyAI@gmail.com')
+    const user = await UserService.findUserByEmail('myai@gmail.com')
     if (user) return
     await AuthService.signUp({
       nickname: `I'm AI`,
       username: 'MyAI',
-      email: 'MyAI@gmail.com',
+      email: 'myai@gmail.com',
       password: 'pjUl0Y+Ne62tvXvn',
       caption: 'I will help you'
     })

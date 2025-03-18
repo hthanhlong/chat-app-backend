@@ -7,13 +7,13 @@ import logger from '../../utils/logger'
 const _logger = logger('MessageController')
 
 class MessageController {
-  getAllMessages = async (req: IRequest, res: Response) => {
-    const partnerId = req.query.partnerId as string
-    if (!partnerId) {
+  getMessages = async (req: IRequest, res: Response) => {
+    const { userId: senderId } = req.decoded
+    const { friendId } = req.params
+    if (!friendId) {
       throw HttpException.badRequestError()
     }
-    const userId = req.decoded.id
-    const messages = await MessageService.getAllMessages(userId, partnerId)
+    const messages = await MessageService.getAllMessages(senderId, friendId)
 
     _logger(req).info('Get all messages successful')
 
@@ -26,12 +26,14 @@ class MessageController {
   }
 
   getLatestMessage = async (req: IRequest, res: Response) => {
-    const partnerId = req.query.partnerId as string
-    if (!partnerId) {
-      throw HttpException.badRequestError()
-    }
-    const userId = req.decoded.id
-    const lastMessage = await MessageService.getLatestMessage(userId, partnerId)
+    const { userId: senderId } = req.decoded
+    const { friendId } = req.params
+    if (!friendId) throw HttpException.badRequestError()
+
+    const lastMessage = await MessageService.getLatestMessage(
+      senderId,
+      friendId
+    )
 
     _logger(req).info('Get last message successful', {
       data: lastMessage
@@ -46,8 +48,9 @@ class MessageController {
   }
 
   deleteAllMessage = async (req: IRequest, res: Response) => {
-    const { senderId, receiverId } = req.body
-    await MessageService.deleteAllMessage(senderId, receiverId)
+    const { userId: senderId } = req.decoded
+    const { friendId } = req.body
+    await MessageService.deleteAllMessage(senderId, friendId)
 
     _logger(req).info('Delete all message successful')
 

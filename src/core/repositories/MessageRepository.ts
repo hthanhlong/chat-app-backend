@@ -1,10 +1,10 @@
 import { MessageModel } from '../../database/model'
 
 class MessageRepository {
-  async getAllMessages(userId: string, partnerId: string) {
+  async getAllMessages(userId: string, friendId: string) {
     const result = await MessageModel.find({
-      senderId: { $in: [userId, partnerId] },
-      receiverId: { $in: [userId, partnerId] }
+      senderId: { $in: [userId, friendId] },
+      receiverId: { $in: [userId, friendId] }
     })
       .sort({ createdAt: -1 })
       .limit(100)
@@ -31,10 +31,10 @@ class MessageRepository {
     })
   }
 
-  async getLatestMessage(userId: string, partnerId: string) {
+  async getLatestMessage(userId: string, friendId: string) {
     return await MessageModel.findOne({
-      senderId: { $in: [userId, partnerId] },
-      receiverId: { $in: [userId, partnerId] }
+      senderId: { $in: [userId, friendId] },
+      receiverId: { $in: [userId, friendId] }
     })
       .sort({ createdAt: -1 })
       .limit(1)

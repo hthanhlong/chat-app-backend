@@ -1,15 +1,15 @@
 import { Response } from 'express'
 import { WsService, FriendService, MessageService } from '../services'
-import HttpException from '../../utils/httpExceptions'
 import { IRequest } from '../../types'
 import logger from '../../utils/logger'
 
 const _logger = logger('FriendController')
 
 class FriendController {
-  async sendFriendRequest(req: IRequest, res: Response) {
-    const { senderId, receiverId, status } = req.body
-    FriendService.sendFriendRequest({ senderId, receiverId, status })
+  addFriend = async (req: IRequest, res: Response) => {
+    const { userId: senderId } = req.decoded
+    const { receiverId, status } = req.body
+    await FriendService.addFriend({ senderId, receiverId, status })
 
     _logger(req).info('Send friend request successful')
 
@@ -22,7 +22,8 @@ class FriendController {
   }
 
   getFriendRequest = async (req: IRequest, res: Response) => {
-    const users = await FriendService.getFriendRequest(req.params.id)
+    const { userId } = req.decoded
+    const users = await FriendService.getFriendRequest(userId)
 
     _logger(req).info('Get friend request successful', {
       data: users
@@ -31,35 +32,46 @@ class FriendController {
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Get all users',
+      message: 'Get friend request successful',
       data: users
     })
   }
 
   updateStatusFriend = async (req: IRequest, res: Response) => {
-    const { senderId, receiverId, status } = req.body
-    const users = await FriendService.updateStatusFriend({
+    const { userId: senderId } = req.decoded
+    const { receiverId, status } = req.body
+
+    const result = await FriendService.updateStatusFriend({
       senderId,
       receiverId,
       status
     })
 
-    _logger(req).info('Update status friend successful', {
-      data: users
-    })
+    if (!result) {
+      _logger(req).error('Update status friend failed')
+      res.status(400).json({
+        isSuccess: false,
+        errorCode: '400',
+        message: 'Update status friend failed',
+        data: null
+      })
+      return
+    }
+
+    _logger(req).info('Update status friend successful')
 
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
       message: 'update status friend successfully',
-      data: users
+      data: null
     })
   }
 
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
-    const { userId } = req.body
+    const { userId } = req.decoded
+    console.log('userId', userId)
     const users = await FriendService.getAllUsersNonFriends(userId)
-
     _logger(req).info('Get all users non friends successful', {
       data: users
     })
@@ -72,11 +84,8 @@ class FriendController {
     })
   }
 
-  getMyFriends = async (req: IRequest, res: Response) => {
-    const userId = req.query.id as string
-    if (!userId) {
-      throw HttpException.badRequestError()
-    }
+  getFriends = async (req: IRequest, res: Response) => {
+    const { userId } = req.decoded
     const users = await FriendService.getMyFriends(userId)
 
     _logger(req).info('Get my friends successful', {
@@ -92,7 +101,10 @@ class FriendController {
   }
 
   searchFriendByKeyword = async (req: IRequest, res: Response) => {
-    if (!req.query.q || !req.params.id) {
+    const { userId } = req.decoded
+    const { keyword } = req.query
+
+    if (!userId || !keyword) {
       _logger(req).error('Invalid query')
 
       res.status(400).json({
@@ -104,8 +116,8 @@ class FriendController {
       return
     }
     const users = await FriendService.searchFriendByKeyword({
-      id: req.params.id,
-      keyword: req.query.q as string
+      userId,
+      keyword: keyword as string
     })
 
     _logger(req).info('Search friend by keyword successful', {
@@ -115,16 +127,17 @@ class FriendController {
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Get all users',
+      message: 'Search friend by keyword successful',
       data: users
     })
   }
 
   unFriend = async (req: IRequest, res: Response) => {
-    const { senderId, receiverId } = req.body
-    await FriendService.unfriend({ senderId, receiverId })
-    await MessageService.deleteAllMessage(senderId, receiverId)
-    WsService.sendDataToClientById(receiverId, {
+    const { userId: senderId } = req.decoded
+    const { friendId } = req.params
+    await FriendService.unfriend({ senderId, friendId })
+    await MessageService.deleteAllMessage(senderId, friendId)
+    WsService.sendDataToClientById(friendId, {
       type: 'UPDATE_FRIEND_LIST'
     })
 

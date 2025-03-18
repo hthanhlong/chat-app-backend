@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import HttpException from '../../utils/httpExceptions'
+import HttpException from '../utils/httpExceptions'
 
 const handleNotFoundRoute = (
   req: Request,

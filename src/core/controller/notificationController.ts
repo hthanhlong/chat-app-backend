@@ -6,10 +6,11 @@ import logger from '../../utils/logger'
 const _logger = logger('NotificationController')
 
 class NotificationController {
-  getAllNotificationsById = async (req: IRequest, res: Response) => {
-    const notifications = await NotificationService.getAllNotificationsById(
-      req.params.id
-    )
+  getNotifications = async (req: IRequest, res: Response) => {
+    const { userId } = req.decoded
+
+    const notifications =
+      await NotificationService.getAllNotificationsById(userId)
 
     _logger(req).info('Get all notifications successful', {
       data: notifications
@@ -24,8 +25,8 @@ class NotificationController {
   }
 
   updateNotification = async (req: IRequest, res: Response) => {
-    const { id, status } = req.body
-    await NotificationService.updateNotification({ id, status })
+    const { notificationId, status } = req.body
+    await NotificationService.updateNotification({ id: notificationId, status })
 
     _logger(req).info('Update notification successful')
 

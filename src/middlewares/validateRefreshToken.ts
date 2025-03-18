@@ -1,8 +1,7 @@
-import { refreshTokenSchema } from './../../validation/schema'
 import { NextFunction, Response } from 'express'
-import HttpException from '../../utils/httpExceptions'
-import JWTService from '../services/JWTService'
-import { IRequest } from '../../types'
+import HttpException from '../utils/httpExceptions'
+import JWTService from '../core/services/JWTService'
+import { IRequest } from '../types'
 
 const validateRefreshToken = async (
   req: IRequest,

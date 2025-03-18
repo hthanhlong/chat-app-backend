@@ -1,8 +1,8 @@
 import { AnySchema } from 'joi'
 import { Response, NextFunction } from 'express'
-import HttpException from '../../utils/httpExceptions'
-import logger from '../../utils/logger'
-import { IRequest } from '../../types'
+import HttpException from '../utils/httpExceptions'
+import logger from '../utils/logger'
+import { IRequest } from '../types'
 
 const _logger = logger('validatorInput')
 

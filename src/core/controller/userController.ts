@@ -7,52 +7,70 @@ import logger from '../../utils/logger'
 const _logger = logger('UserController')
 
 class UserController {
-  getMe = async (req: IRequest, res: Response) => {
-    const userId = req.query.id as string
-    if (!userId) {
-      throw HttpException.badRequestError()
-    }
+  getUser = async (req: IRequest, res: Response) => {
+    const { userId } = req.decoded
+    const user = await UserService.findUserById(userId)
+
+    _logger(req).info('Get user successful', {
+      data: user
+    })
+
+    res.status(200).json({
+      isSuccess: true,
+      errorCode: null,
+      message: 'Get user successful',
+      data: user
+    })
+  }
+
+  getUserById = async (req: IRequest, res: Response) => {
+    const userId = req.params.userId
+    if (!userId) throw HttpException.badRequestError()
     const user = await UserService.findUserById(userId)
     if (!user) {
-      throw HttpException.badRequestError()
+      res.status(200).json({
+        isSuccess: true,
+        errorCode: null,
+        message: 'No user found',
+        data: null
+      })
+      return
     }
 
-    _logger(req).info('Get me successful', {
+    _logger(req).info('Get user by id successful', {
       data: user
     })
 
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Get me successful',
+      message: 'Get user by id successful',
       data: user
     })
   }
 
-  getUsers = async (req: IRequest, res: Response) => {
-    const userId = req.query.id as string
-    if (!userId) {
-      throw HttpException.badRequestError()
-    }
+  getUsersNonFriends = async (req: IRequest, res: Response) => {
+    const { userId } = req.decoded
+    console.log('userId', userId)
+    if (!userId) throw HttpException.badRequestError()
     const users = await FriendService.getAllUsersNonFriends(userId)
 
-    _logger(req).info('Get users successful', {
+    _logger(req).info('Get users non friends successful', {
       data: users
     })
 
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
-      message: 'Get users successful',
+      message: 'Get users non friends successful',
       data: users
     })
   }
 
-  updateUserById = async (req: IRequest, res: Response) => {
-    const user = await UserService.updateUserById(req.params.id, req.body)
-    if (!user) {
-      throw HttpException.badRequestError()
-    }
+  updateUser = async (req: IRequest, res: Response) => {
+    const { userId } = req.decoded
+    if (!userId) throw HttpException.badRequestError()
+    const user = await UserService.updateUserById(userId, req.body)
 
     _logger(req).info('Update user successful', {
       data: user

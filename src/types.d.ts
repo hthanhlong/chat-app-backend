@@ -39,7 +39,7 @@ interface sendDataToIdByWs {
 }
 
 interface JWT_PAYLOAD {
-  id: string
+  userId: string
   username: string
 }
 

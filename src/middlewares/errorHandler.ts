@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express'
-import { IRequest } from '../../types'
-import HttpException from '../../utils/httpExceptions'
+import HttpException from '../utils/httpExceptions'
+import { IRequest } from '../types'
 
 const errorHandler = (
   error: HttpException | Error,

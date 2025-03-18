@@ -1,16 +1,20 @@
-import { FriendRequest } from '../../types'
 import { FriendRepository } from '../repositories'
+import { FriendRequest } from '../../types'
 class FriendService {
-  async sendFriendRequest(data: FriendRequest) {
-    return await FriendRepository.SendFriendRequest(data)
+  async addFriend(data: FriendRequest) {
+    return await FriendRepository.addFriend({
+      senderId: data.senderId,
+      receiverId: data.receiverId,
+      status: data.status
+    })
   }
 
-  async getAllUsersNonFriends(id: string) {
-    return await FriendRepository.GetAllUsersNonFriends(id)
+  async getAllUsersNonFriends(userId: string) {
+    return await FriendRepository.GetAllUsersNonFriends(userId)
   }
 
-  async getFriendRequest(id: string) {
-    return await FriendRepository.GetFriendRequests(id)
+  async getFriendRequest(userId: string) {
+    return await FriendRepository.GetFriendRequests(userId)
   }
 
   async getMyFriends(id: string) {
@@ -22,28 +26,28 @@ class FriendService {
   }
 
   async searchFriendByKeyword({
-    id,
+    userId,
     keyword
   }: {
-    id: string
+    userId: string
     keyword: string
   }) {
     return await FriendRepository.searchFriendByKeyword({
-      id,
+      userId,
       keyword
     })
   }
 
   async unfriend({
     senderId,
-    receiverId
+    friendId
   }: {
     senderId: string
-    receiverId: string
+    friendId: string
   }) {
     return await FriendRepository.unfriend({
       senderId,
-      receiverId
+      friendId
     })
   }
 }

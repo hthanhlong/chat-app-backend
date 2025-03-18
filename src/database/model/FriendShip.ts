@@ -22,7 +22,7 @@ const schema = new Schema<IFriendShip>(
     },
     status: {
       type: Schema.Types.String,
-      ref: 'FriendStatus'
+      enum: ['PENDING', 'FRIEND', 'BLOCKED', 'REJECTED']
     }
   },
   {

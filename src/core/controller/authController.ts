@@ -140,10 +140,7 @@ class AuthController {
   }
 
   signOut = async (req: IRequest, res: Response) => {
-    const userId = req.body.id as string
-    if (!userId) {
-      throw HttpException.badRequestError()
-    }
+    const { userId } = req.decoded
     RedisService.deleteUser(userId)
 
     _logger(req).info('Sign out successful', {

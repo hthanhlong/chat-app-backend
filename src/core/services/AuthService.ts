@@ -29,7 +29,8 @@ class AuthService {
     }
 
     const result = await UserService.createUser(user as IUser)
-    const myAI = await UserService.findUserByEmail('MyAI@gmail.com')
+    const myAI = await UserService.findUserByEmail('myai@gmail.com')
+
     if (myAI && result) {
       await FriendService.updateStatusFriend({
         senderId: myAI._id.toString(),
@@ -43,7 +44,7 @@ class AuthService {
   async signIn({ id, username }: { id: string; username: string }) {
     if (!username) return null
     const payload = {
-      id: id,
+      userId: id,
       username: username
     } as JWT_PAYLOAD
     const { accessToken, refreshToken } = JWTService.generateToken(payload)
@@ -52,8 +53,8 @@ class AuthService {
   }
 
   async refreshToken(refreshToken: JWT_PAYLOAD): Promise<string> {
-    const { id, username } = refreshToken
-    const accessToken = JWTService.signAccessToken({ id, username })
+    const { userId, username } = refreshToken
+    const accessToken = JWTService.signAccessToken({ userId, username })
     return accessToken
   }
 }

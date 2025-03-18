@@ -13,8 +13,7 @@ export const signInSchema = Joi.object({
   password: Joi.string().required().min(6).max(64)
 })
 
-export const sendFriendRequestSchema = Joi.object({
-  senderId: Joi.string().required(),
+export const addFriendSchema = Joi.object({
   receiverId: Joi.string().required(),
   status: Joi.string().required()
 })
@@ -36,4 +35,13 @@ export const googleSignInSchema = Joi.object({
 
 export const signOutSchema = Joi.object({
   id: Joi.string().required()
+})
+
+export const updateFriendStatusSchema = Joi.object({
+  receiverId: Joi.string().required(),
+  status: Joi.string().required()
+})
+
+export const deleteAllMessageSchema = Joi.object({
+  friendId: Joi.string().required()
 })
