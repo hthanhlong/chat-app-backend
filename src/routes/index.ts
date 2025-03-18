@@ -76,7 +76,7 @@ router.post(
   asyncHandler(FriendController.updateStatusFriend)
 )
 router.get(
-  '/search-friend/:id',
+  '/search-friend',
   asyncHandler(FriendController.searchFriendByKeyword)
 )
 router.post('/unfriend', asyncHandler(FriendController.unFriend))

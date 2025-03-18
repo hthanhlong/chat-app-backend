@@ -92,7 +92,9 @@ class FriendController {
   }
 
   searchFriendByKeyword = async (req: IRequest, res: Response) => {
-    if (!req.query.q || !req.params.id) {
+    const { id, keyword } = req.query
+
+    if (!id || !keyword) {
       _logger(req).error('Invalid query')
 
       res.status(400).json({
@@ -104,8 +106,8 @@ class FriendController {
       return
     }
     const users = await FriendService.searchFriendByKeyword({
-      id: req.params.id,
-      keyword: req.query.q as string
+      id: id as string,
+      keyword: keyword as string
     })
 
     _logger(req).info('Search friend by keyword successful', {

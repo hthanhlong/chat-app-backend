@@ -3,6 +3,8 @@ import { UserModel, FriendShipModel } from '../../database/model'
 import { UserService, NotificationService } from '../services'
 import { IUser } from '../../database/model/User'
 
+const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
+
 class FriendRepository {
   async SendFriendRequest(data: {
     senderId: string
@@ -121,10 +123,13 @@ class FriendRepository {
     id: string
     keyword: string
   }) {
-    const friendListIds = await this._filterFriendsById(id)
-    if (!friendListIds) return []
+    // to do refactor - because call 2
+    const friendListIds = await this._filterFriendsById(id) // get list friends by id
     const result = await UserModel.find({
-      nickname: { $regex: keyword },
+      nickname: {
+        $regex: keyword.replace(regexPattern, '\\$&'),
+        $options: 'i'
+      },
       _id: { $in: friendListIds.filter((id) => id !== undefined) }
     })
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
