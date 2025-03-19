@@ -38,9 +38,7 @@ class AuthController {
 
     await AuthService.signUp(req.body)
 
-    _logger(req).info('Signup successful', {
-      data: req.body
-    })
+    _logger(req).info('Signup successful')
 
     res.status(201).json({
       isSuccess: true,
@@ -74,9 +72,7 @@ class AuthController {
       id: user._id.toString(),
       username: user.username
     })
-    _logger(req).info('Sign in successful', {
-      data: data
-    })
+    _logger(req).info('Sign in successful')
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -88,9 +84,7 @@ class AuthController {
   refreshToken = async (req: IRequest, res: Response) => {
     const refreshToken = req.refreshToken as JWT_PAYLOAD
     const newAccessToken = await AuthService.refreshToken(refreshToken)
-    _logger(req).info('Refresh token successful', {
-      data: { accessToken: newAccessToken }
-    })
+    _logger(req).info('Refresh token successful')
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
@@ -127,9 +121,7 @@ class AuthController {
       id: user._id.toString(),
       username: user.username
     })
-    _logger(req).info('Google sign in successful', {
-      data: data
-    })
+    _logger(req).info('Google sign in successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -143,9 +135,7 @@ class AuthController {
     const { userId } = req.decoded
     RedisService.deleteUser(userId)
 
-    _logger(req).info('Sign out successful', {
-      data: { userId }
-    })
+    _logger(req).info('Sign out successful')
 
     res.status(200).json({
       isSuccess: true,

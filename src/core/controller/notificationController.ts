@@ -12,9 +12,7 @@ class NotificationController {
     const notifications =
       await NotificationService.getAllNotificationsById(userId)
 
-    _logger(req).info('Get all notifications successful', {
-      data: notifications
-    })
+    _logger(req).info('Get all notifications successful')
 
     res.status(200).json({
       isSuccess: true,

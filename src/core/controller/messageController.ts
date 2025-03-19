@@ -10,10 +10,15 @@ class MessageController {
   getMessages = async (req: IRequest, res: Response) => {
     const { userId: senderId } = req.decoded
     const { friendId } = req.params
+    const { page } = req.query
     if (!friendId) {
       throw HttpException.badRequestError()
     }
-    const messages = await MessageService.getAllMessages(senderId, friendId)
+    const messages = await MessageService.getAllMessages(
+      senderId,
+      friendId,
+      page ? Number(page) : 1
+    )
 
     _logger(req).info('Get all messages successful')
 
@@ -35,9 +40,7 @@ class MessageController {
       friendId
     )
 
-    _logger(req).info('Get last message successful', {
-      data: lastMessage
-    })
+    _logger(req).info('Get last message successful')
 
     res.status(200).json({
       isSuccess: true,

@@ -1,7 +1,7 @@
 import { MessageRepository } from '../repositories'
 class MessageService {
-  async getAllMessages(userId: string, friendId: string) {
-    return await MessageRepository.getAllMessages(userId, friendId)
+  async getAllMessages(userId: string, friendId: string, page: number = 1) {
+    return await MessageRepository.getAllMessages(userId, friendId, page)
   }
 
   async createMessage({

@@ -11,9 +11,7 @@ const validatorInput =
   async (req: IRequest, res: Response, next: NextFunction) => {
     try {
       await schema.validateAsync(req.body)
-      _logger(req).info('Validation passed', {
-        data: req.body
-      })
+      _logger(req).info('Validation passed')
       next()
     } catch (error: any) {
       _logger(req).error(error)

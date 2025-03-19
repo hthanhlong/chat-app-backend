@@ -25,9 +25,7 @@ class FriendController {
     const { userId } = req.decoded
     const users = await FriendService.getFriendRequest(userId)
 
-    _logger(req).info('Get friend request successful', {
-      data: users
-    })
+    _logger(req).info('Get friend request successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -72,9 +70,7 @@ class FriendController {
     const { userId } = req.decoded
     console.log('userId', userId)
     const users = await FriendService.getAllUsersNonFriends(userId)
-    _logger(req).info('Get all users non friends successful', {
-      data: users
-    })
+    _logger(req).info('Get all users non friends successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -88,9 +84,7 @@ class FriendController {
     const { userId } = req.decoded
     const users = await FriendService.getMyFriends(userId)
 
-    _logger(req).info('Get my friends successful', {
-      data: users
-    })
+    _logger(req).info('Get my friends successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -120,9 +114,7 @@ class FriendController {
       keyword: keyword as string
     })
 
-    _logger(req).info('Search friend by keyword successful', {
-      data: users
-    })
+    _logger(req).info('Search friend by keyword successful')
 
     res.status(200).json({
       isSuccess: true,

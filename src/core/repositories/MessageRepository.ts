@@ -1,15 +1,36 @@
 import { MessageModel } from '../../database/model'
 
 class MessageRepository {
-  async getAllMessages(userId: string, friendId: string) {
-    const result = await MessageModel.find({
-      senderId: { $in: [userId, friendId] },
-      receiverId: { $in: [userId, friendId] }
+  async getAllMessages(
+    userId: string,
+    friendId: string,
+    page: number = 1,
+    limit: number = 20
+  ) {
+    const skip = (page - 1) * limit
+
+    const messages = await MessageModel.find({
+      $or: [
+        { senderId: userId, receiverId: friendId },
+        { senderId: friendId, receiverId: userId }
+      ]
     })
       .sort({ createdAt: -1 })
-      .limit(100)
-    const reversedResult = result.reverse()
-    return reversedResult
+      .skip(skip)
+      .limit(limit)
+
+    const totalCount = await MessageModel.countDocuments({
+      $or: [
+        { senderId: userId, receiverId: friendId },
+        { senderId: friendId, receiverId: userId }
+      ]
+    })
+
+    return {
+      messages: messages.reverse(),
+      hasMore: skip + messages.length < totalCount,
+      currentPage: page
+    }
   }
 
   async createMessage({

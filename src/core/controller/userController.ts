@@ -11,9 +11,7 @@ class UserController {
     const { userId } = req.decoded
     const user = await UserService.findUserById(userId)
 
-    _logger(req).info('Get user successful', {
-      data: user
-    })
+    _logger(req).info('Get user successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -37,9 +35,7 @@ class UserController {
       return
     }
 
-    _logger(req).info('Get user by id successful', {
-      data: user
-    })
+    _logger(req).info('Get user by id successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -55,9 +51,7 @@ class UserController {
     if (!userId) throw HttpException.badRequestError()
     const users = await FriendService.getAllUsersNonFriends(userId)
 
-    _logger(req).info('Get users non friends successful', {
-      data: users
-    })
+    _logger(req).info('Get users non friends successful')
 
     res.status(200).json({
       isSuccess: true,
@@ -72,9 +66,7 @@ class UserController {
     if (!userId) throw HttpException.badRequestError()
     const user = await UserService.updateUserById(userId, req.body)
 
-    _logger(req).info('Update user successful', {
-      data: user
-    })
+    _logger(req).info('Update user successful')
 
     res.status(200).json({
       isSuccess: true,

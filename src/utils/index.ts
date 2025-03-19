@@ -57,24 +57,3 @@ export const dataSelectedByKeys = (
   })
   return newItem
 }
-
-export function findIpAddress(req: IRequest) {
-  try {
-    if (req.headers['x-forwarded-for']) {
-      return req.headers['x-forwarded-for'].toString().split(',')[0]
-    } else if (req.connection && req.connection.remoteAddress) {
-      return req.connection.remoteAddress
-    }
-    return req.ip
-  } catch (e) {
-    _logger(req).error(e)
-    return undefined
-  }
-}
-
-export function restrictIpAddress(req: IRequest, ipAddress: string) {
-  if (ipAddress === '*') return
-  const ip = findIpAddress(req)
-  if (!ip) throw HttpException.forbiddenError()
-  if (ipAddress !== ip) throw HttpException.forbiddenError()
-}

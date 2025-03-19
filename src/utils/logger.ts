@@ -2,11 +2,11 @@ import winston from 'winston'
 import { IRequest } from '../types'
 import path from 'path'
 
-// const logFormat = winston.format.printf(
-//   ({ level, message, timestamp, traceId }) => {
-//     return `[${timestamp}] [traceId: ${traceId || 'N/A'}] ${level.toUpperCase()}: ${message}`
-//   }
-// )
+/*
+  Todo list:
+  - add log central
+  - add estimate time request
+*/
 
 const logger = (where: string) => (req: IRequest | null) =>
   winston.createLogger({
