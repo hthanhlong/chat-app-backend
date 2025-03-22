@@ -9,7 +9,7 @@ const notificationPaths = {
   getNotifications: '/'
 }
 
-notificationRouter.use(validateAccessToken)
+notificationRouter.use(asyncHandler(validateAccessToken))
 
 notificationRouter.post(
   notificationPaths.updateNotification,

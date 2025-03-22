@@ -14,7 +14,7 @@ const friendPaths = {
   getFriends: '/'
 }
 
-friendRouter.use(validateAccessToken)
+friendRouter.use(asyncHandler(validateAccessToken))
 
 friendRouter.post(
   friendPaths.addFriend,

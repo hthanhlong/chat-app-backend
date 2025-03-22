@@ -13,7 +13,7 @@ const userPaths = {
   updateUser: '/'
 }
 
-userRouter.use(validateAccessToken)
+userRouter.use(asyncHandler(validateAccessToken))
 
 userRouter.get(
   userPaths.getUsersNonFriends,

@@ -50,7 +50,7 @@ authRouter.post(
 
 authRouter.get(
   authPaths.signOut,
-  validateAccessToken,
+  asyncHandler(validateAccessToken),
   asyncHandler(AuthController.signOut)
 )
 

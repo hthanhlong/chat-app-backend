@@ -42,7 +42,7 @@ class NotificationRepository {
 
   async getAllNotificationsById(id: string) {
     const allNotifications = await NotificationModel.find({
-      $or: [{ senderId: id }, { receiverId: id }]
+      receiverId: id
     })
       .sort({ createdAt: -1 })
       .limit(50)

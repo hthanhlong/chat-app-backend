@@ -12,7 +12,7 @@ const messagePaths = {
   deleteAllMessage: '/delete-all-message'
 }
 
-messageRouter.use(validateAccessToken)
+messageRouter.use(asyncHandler(validateAccessToken))
 
 messageRouter.get(
   messagePaths.getMessages,
