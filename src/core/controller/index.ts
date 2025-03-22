@@ -1,12 +1,12 @@
 import AuthController from './AuthController'
-import FriendController from './FriendController'
+import FriendShipController from './FriendShipController'
 import MessageController from './MessageController'
 import NotificationController from './NotificationController'
 import UserController from './UserController'
 
 export {
   AuthController,
-  FriendController,
+  FriendShipController,
   MessageController,
   NotificationController,
   UserController

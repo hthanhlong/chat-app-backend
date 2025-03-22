@@ -26,7 +26,7 @@ class NotificationRepository {
 
     WsService.sendDataToClientById(receiverId, {
       type: 'HAS_NEW_NOTIFICATION',
-      payload: notification
+      payload: null
     })
   }
 
@@ -42,7 +42,7 @@ class NotificationRepository {
 
   async getAllNotificationsById(id: string) {
     const allNotifications = await NotificationModel.find({
-      receiverId: id
+      $or: [{ senderId: id }, { receiverId: id }]
     })
       .sort({ createdAt: -1 })
       .limit(50)

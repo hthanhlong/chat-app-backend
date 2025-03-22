@@ -1,5 +1,5 @@
 import express from 'express'
-import { FriendController } from '../controller'
+import { FriendShipController } from '../controller'
 import { asyncHandler } from '../../helpers'
 import { validateAccessToken, validatorInput } from '../../middlewares'
 import { addFriendSchema, updateFriendStatusSchema } from '../../validation'
@@ -19,26 +19,29 @@ friendRouter.use(validateAccessToken)
 friendRouter.post(
   friendPaths.addFriend,
   validatorInput(addFriendSchema),
-  asyncHandler(FriendController.addFriend)
+  asyncHandler(FriendShipController.addFriend)
 )
 friendRouter.get(
   friendPaths.getFriendRequest,
-  asyncHandler(FriendController.getFriendRequest)
+  asyncHandler(FriendShipController.getFriendRequest)
 )
 
 friendRouter.post(
   friendPaths.updateFriendStatus,
   validatorInput(updateFriendStatusSchema),
-  asyncHandler(FriendController.updateStatusFriend)
+  asyncHandler(FriendShipController.updateStatusFriend)
 )
 friendRouter.get(
   friendPaths.searchFriendByKeyword,
-  asyncHandler(FriendController.searchFriendByKeyword)
+  asyncHandler(FriendShipController.searchFriendByKeyword)
 )
-friendRouter.get(friendPaths.unFriend, asyncHandler(FriendController.unFriend))
+friendRouter.get(
+  friendPaths.unFriend,
+  asyncHandler(FriendShipController.unFriend)
+)
 friendRouter.get(
   friendPaths.getFriends,
-  asyncHandler(FriendController.getFriends)
+  asyncHandler(FriendShipController.getFriends)
 )
 
 export default friendRouter

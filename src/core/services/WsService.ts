@@ -1,7 +1,7 @@
 import logger from '../../utils/logger'
 import JWTService from './JWTService'
 import MessageService from './MessageService'
-import FriendService from './FriendService'
+import FriendShipService from './FriendShipService'
 import {
   JWT_PAYLOAD,
   WebSocketEvent,
@@ -84,7 +84,7 @@ class WsService {
           const { userId } = payload as ISocketEventGetOnlineUsers
           const user = WsService.clients.get(userId)
           if (!user) return WsService.closeConnection(userId)
-          const friends = await FriendService.getMyFriends(userId)
+          const friends = await FriendShipService.getMyFriends(userId)
           const onlineUsers = clientIds.filter((id: string) =>
             friends?.some((friend: any) => friend._id.toString() === id)
           )
@@ -94,9 +94,9 @@ class WsService {
           })
           break
         case WsService.SOCKET_EVENTS.SEND_MESSAGE:
-          const { _id, senderId, receiverId, message, createdAt } =
+          const { senderId, receiverId, message, createdAt } =
             payload as ISocketEventSendMessage
-          await MessageService.createMessage({
+          const result = await MessageService.createMessage({
             senderId,
             receiverId,
             message,
@@ -105,7 +105,7 @@ class WsService {
           WsService.sendDataToClientById(receiverId, {
             type: WsService.SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
-              _id,
+              _id: result._id,
               senderId,
               receiverId,
               message,

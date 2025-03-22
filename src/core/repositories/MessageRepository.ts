@@ -44,12 +44,13 @@ class MessageRepository {
     message: string
     createdAt: Date
   }) {
-    await MessageModel.create({
+    const result = await MessageModel.create({
       senderId,
       receiverId,
       message,
       createdAt
     })
+    return result
   }
 
   async getLatestMessage(userId: string, friendId: string) {

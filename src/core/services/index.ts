@@ -3,7 +3,7 @@ import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'
 import JWTService from './JWTService'
-import FriendService from './FriendService'
+import FriendShipService from './FriendShipService'
 import MessageService from './MessageService'
 
 export {
@@ -12,6 +12,6 @@ export {
   UserService,
   WsService,
   JWTService,
-  FriendService,
+  FriendShipService,
   MessageService
 }

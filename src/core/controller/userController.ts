@@ -1,7 +1,7 @@
 import { Response } from 'express'
 import { IRequest } from '../../types'
 import HttpException from '../../utils/httpExceptions'
-import { UserService, FriendService } from '../services'
+import { UserService, FriendShipService } from '../services'
 import logger from '../../utils/logger'
 
 const _logger = logger('UserController')
@@ -49,7 +49,7 @@ class UserController {
     const { userId } = req.decoded
     console.log('userId', userId)
     if (!userId) throw HttpException.badRequestError()
-    const users = await FriendService.getAllUsersNonFriends(userId)
+    const users = await FriendShipService.getAllUsersNonFriends(userId)
 
     _logger(req).info('Get users non friends successful')
 

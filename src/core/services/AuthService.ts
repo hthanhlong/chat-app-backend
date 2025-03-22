@@ -1,5 +1,5 @@
 import { checkPassword, generateSalt, hashPassword } from '../../utils'
-import { FriendService, JWTService, UserService } from '.'
+import { FriendShipService, JWTService, UserService } from '.'
 import { signUpInput, JWT_PAYLOAD } from '../../types'
 import { IUser } from '../../database/model/User'
 
@@ -32,7 +32,7 @@ class AuthService {
     const myAI = await UserService.findUserByEmail('myai@gmail.com')
 
     if (myAI && result) {
-      await FriendService.updateStatusFriend({
+      await FriendShipService.updateStatusFriend({
         senderId: myAI._id.toString(),
         receiverId: result._id.toString(),
         status: 'FRIEND'

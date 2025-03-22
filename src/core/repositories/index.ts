@@ -1,10 +1,10 @@
-import FriendRepository from './FriendRepository'
+import FriendShipRepository from './FriendShipRepository'
 import MessageRepository from './MessageRepository'
 import NotificationRepository from './NotificationRepository'
 import UserRepository from './UserRepository'
 
 export {
-  FriendRepository,
+  FriendShipRepository,
   MessageRepository,
   NotificationRepository,
   UserRepository

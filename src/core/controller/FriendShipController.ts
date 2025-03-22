@@ -1,15 +1,15 @@
 import { Response } from 'express'
-import { WsService, FriendService, MessageService } from '../services'
+import { WsService, FriendShipService, MessageService } from '../services'
 import { IRequest } from '../../types'
 import logger from '../../utils/logger'
 
-const _logger = logger('FriendController')
+const _logger = logger('FriendShipController')
 
-class FriendController {
+class FriendShipController {
   addFriend = async (req: IRequest, res: Response) => {
     const { userId: senderId } = req.decoded
     const { receiverId, status } = req.body
-    await FriendService.addFriend({ senderId, receiverId, status })
+    await FriendShipService.addFriend({ senderId, receiverId, status })
 
     _logger(req).info('Send friend request successful')
 
@@ -23,7 +23,7 @@ class FriendController {
 
   getFriendRequest = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
-    const users = await FriendService.getFriendRequest(userId)
+    const users = await FriendShipService.getFriendRequest(userId)
 
     _logger(req).info('Get friend request successful')
 
@@ -39,7 +39,7 @@ class FriendController {
     const { userId: senderId } = req.decoded
     const { receiverId, status } = req.body
 
-    const result = await FriendService.updateStatusFriend({
+    const result = await FriendShipService.updateStatusFriend({
       senderId,
       receiverId,
       status
@@ -53,7 +53,6 @@ class FriendController {
         message: 'Update status friend failed',
         data: null
       })
-      return
     }
 
     _logger(req).info('Update status friend successful')
@@ -69,7 +68,7 @@ class FriendController {
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
     console.log('userId', userId)
-    const users = await FriendService.getAllUsersNonFriends(userId)
+    const users = await FriendShipService.getAllUsersNonFriends(userId)
     _logger(req).info('Get all users non friends successful')
 
     res.status(200).json({
@@ -82,9 +81,11 @@ class FriendController {
 
   getFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
-    const users = await FriendService.getMyFriends(userId)
+    const users = await FriendShipService.getMyFriends(userId)
 
-    _logger(req).info('Get my friends successful')
+    _logger(req).info('Get my friends successful', {
+      data: users
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -109,12 +110,14 @@ class FriendController {
       })
       return
     }
-    const users = await FriendService.searchFriendByKeyword({
+    const users = await FriendShipService.searchFriendByKeyword({
       userId,
       keyword: keyword as string
     })
 
-    _logger(req).info('Search friend by keyword successful')
+    _logger(req).info('Search friend by keyword successful', {
+      data: users
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -127,7 +130,7 @@ class FriendController {
   unFriend = async (req: IRequest, res: Response) => {
     const { userId: senderId } = req.decoded
     const { friendId } = req.params
-    await FriendService.unfriend({ senderId, friendId })
+    await FriendShipService.unfriend({ senderId, friendId })
     await MessageService.deleteAllMessage(senderId, friendId)
     WsService.sendDataToClientById(friendId, {
       type: 'UPDATE_FRIEND_LIST'
@@ -144,4 +147,4 @@ class FriendController {
   }
 }
 
-export default new FriendController()
+export default new FriendShipController()

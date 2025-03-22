@@ -5,7 +5,7 @@ import { IUser } from '../../database/model/User'
 
 const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
 
-class FriendRepository {
+class FriendShipRepository {
   async addFriend(data: {
     senderId: string
     receiverId: string
@@ -98,17 +98,10 @@ class FriendRepository {
       { $set: { status: data.status } },
       { new: true, upsert: true }
     )
-    if (result?.status === 'FRIEND') {
-      const user = await UserService.findUserById(data.receiverId)
-      await NotificationService.createNotification({
-        senderId: data.receiverId,
-        receiverId: data.senderId,
-        type: 'FRIEND',
-        content: `${user.nickname} has accepted your friend request`,
-        status: 'UNREAD'
-      })
+    if (result) {
+      return result
     }
-    return true
+    return false
   }
 
   async searchFriendByKeyword({
@@ -166,4 +159,4 @@ class FriendRepository {
   }
 }
 
-export default new FriendRepository()
+export default new FriendShipRepository()

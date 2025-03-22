@@ -53,7 +53,6 @@ interface ISocketEventGetOnlineUsers {
 }
 
 interface ISocketEventSendMessage {
-  _id: string
   senderId: string
   receiverId: string
   message: string
