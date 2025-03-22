@@ -1,7 +1,7 @@
 import winston from 'winston'
 import { IRequest } from '../types'
 import path from 'path'
-
+import DailyRotateFile from 'winston-daily-rotate-file'
 /*
   Todo list:
   - add log central
@@ -22,12 +22,11 @@ const logger = (where: string) => (req: IRequest | null) =>
     ),
     transports: [
       new winston.transports.Console(),
-      new winston.transports.File({
-        filename: path.join(__dirname, '../../logs/app.log'), // Log to file
+      new DailyRotateFile({
+        filename: path.join(__dirname, `../../logs/app.log`), // Log to file
         level: 'info',
-        maxsize: 5 * 1024 * 1024, // Max file size: 5MB
-        maxFiles: 5, // Keep last 5 log files
-        tailable: true // Keep writing to the latest file
+        maxSize: '20m', // Max file size: 20MB
+        maxFiles: '14d' // Keep last 14 days log files
       })
     ]
   })
