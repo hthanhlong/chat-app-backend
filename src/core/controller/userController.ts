@@ -47,7 +47,6 @@ class UserController {
 
   getUsersNonFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
-    console.log('userId', userId)
     if (!userId) throw HttpException.badRequestError()
     const users = await FriendShipService.getAllUsersNonFriends(userId)
 

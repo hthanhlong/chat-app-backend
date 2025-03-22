@@ -9,7 +9,7 @@ import {
   ISocketEventGetOnlineUsers,
   ISocketEventSendMessage
 } from '../../types'
-import RedisService from '../../redis/RedisService'
+import RedisService from './RedisService'
 const _logger = logger('WsService')
 
 class WsService {

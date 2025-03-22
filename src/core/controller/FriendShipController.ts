@@ -67,7 +67,6 @@ class FriendShipController {
 
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
-    console.log('userId', userId)
     const users = await FriendShipService.getAllUsersNonFriends(userId)
     _logger(req).info('Get all users non friends successful')
 

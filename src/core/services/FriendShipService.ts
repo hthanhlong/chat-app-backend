@@ -3,6 +3,7 @@ import { FriendRequest } from '../../types'
 import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'
+import RedisService from './RedisService'
 
 class FriendShipService {
   async addFriend(data: FriendRequest) {
@@ -30,6 +31,7 @@ class FriendShipService {
     if (!result) return false
     if (result?.status === 'FRIEND') {
       const user = await UserService.findUserById(data.receiverId)
+
       await NotificationService.createNotification({
         senderId: data.receiverId,
         receiverId: data.senderId,
@@ -37,6 +39,13 @@ class FriendShipService {
         content: `${user.nickname} has accepted your friend request`,
         status: 'UNREAD'
       })
+
+      RedisService.delete(
+        RedisService.CACHE_KEYS.get_friend_list_by_id(data.senderId)
+      )
+      RedisService.delete(
+        RedisService.CACHE_KEYS.get_friend_list_by_id(data.receiverId)
+      )
 
       WsService.sendDataToClientById(data.senderId, {
         type: 'UPDATE_FRIEND_LIST',

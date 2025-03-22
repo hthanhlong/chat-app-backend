@@ -7,7 +7,7 @@ import { handleNotFoundRoute, limiter, errorHandler } from './middlewares'
 import envConfig from './config'
 import Database from './database'
 import WebSocketService from './ws'
-import RedisService from './redis'
+import RedisService from './core/services/RedisService'
 
 const _logger = logger('server')
 

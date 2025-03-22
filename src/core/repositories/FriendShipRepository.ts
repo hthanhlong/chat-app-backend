@@ -1,6 +1,6 @@
 import { dataSelectedByKeys } from '../../utils'
 import { UserModel, FriendShipModel } from '../../database/model'
-import { UserService, NotificationService } from '../services'
+import { UserService, NotificationService, RedisService } from '../services'
 import { IUser } from '../../database/model/User'
 
 const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
@@ -29,8 +29,6 @@ class FriendShipRepository {
   }
 
   async GetAllUsersNonFriends(userId: string) {
-    console.log('userId', userId)
-
     const friendListIds = await FriendShipModel.find({
       $or: [{ senderId: userId }, { receiveId: userId }]
     }).limit(100)
@@ -66,8 +64,6 @@ class FriendShipRepository {
       receiveId: userId,
       status: 'PENDING'
     })
-
-    console.log('friendRequests', friendRequests)
 
     const senderIds = friendRequests.map(function (user: {
       senderId: string
@@ -118,7 +114,7 @@ class FriendShipRepository {
         $regex: keyword.replace(regexPattern, '\\$&'),
         $options: 'i'
       },
-      _id: { $in: friendListIds.filter((id) => id !== undefined) }
+      _id: { $in: friendListIds.filter((id: string) => id !== undefined) }
     })
     return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
   }
@@ -139,10 +135,16 @@ class FriendShipRepository {
   }
 
   async _filterFriendsById(id: string) {
+    const cacheKey = RedisService.CACHE_KEYS.get_friend_list_by_id(id)
+    const cachedFriends = await RedisService.get(cacheKey)
+    if (cachedFriends) return cachedFriends
+
     const friendListIds = await FriendShipModel.find({
       $or: [{ senderId: id }, { receiveId: id }],
       $and: [{ status: 'FRIEND' }]
     })
+
+    if (!friendListIds) return []
 
     const friendIds = friendListIds.map(function (user: {
       senderId: string
@@ -155,6 +157,7 @@ class FriendShipRepository {
         return user.senderId
       }
     })
+    RedisService.set(cacheKey, friendIds, 180000)
     return friendIds
   }
 }

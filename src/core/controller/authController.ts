@@ -5,7 +5,7 @@ import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
 import { JWT_PAYLOAD, IRequest } from '../../types'
 import { IUser } from '../../database/model/User'
-import RedisService from '../../redis/RedisService'
+import RedisService from '../services/RedisService'
 import logger from '../../utils/logger'
 
 const _logger = logger('AuthController')
