@@ -1,9 +1,7 @@
 import Redis from 'ioredis'
 import envConfig from '../../config'
-import logger from '../../utils/logger'
+import LoggerService from './LoggerService'
 import { IUser } from '../../database/model/User'
-
-const _logger = logger('RedisService')
 
 class RedisService {
   private redisPub!: Redis
@@ -27,11 +25,17 @@ class RedisService {
     })
 
     this.redisPub.on('connect', () => {
-      _logger(null).info('RedisPub connected successfully')
+      LoggerService.info({
+        where: 'RedisService',
+        message: 'RedisPub connected successfully'
+      })
     })
 
     this.redisPub.on('error', (err) => {
-      _logger(null).error('Redis error', err)
+      LoggerService.error({
+        where: 'RedisService',
+        message: 'Redis error'
+      })
       process.exit(1)
     })
   }
@@ -43,11 +47,17 @@ class RedisService {
     })
 
     this.redisSub.on('connect', () => {
-      _logger(null).info('RedisSub connected successfully')
+      LoggerService.info({
+        where: 'RedisService',
+        message: 'RedisSub connected successfully'
+      })
     })
 
     this.redisSub.on('error', (err) => {
-      _logger(null).error('Redis error', err)
+      LoggerService.error({
+        where: 'RedisService',
+        message: 'Redis error'
+      })
       process.exit(1)
     })
 
@@ -98,13 +108,19 @@ class RedisService {
   disconnect() {
     this.redisPub.disconnect()
     this.redisSub.disconnect()
-    _logger(null).info('Redis disconnected successfully')
+    LoggerService.info({
+      where: 'RedisService',
+      message: 'Redis disconnected successfully'
+    })
   }
 
   subscribe(channel: string) {
     this.redisSub.subscribe(channel, (err) => {
       if (err) {
-        _logger(null).error('Redis subscribe error', err)
+        LoggerService.error({
+          where: 'RedisService',
+          message: 'Redis subscribe error'
+        })
       }
     })
   }
@@ -112,7 +128,10 @@ class RedisService {
   unsubscribe(channel: string) {
     this.redisSub.unsubscribe(channel, (err) => {
       if (err) {
-        _logger(null).error('Redis unsubscribe error', err)
+        LoggerService.error({
+          where: 'RedisService',
+          message: 'Redis unsubscribe error'
+        })
       }
     })
   }
@@ -120,7 +139,10 @@ class RedisService {
   publishClients(message: string) {
     this.redisPub.publish(this.CHANNELS.clients_connected, message, (err) => {
       if (err) {
-        _logger(null).error('Redis publish error', err)
+        LoggerService.error({
+          where: 'RedisService',
+          message: 'Redis publish error'
+        })
       }
     })
   }

@@ -1,8 +1,4 @@
 import bcrypt from 'bcrypt'
-import logger from './logger'
-import HttpException from './httpExceptions'
-import { IRequest } from '../types'
-const _logger = logger('utils')
 
 export const generateSalt = async (length: number = 6) => {
   const salt = await bcrypt.genSalt(length)

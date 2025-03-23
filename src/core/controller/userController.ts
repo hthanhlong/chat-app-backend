@@ -2,16 +2,17 @@ import { Response } from 'express'
 import { IRequest } from '../../types'
 import HttpException from '../../utils/httpExceptions'
 import { UserService, FriendShipService } from '../services'
-import logger from '../../utils/logger'
-
-const _logger = logger('UserController')
+import LoggerService from '../services/LoggerService'
 
 class UserController {
   getUser = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
     const user = await UserService.findUserById(userId)
 
-    _logger(req).info('Get user successful')
+    LoggerService.info({
+      where: 'UserController',
+      message: 'Get user successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -35,7 +36,10 @@ class UserController {
       return
     }
 
-    _logger(req).info('Get user by id successful')
+    LoggerService.info({
+      where: 'UserController',
+      message: 'Get user by id successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -50,7 +54,10 @@ class UserController {
     if (!userId) throw HttpException.badRequestError()
     const users = await FriendShipService.getAllUsersNonFriends(userId)
 
-    _logger(req).info('Get users non friends successful')
+    LoggerService.info({
+      where: 'UserController',
+      message: 'Get users non friends successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -65,7 +72,10 @@ class UserController {
     if (!userId) throw HttpException.badRequestError()
     const user = await UserService.updateUserById(userId, req.body)
 
-    _logger(req).info('Update user successful')
+    LoggerService.info({
+      where: 'UserController',
+      message: 'Update user successful'
+    })
 
     res.status(200).json({
       isSuccess: true,

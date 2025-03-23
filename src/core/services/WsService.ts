@@ -1,4 +1,3 @@
-import logger from '../../utils/logger'
 import JWTService from './JWTService'
 import MessageService from './MessageService'
 import FriendShipService from './FriendShipService'
@@ -10,7 +9,7 @@ import {
   ISocketEventSendMessage
 } from '../../types'
 import RedisService from './RedisService'
-const _logger = logger('WsService')
+import LoggerService from './LoggerService'
 
 class WsService {
   static SOCKET_EVENTS = {
@@ -63,13 +62,21 @@ class WsService {
       socket.on('message', (event: WebSocketEvent) =>
         WsService._onMessage(event, req)
       )
-      socket.on('error', (err: any) => _logger(req).error('Socket', err))
+      socket.on('error', (err: any) =>
+        LoggerService.error({
+          where: 'WsService',
+          message: `Error on socket: ${err.message}`
+        })
+      )
       socket.on('close', () => {
         WsService.clients.delete(data.userId)
       })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')
-      _logger(req).error('error.message', error.message)
+      LoggerService.error({
+        where: 'WsService',
+        message: `Error on connection: ${error.message}`
+      })
     }
   }
 
@@ -115,7 +122,10 @@ class WsService {
           break
       }
     } catch (error: Error | any) {
-      _logger(req).error('error.message', error.message)
+      LoggerService.error({
+        where: 'WsService',
+        message: `Error on message: ${error.message}`
+      })
     }
   }
 

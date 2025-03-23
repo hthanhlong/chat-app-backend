@@ -1,9 +1,7 @@
 import { Response } from 'express'
 import { WsService, FriendShipService, MessageService } from '../services'
 import { IRequest } from '../../types'
-import logger from '../../utils/logger'
-
-const _logger = logger('FriendShipController')
+import LoggerService from '../services/LoggerService'
 
 class FriendShipController {
   addFriend = async (req: IRequest, res: Response) => {
@@ -11,7 +9,10 @@ class FriendShipController {
     const { receiverId, status } = req.body
     await FriendShipService.addFriend({ senderId, receiverId, status })
 
-    _logger(req).info('Send friend request successful')
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Send friend request successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -25,7 +26,10 @@ class FriendShipController {
     const { userId } = req.decoded
     const users = await FriendShipService.getFriendRequest(userId)
 
-    _logger(req).info('Get friend request successful')
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Get friend request successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -46,7 +50,10 @@ class FriendShipController {
     })
 
     if (!result) {
-      _logger(req).error('Update status friend failed')
+      LoggerService.error({
+        where: 'FriendShipController',
+        message: 'Update status friend failed'
+      })
       res.status(400).json({
         isSuccess: false,
         errorCode: '400',
@@ -55,7 +62,10 @@ class FriendShipController {
       })
     }
 
-    _logger(req).info('Update status friend successful')
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Update status friend successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -68,7 +78,10 @@ class FriendShipController {
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
     const { userId } = req.decoded
     const users = await FriendShipService.getAllUsersNonFriends(userId)
-    _logger(req).info('Get all users non friends successful')
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Get all users non friends successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -82,8 +95,9 @@ class FriendShipController {
     const { userId } = req.decoded
     const users = await FriendShipService.getMyFriends(userId)
 
-    _logger(req).info('Get my friends successful', {
-      data: users
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: `Get my friends: ${userId} successful`
     })
 
     res.status(200).json({
@@ -99,7 +113,10 @@ class FriendShipController {
     const { keyword } = req.query
 
     if (!userId || !keyword) {
-      _logger(req).error('Invalid query')
+      LoggerService.error({
+        where: 'FriendShipController',
+        message: 'Invalid query'
+      })
 
       res.status(400).json({
         isSuccess: false,
@@ -114,8 +131,9 @@ class FriendShipController {
       keyword: keyword as string
     })
 
-    _logger(req).info('Search friend by keyword successful', {
-      data: users
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Search friend by keyword successful'
     })
 
     res.status(200).json({
@@ -135,7 +153,10 @@ class FriendShipController {
       type: 'UPDATE_FRIEND_LIST'
     })
 
-    _logger(req).info('Unfriend successful')
+    LoggerService.info({
+      where: 'FriendShipController',
+      message: 'Unfriend successful'
+    })
 
     res.status(200).json({
       isSuccess: true,

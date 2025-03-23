@@ -2,10 +2,7 @@ import { Response } from 'express'
 import HttpException from '../../utils/httpExceptions'
 import { MessageService } from '../services'
 import { IRequest } from '../../types'
-import logger from '../../utils/logger'
-
-const _logger = logger('MessageController')
-
+import LoggerService from '../services/LoggerService'
 class MessageController {
   getMessages = async (req: IRequest, res: Response) => {
     const { userId: senderId } = req.decoded
@@ -20,7 +17,10 @@ class MessageController {
       page ? Number(page) : 1
     )
 
-    _logger(req).info('Get all messages successful')
+    LoggerService.info({
+      where: 'MessageController',
+      message: 'Get all messages successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -40,7 +40,10 @@ class MessageController {
       friendId
     )
 
-    _logger(req).info('Get last message successful')
+    LoggerService.info({
+      where: 'MessageController',
+      message: 'Get last message successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -55,7 +58,10 @@ class MessageController {
     const { friendId } = req.body
     await MessageService.deleteAllMessage(senderId, friendId)
 
-    _logger(req).info('Delete all message successful')
+    LoggerService.info({
+      where: 'MessageController',
+      message: 'Delete all message successful'
+    })
 
     res.status(200).json({
       isSuccess: true,

@@ -1,18 +1,22 @@
 import mongoose from 'mongoose'
 import envConfig from '../config'
-import logger from '../utils/logger'
 import { UserService, AuthService } from '../core/services'
-
-const _logger = logger('database')
+import LoggerService from '../core/services/LoggerService'
 
 class Database {
   init = async () => {
     try {
       await mongoose.connect(envConfig.MONGO_URL)
-      _logger(null).info('MongoDB connected successfully')
+      LoggerService.info({
+        where: 'Database',
+        message: 'MongoDB connected successfully'
+      })
       await this.createMyAIAccount()
-    } catch (error) {
-      _logger(null).error('MongoDB connection error:', error)
+    } catch (error: any) {
+      LoggerService.error({
+        where: 'Database',
+        message: `MongoDB connection error: ${error.message}`
+      })
       process.exit(1)
     }
   }
@@ -32,7 +36,10 @@ class Database {
 
   close = async () => {
     await mongoose.connection.close()
-    _logger(null).info('MongoDB disconnected successfully')
+    LoggerService.info({
+      where: 'Database',
+      message: 'MongoDB disconnected successfully'
+    })
   }
 }
 

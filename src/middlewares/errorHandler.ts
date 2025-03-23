@@ -1,18 +1,21 @@
 import { Response, NextFunction } from 'express'
 import HttpException from '../utils/httpExceptions'
 import { IRequest } from '../types'
-
+import LoggerService from '../core/services/LoggerService'
 const errorHandler = (
   error: HttpException | Error,
   req: IRequest,
   res: Response,
   next: NextFunction
 ) => {
-  //@ts-ignore
-  const errorType = error?.type
-  //@ts-ignore
+  LoggerService.error({
+    where: 'errorHandler',
+    message: error.message
+  })
+  const errorType = (error as HttpException)?.type
+  // @ts-ignore
   if (errorType && HttpException.ERROR_TYPES[errorType]) {
-    //@ts-ignore
+    // @ts-ignore
     res.status(error.statusCode).json({
       isSuccess: false,
       errorCode: errorType,

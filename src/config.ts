@@ -16,7 +16,6 @@ class EnvConfig {
   }
   JSON_LIMIT = '10mb'
 
-  IS_LOAD_ENV = process.env.IS_LOAD_ENV === 'true'
   ENVIRONMENT = process.env.NODE_ENV || 'development'
   APP_PORT = process.env.APP_PORT || '8080'
   SOCKET_PORT = process.env.SOCKET_PORT || '8081'

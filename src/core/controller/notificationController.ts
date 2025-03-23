@@ -1,9 +1,7 @@
 import { Response } from 'express'
 import { IRequest } from '../../types'
 import { NotificationService } from '../services'
-import logger from '../../utils/logger'
-
-const _logger = logger('NotificationController')
+import LoggerService from '../services/LoggerService'
 
 class NotificationController {
   getNotifications = async (req: IRequest, res: Response) => {
@@ -12,7 +10,10 @@ class NotificationController {
     const notifications =
       await NotificationService.getAllNotificationsById(userId)
 
-    _logger(req).info('Get all notifications successful')
+    LoggerService.info({
+      where: 'NotificationController',
+      message: 'Get all notifications successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
@@ -26,7 +27,10 @@ class NotificationController {
     const { notificationId, status } = req.body
     await NotificationService.updateNotification({ id: notificationId, status })
 
-    _logger(req).info('Update notification successful')
+    LoggerService.info({
+      where: 'NotificationController',
+      message: 'Update notification successful'
+    })
 
     res.status(200).json({
       isSuccess: true,
