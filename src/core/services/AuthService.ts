@@ -21,7 +21,7 @@ class AuthService {
       username,
       email,
       password: hashedPassword,
-      caption: caption || '',
+      caption: caption || 'what is on your mind?',
       verified: true,
       isActive: true,
       salt: salt,
