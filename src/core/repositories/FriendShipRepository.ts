@@ -152,14 +152,14 @@ class FriendShipRepository {
     senderId,
     friendId
   }: {
-    senderId: string
-    friendId: string
+    senderId: number
+    friendId: number
   }) {
     await prisma.friendShip.deleteMany({
       where: {
         OR: [
-          { userId: parseInt(senderId), friendId: parseInt(friendId) },
-          { userId: parseInt(friendId), friendId: parseInt(senderId) }
+          { userId: senderId, friendId: friendId },
+          { userId: friendId, friendId: senderId }
         ]
       }
     })

@@ -6,6 +6,7 @@ import limiter from './rateLimiter'
 import errorHandler from './errorHandler'
 import LocalStorage from './LocalStorage'
 import requestLogger from './requestLogger'
+import checkDatabaseConnection from './prismConnection'
 
 export {
   validateAccessToken,
@@ -15,5 +16,6 @@ export {
   errorHandler,
   limiter,
   LocalStorage,
-  requestLogger
+  requestLogger,
+  checkDatabaseConnection
 }

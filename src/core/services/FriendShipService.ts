@@ -108,8 +108,8 @@ class FriendShipService {
     senderId,
     friendId
   }: {
-    senderId: string
-    friendId: string
+    senderId: number
+    friendId: number
   }) {
     return await FriendShipRepository.unfriend({
       senderId,

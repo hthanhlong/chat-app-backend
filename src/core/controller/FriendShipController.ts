@@ -147,9 +147,9 @@ class FriendShipController {
   unFriend = async (req: IRequest, res: Response) => {
     const { id: senderId } = req.decoded
     const { friendId } = req.params
-    await FriendShipService.unfriend({ senderId, friendId })
-    await MessageService.deleteAllMessage(senderId, friendId)
-    WsService.sendDataToClientById(friendId, {
+    await FriendShipService.unfriend({ senderId, friendId: Number(friendId) })
+    await MessageService.deleteAllMessage(senderId, Number(friendId))
+    WsService.sendDataToClientById(Number(friendId), {
       type: 'UPDATE_FRIEND_LIST'
     })
 

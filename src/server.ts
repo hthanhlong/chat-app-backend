@@ -3,7 +3,6 @@ import helmet from 'helmet'
 import cors from 'cors'
 import routes from './core/routes'
 import envConfig from './config'
-import Database from './database'
 import WebSocketService from './ws'
 import RedisService from './core/services/RedisService'
 import LoggerService from './core/services/LoggerService'
@@ -12,14 +11,15 @@ import {
   limiter,
   errorHandler,
   LocalStorage,
-  requestLogger
+  requestLogger,
+  checkDatabaseConnection
 } from './middlewares'
 
 async function main() {
   const APP_PORT = envConfig.APP_PORT
   const app = express()
   LoggerService.initLogger()
-  await Database.init()
+  await checkDatabaseConnection()
   RedisService.initPub()
   RedisService.initSub()
   WebSocketService.init()
@@ -46,7 +46,6 @@ async function main() {
       where: 'server',
       message: 'Server is shutting down'
     })
-    await Database.close()
     RedisService.disconnect()
     process.exit(0)
   })
@@ -56,7 +55,6 @@ async function main() {
       where: 'server',
       message: 'Server is shutting down'
     })
-    await Database.close()
     RedisService.disconnect()
     process.exit(0)
   })

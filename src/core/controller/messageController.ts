@@ -13,7 +13,7 @@ class MessageController {
     }
     const messages = await MessageService.getAllMessages(
       senderId,
-      friendId,
+      Number(friendId),
       page ? Number(page) : 1
     )
 
@@ -37,7 +37,7 @@ class MessageController {
 
     const lastMessage = await MessageService.getLatestMessage(
       senderId,
-      friendId
+      Number(friendId)
     )
 
     LoggerService.info({

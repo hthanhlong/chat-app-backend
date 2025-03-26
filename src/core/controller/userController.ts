@@ -25,7 +25,7 @@ class UserController {
   getUserById = async (req: IRequest, res: Response) => {
     const userId = req.params.userId
     if (!userId) throw HttpException.badRequestError()
-    const user = await UserService.findUserById(userId)
+    const user = await UserService.findUserById(Number(userId))
     if (!user) {
       res.status(200).json({
         isSuccess: true,
