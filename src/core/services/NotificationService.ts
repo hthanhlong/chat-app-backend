@@ -9,8 +9,8 @@ class NotificationService {
     content,
     status
   }: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     type: 'FRIEND' | 'MESSAGE' | 'POST'
     content: string
     status: 'READ' | 'UNREAD'
@@ -35,7 +35,7 @@ class NotificationService {
     id,
     status
   }: {
-    id: string
+    id: number
     status: 'READ' | 'UNREAD'
   }) {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(id)
@@ -43,7 +43,7 @@ class NotificationService {
     return await NotificationRepository.updateNotification({ id, status })
   }
 
-  async getAllNotificationsById(id: string) {
+  async getAllNotificationsById(id: number) {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(id)
     const cachedNotifications = await RedisService.get(cacheKey)
     if (cachedNotifications) return cachedNotifications

@@ -1,37 +1,46 @@
-import UserModel, { IUser } from '../../database/model/User'
+import { PrismaClient, User } from '@prisma/client'
+const prisma = new PrismaClient()
+
 class UserRepository {
-  async getAllUsers(id: string) {
-    const users = await UserModel.find({
-      _id: { $not: { $eq: id } }
-    }).limit(20)
+  async getAllUsers(id: number) {
+    const users = await prisma.user.findMany({
+      where: { id: { not: id } },
+      take: 20
+    })
     return users
   }
 
-  async createUser(user: IUser) {
-    const createdUser = await UserModel.create(user)
+  async createUser(user: User) {
+    const createdUser = await prisma.user.create({
+      data: user
+    })
     return createdUser
   }
 
-  async updateUserById(id: string, user: IUser) {
-    const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, user, {
-      new: true
+  async updateUserById(id: number, user: User) {
+    const updatedUser = await prisma.user.update({
+      where: { id: id },
+      data: user
     })
     return updatedUser
   }
 
   async findUserByEmail(email: string) {
-    const user = await UserModel.findOne({ email })
+    const user = await prisma.user.findUnique({ where: { email } })
     return user
   }
 
-  async findUserById(id: string) {
-    const user = await UserModel.findById(id)
+  async findUserById(id: number) {
+    const user = await prisma.user.findUnique({ where: { id } })
     return user
   }
-
-  async findUserByUsername(username: string): Promise<IUser | null> {
-    const user = await UserModel.findOne({ username })
-    return user as IUser | null
+  async findUserByUsername(username: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        name: username
+      }
+    })
+    return user
   }
 }
 

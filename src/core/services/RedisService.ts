@@ -1,16 +1,15 @@
 import Redis from 'ioredis'
 import envConfig from '../../config'
 import LoggerService from './LoggerService'
-import { IUser } from '../../database/model/User'
-
+import { User } from '@prisma/client'
 class RedisService {
   private redisPub!: Redis
   private redisSub!: Redis
 
   CACHE_KEYS = {
-    get_notifications_by_id: (id: string) => `get-notifications-by-id:${id}`,
-    get_friend_list_by_id: (id: string) => `get-friend-list-by-id:${id}`,
-    get_user_by_id: (id: string) => `get-user-by-id:${id}`,
+    get_notifications_by_id: (id: number) => `get-notifications-by-id:${id}`,
+    get_friend_list_by_id: (id: number) => `get-friend-list-by-id:${id}`,
+    get_user_by_id: (id: number) => `get-user-by-id:${id}`,
     get_user_by_email: (email: string) => `get-user-by-email:${email}`
   }
 
@@ -89,20 +88,20 @@ class RedisService {
     this.redisPub.del(key)
   }
 
-  setUser(userId: string, user: IUser) {
-    this.redisPub.set(userId, JSON.stringify(user), 'EX', 180000)
+  setUser(userId: number, user: User) {
+    this.redisPub.set(userId.toString(), JSON.stringify(user), 'EX', 180000)
   }
 
-  async getUser(userId: string) {
-    const cachedUser = await this.redisPub.get(userId)
+  async getUser(userId: number) {
+    const cachedUser = await this.redisPub.get(userId.toString())
     if (cachedUser) {
       return JSON.parse(cachedUser)
     }
     return null
   }
 
-  deleteUser(userId: string) {
-    this.redisPub.del(userId)
+  deleteUser(userId: number) {
+    this.redisPub.del(userId.toString())
   }
 
   disconnect() {

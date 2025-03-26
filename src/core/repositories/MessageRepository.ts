@@ -1,29 +1,34 @@
-import { MessageModel } from '../../database/model'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
 class MessageRepository {
   async getAllMessages(
-    userId: string,
-    friendId: string,
+    userId: number,
+    friendId: number,
     page: number = 1,
     limit: number = 20
   ) {
     const skip = (page - 1) * limit
 
-    const messages = await MessageModel.find({
-      $or: [
-        { senderId: userId, receiverId: friendId },
-        { senderId: friendId, receiverId: userId }
-      ]
+    const messages = await prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId, receiverId: friendId },
+          { senderId: friendId, receiverId: userId }
+        ]
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit
     })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
 
-    const totalCount = await MessageModel.countDocuments({
-      $or: [
-        { senderId: userId, receiverId: friendId },
-        { senderId: friendId, receiverId: userId }
-      ]
+    const totalCount = await prisma.message.count({
+      where: {
+        OR: [
+          { senderId: userId, receiverId: friendId },
+          { senderId: friendId, receiverId: userId }
+        ]
+      }
     })
 
     return {
@@ -39,33 +44,43 @@ class MessageRepository {
     message,
     createdAt
   }: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     message: string
     createdAt: Date
   }) {
-    const result = await MessageModel.create({
-      senderId,
-      receiverId,
-      message,
-      createdAt
+    const result = await prisma.message.create({
+      data: {
+        senderId: senderId,
+        receiverId: receiverId,
+        message,
+        createdAt
+      }
     })
     return result
   }
 
-  async getLatestMessage(userId: string, friendId: string) {
-    return await MessageModel.findOne({
-      senderId: { $in: [userId, friendId] },
-      receiverId: { $in: [userId, friendId] }
+  async getLatestMessage(userId: number, friendId: number) {
+    return await prisma.message.findFirst({
+      where: {
+        OR: [
+          { senderId: userId, receiverId: friendId },
+          { senderId: friendId, receiverId: userId }
+        ]
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 1
     })
-      .sort({ createdAt: -1 })
-      .limit(1)
   }
 
-  async deleteAllMessage(senderId: string, receiverId: string) {
-    await MessageModel.deleteMany({
-      senderId: { $in: [senderId, receiverId] },
-      receiverId: { $in: [senderId, receiverId] }
+  async deleteAllMessage(senderId: number, receiverId: number) {
+    await prisma.message.deleteMany({
+      where: {
+        OR: [
+          { senderId: senderId, receiverId: receiverId },
+          { senderId: receiverId, receiverId: senderId }
+        ]
+      }
     })
   }
 }

@@ -38,7 +38,7 @@ class WsService {
     }
     try {
       const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-      WsService.clients.set(data.id, socket)
+      WsService.clients.set(data.id.toString(), socket)
       RedisService.publishClients(
         JSON.stringify({
           type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
@@ -53,8 +53,8 @@ class WsService {
           const { type, payload } = data
           if (type === WsService.SOCKET_EVENTS.GET_ONLINE_USERS) {
             const { userId } = payload as ISocketEventGetOnlineUsers
-            if (!WsService.clients.has(userId)) {
-              WsService.clients.set(userId, socket)
+            if (!WsService.clients.has(userId.toString())) {
+              WsService.clients.set(userId.toString(), socket)
             }
           }
         }
@@ -69,7 +69,7 @@ class WsService {
         })
       )
       socket.on('close', () => {
-        WsService.clients.delete(data.id)
+        WsService.clients.delete(data.id.toString())
       })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')
@@ -89,7 +89,7 @@ class WsService {
       switch (type) {
         case WsService.SOCKET_EVENTS.GET_ONLINE_USERS:
           const { userId } = payload as ISocketEventGetOnlineUsers
-          const user = WsService.clients.get(userId)
+          const user = WsService.clients.get(userId.toString())
           if (!user) return WsService.closeConnection(userId)
           const friends = await FriendShipService.getMyFriends(userId)
           const onlineUsers = clientIds.filter((id: string) =>
@@ -112,7 +112,7 @@ class WsService {
           WsService.sendDataToClientById(receiverId, {
             type: WsService.SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
-              _id: result._id,
+              _id: result.id,
               senderId,
               receiverId,
               message,
@@ -129,16 +129,16 @@ class WsService {
     }
   }
 
-  static sendDataToClientById(userId: string, data: any) {
-    const client = WsService.clients.get(userId)
+  static sendDataToClientById(userId: number, data: any) {
+    const client = WsService.clients.get(userId.toString())
     if (!client) return
     client.send(JSON.stringify(data))
   }
 
-  static closeConnection(userId: string) {
-    const client = WsService.clients.get(userId)
+  static closeConnection(userId: number) {
+    const client = WsService.clients.get(userId.toString())
     client?.close()
-    WsService.clients.delete(userId)
+    WsService.clients.delete(userId.toString())
   }
 }
 

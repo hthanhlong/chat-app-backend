@@ -1,8 +1,7 @@
 import { checkPassword, generateSalt, hashPassword } from '../../utils'
 import { FriendShipService, JWTService, UserService } from '.'
 import { signUpInput, JWT_PAYLOAD } from '../../types'
-import { IUser } from '../../database/model/User'
-import { v4 as uuidv4 } from 'uuid'
+import { User } from '@prisma/client'
 class AuthService {
   async validatePassword(
     password: string,
@@ -16,36 +15,46 @@ class AuthService {
     const salt = await generateSalt()
     const hashedPassword = await hashPassword(password, salt)
 
-    const user = {
-      nickname,
-      username,
+    const user: Omit<User, 'id' | 'uuid' | 'createdAt' | 'updatedAt'> = {
+      nickName: nickname,
+      name: username,
       email,
-      password: hashedPassword,
+      hashedPassword,
       caption: caption || 'what is on your mind?',
-      verified: true,
+      isVerified: true,
       isActive: true,
       salt: salt,
-      profilePicUrl: ''
+      profilePicUrl: '',
+      phone: '',
+      isDeleted: false
     }
 
-    const result = await UserService.createUser(user as IUser)
+    const result = await UserService.createUser(user as User)
     const myAI = await UserService.findUserByEmail('myai@gmail.com')
 
     if (myAI && result) {
       await FriendShipService.updateStatusFriend({
-        senderId: myAI._id.toString(),
-        receiverId: result._id.toString(),
+        senderId: myAI.id,
+        receiverId: result.id,
         status: 'FRIEND'
       })
     }
     return result
   }
 
-  async signIn({ id, username }: { id: string; username: string }) {
+  async signIn({
+    id,
+    username,
+    uuid
+  }: {
+    id: number
+    username: string
+    uuid: string
+  }) {
     if (!username) return null
     const payload = {
       id: id,
-      uuid: uuidv4(),
+      uuid: uuid,
       username: username
     } as JWT_PAYLOAD
     const { accessToken, refreshToken } = JWTService.generateToken(payload)

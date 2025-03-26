@@ -20,14 +20,14 @@ interface SignInInput {
 }
 
 interface FriendRequest {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
   status: 'PENDING' | 'FRIEND' | 'UNFRIEND'
 }
 
 interface NotificationInput {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
   type: 'FRIEND' | 'MESSAGE' | 'POST'
   content: string
   status: 'UNREAD' | 'READ'
@@ -39,9 +39,9 @@ interface sendDataToIdByWs {
 }
 
 interface JWT_PAYLOAD {
-  id: string
+  id: number
   uuid: string
-  name: string
+  username: string
 }
 
 interface WebSocketEvent {
@@ -50,50 +50,50 @@ interface WebSocketEvent {
 }
 
 interface ISocketEventGetOnlineUsers {
-  userId: string
+  userId: number
 }
 
 interface ISocketEventSendMessage {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
   message: string
   createdAt: Date
 }
 
 interface ISocketEventHasNewMessage {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
   message: string
   createdAt: Date
 }
 
 interface ISocketEventUpdateFriendList {
-  userId: string
+  userId: number
 }
 
 interface ISocketEventCloseConnection {
-  userId: string
+  userId: number
 }
 
 interface ISocketEventGetFriendList {
-  userId: string
+  userId: number
 }
 
 interface ISocketEventGetFriendRequest {
-  userId: string
+  userId: number
 }
 
 interface ISocketEventSendFriendRequest {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
 }
 
 interface ISocketEventAcceptFriendRequest {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
 }
 
 interface ISocketEventRejectFriendRequest {
-  senderId: string
-  receiverId: string
+  senderId: number
+  receiverId: number
 }

@@ -1,97 +1,127 @@
 import { dataSelectedByKeys } from '../../utils'
-import { UserModel, FriendShipModel } from '../../database/model'
-
-const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
+import { FriendShipStatus, PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+// const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
 
 class FriendShipRepository {
   async addFriend(data: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     status: string
   }) {
-    await FriendShipModel.create({
-      senderId: data.senderId,
-      receiveId: data.receiverId,
-      status: data.status
+    await prisma.friendShip.create({
+      data: {
+        userId: data.senderId,
+        friendId: data.receiverId,
+        status: data.status as FriendShipStatus
+      }
     })
   }
 
-  async GetAllUsersNonFriends(userId: string) {
-    const friendListIds = await FriendShipModel.find({
-      $or: [{ senderId: userId }, { receiveId: userId }]
-    }).limit(100)
+  async GetAllUsersNonFriends(userId: number) {
+    const friendListIds = await prisma.friendShip.findMany({
+      where: {
+        OR: [{ userId: userId }, { friendId: userId }]
+      },
+      take: 100
+    })
 
     const friendIds = friendListIds.map(function (user: {
-      senderId: string
-      receiveId: string
+      userId: number
+      friendId: number
     }) {
-      if (user.senderId.toString() === userId.toString()) {
-        return user.receiveId
+      if (user.userId.toString() === userId.toString()) {
+        return user.friendId
       }
-      if (user.receiveId.toString() === userId.toString()) {
-        return user.senderId
+      if (user.friendId.toString() === userId.toString()) {
+        return user.userId
       }
     })
 
     return friendIds
   }
 
-  async getFriendListIdsByUserId(id: string) {
-    const friendListIds = await FriendShipModel.find({
-      $or: [{ senderId: id }, { receiveId: id }],
-      $and: [{ status: 'FRIEND' }]
+  async getFriendListIdsByUserId(id: number) {
+    const friendListIds = await prisma.friendShip.findMany({
+      where: {
+        OR: [{ userId: id }, { friendId: id }],
+        status: FriendShipStatus.FRIEND
+      },
+      take: 100
     })
 
     const friendIds = friendListIds.map(function (user: {
-      senderId: string
-      receiveId: string
+      userId: number
+      friendId: number
     }) {
-      if (user.senderId.toString() === id.toString()) {
-        return user.receiveId
+      if (user.userId.toString() === id.toString()) {
+        return user.friendId
       }
-      if (user.receiveId.toString() === id.toString()) {
-        return user.senderId
+      if (user.friendId.toString() === id.toString()) {
+        return user.userId
       }
     })
 
     return friendIds
   }
 
-  async GetFriendRequests(userId: string) {
-    const friendRequests = await FriendShipModel.find({
-      receiveId: userId,
-      status: 'PENDING'
+  async GetFriendRequests(userId: number) {
+    const friendRequests = await prisma.friendShip.findMany({
+      where: {
+        friendId: userId,
+        status: FriendShipStatus.PENDING
+      }
     })
 
     const senderIds = friendRequests.map(function (user: {
-      senderId: string
-      receiveId: string
+      userId: number
+      friendId: number
     }) {
-      return user.senderId
+      if (user.userId.toString() === userId.toString()) {
+        return user.friendId
+      }
+      if (user.friendId.toString() === userId.toString()) {
+        return user.userId
+      }
     })
 
-    const result = await UserModel.find({ _id: { $in: senderIds } })
+    const result = await prisma.user.findMany({
+      where: { id: { in: senderIds.filter((id) => id !== undefined) } }
+    })
 
-    return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
+    return dataSelectedByKeys(result, ['id', 'nickName', 'name'])
   }
 
-  async getMyFriends(id: string) {
+  async getMyFriends(id: number) {
     const friendListIds = await this.getFriendListIdsByUserId(id)
     if (!friendListIds) return []
-    const friends = await UserModel.find({ _id: { $in: friendListIds } })
-    return dataSelectedByKeys(friends, ['_id', 'nickname', 'username'])
+    const friends = await prisma.user.findMany({
+      where: { id: { in: friendListIds.filter((id) => id !== undefined) } }
+    })
+    return dataSelectedByKeys(friends, ['id', 'nickName', 'name'])
   }
 
   async updateStatusFriend(data: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     status: string
   }) {
-    const result = await FriendShipModel.findOneAndUpdate(
-      { senderId: data.receiverId, receiveId: data.senderId },
-      { $set: { status: data.status } },
-      { new: true, upsert: true }
-    )
+    const result = await prisma.friendShip.update({
+      where: {
+        id: await prisma.friendShip
+          .findFirst({
+            where: {
+              userId: data.receiverId,
+              friendId: data.senderId
+            },
+            select: {
+              id: true
+            }
+          })
+          .then((result) => result?.id)
+      },
+      data: { status: data.status as FriendShipStatus }
+    })
     if (result) {
       return result
     }
@@ -102,18 +132,20 @@ class FriendShipRepository {
     userId,
     keyword
   }: {
-    userId: string
+    userId: number
     keyword: string
   }) {
     const friendListIds = await this.getFriendListIdsByUserId(userId)
-    const result = await UserModel.find({
-      nickname: {
-        $regex: keyword.replace(regexPattern, '\\$&'),
-        $options: 'i'
-      },
-      _id: { $in: friendListIds.filter((id: string) => id !== undefined) }
+    const result = await prisma.user.findMany({
+      where: {
+        nickName: {
+          contains: keyword,
+          mode: 'insensitive'
+        },
+        id: { in: friendListIds.filter((id) => id !== undefined) }
+      }
     })
-    return dataSelectedByKeys(result, ['_id', 'nickname', 'username'])
+    return dataSelectedByKeys(result, ['id', 'nickName', 'name'])
   }
 
   async unfriend({
@@ -123,11 +155,13 @@ class FriendShipRepository {
     senderId: string
     friendId: string
   }) {
-    await FriendShipModel.findOneAndDelete({
-      $or: [
-        { senderId: senderId, receiveId: friendId },
-        { senderId: friendId, receiveId: senderId }
-      ]
+    await prisma.friendShip.deleteMany({
+      where: {
+        OR: [
+          { userId: parseInt(senderId), friendId: parseInt(friendId) },
+          { userId: parseInt(friendId), friendId: parseInt(senderId) }
+        ]
+      }
     })
   }
 }

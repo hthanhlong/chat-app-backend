@@ -4,9 +4,7 @@ import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'
 import RedisService from './RedisService'
-import { IUser } from '../../database/model/User'
-import { dataSelectedByKeys } from '../../utils'
-
+import { User } from '@prisma/client'
 class FriendShipService {
   async addFriend(data: FriendRequest) {
     await FriendShipRepository.addFriend({
@@ -28,13 +26,13 @@ class FriendShipService {
     return true
   }
 
-  async getAllUsersNonFriends(userId: string) {
+  async getAllUsersNonFriends(userId: number) {
     const ids = await FriendShipRepository.GetAllUsersNonFriends(userId)
 
     let nonFriends = await UserService.getAllUsers(userId)
     if (Array.isArray(ids) && ids.length > 0) {
       if (!nonFriends) return []
-      nonFriends = nonFriends.filter((user: IUser) => {
+      nonFriends = nonFriends.filter((user: User) => {
         return !ids.some(
           // @ts-ignore
           (id) => id.toString() === user._id.toString()
@@ -45,11 +43,11 @@ class FriendShipService {
     return nonFriends
   }
 
-  async getFriendRequest(userId: string) {
+  async getFriendRequest(userId: number) {
     return await FriendShipRepository.GetFriendRequests(userId)
   }
 
-  async getMyFriends(id: string) {
+  async getMyFriends(id: number) {
     return await FriendShipRepository.getMyFriends(id)
   }
 
@@ -97,7 +95,7 @@ class FriendShipService {
     userId,
     keyword
   }: {
-    userId: string
+    userId: number
     keyword: string
   }) {
     return await FriendShipRepository.searchFriendByKeyword({

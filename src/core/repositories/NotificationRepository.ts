@@ -1,4 +1,5 @@
-import { NotificationModel } from '../../database/model'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
 class NotificationRepository {
   async createNotification({
@@ -8,38 +9,43 @@ class NotificationRepository {
     content,
     status
   }: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     type: 'FRIEND' | 'MESSAGE' | 'POST'
     content: string
     status: 'READ' | 'UNREAD'
   }) {
     const notification = {
-      senderId,
-      receiverId,
+      senderId: senderId,
+      receiverId: receiverId,
       type: type,
       content: content,
       status: status
     }
-    await NotificationModel.create(notification)
+    await prisma.notification.create({
+      data: notification
+    })
   }
 
   async updateNotification({
     id,
     status
   }: {
-    id: string
+    id: number
     status: 'READ' | 'UNREAD'
   }) {
-    await NotificationModel.findByIdAndUpdate(id, { status })
+    await prisma.notification.update({
+      where: { id: id },
+      data: { status }
+    })
   }
 
-  async getAllNotificationsById(id: string) {
-    const allNotifications = await NotificationModel.find({
-      receiverId: id
+  async getAllNotificationsById(id: number) {
+    const allNotifications = await prisma.notification.findMany({
+      where: { receiverId: id },
+      orderBy: { createdAt: 'desc' },
+      take: 50
     })
-      .sort({ createdAt: -1 })
-      .limit(50)
     return allNotifications
   }
 }

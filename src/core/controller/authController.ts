@@ -4,9 +4,9 @@ import { OAuth2Client, TokenPayload } from 'google-auth-library'
 import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
 import { JWT_PAYLOAD, IRequest } from '../../types'
-import { IUser } from '../../database/model/User'
 import RedisService from '../services/RedisService'
 import LoggerService from '../services/LoggerService'
+import { User } from '@prisma/client'
 
 const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID)
 
@@ -63,7 +63,7 @@ class AuthController {
       throw HttpException.badRequestError()
     }
 
-    const { password: hashedPassword, salt } = user as IUser
+    const { hashedPassword, salt } = user as User
 
     const isRightPassword = await AuthService.validatePassword(
       password,
@@ -76,8 +76,9 @@ class AuthController {
     }
 
     const data = await AuthService.signIn({
-      id: user._id.toString(),
-      username: user.username
+      id: user.id,
+      uuid: user.uuid,
+      username: user.name
     })
     LoggerService.info({
       where: 'AuthController',
@@ -131,8 +132,9 @@ class AuthController {
     }
 
     const data = await AuthService.signIn({
-      id: user._id.toString(),
-      username: user.username
+      id: user.id,
+      uuid: user.uuid,
+      username: user.name
     })
     LoggerService.info({
       where: 'AuthController',

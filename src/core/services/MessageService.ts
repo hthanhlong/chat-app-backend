@@ -1,6 +1,6 @@
 import { MessageRepository } from '../repositories'
 class MessageService {
-  async getAllMessages(userId: string, friendId: string, page: number = 1) {
+  async getAllMessages(userId: number, friendId: number, page: number = 1) {
     return await MessageRepository.getAllMessages(userId, friendId, page)
   }
 
@@ -10,8 +10,8 @@ class MessageService {
     message,
     createdAt
   }: {
-    senderId: string
-    receiverId: string
+    senderId: number
+    receiverId: number
     message: string
     createdAt: Date
   }) {
@@ -23,11 +23,11 @@ class MessageService {
     })
   }
 
-  async getLatestMessage(userId: string, friendId: string) {
+  async getLatestMessage(userId: number, friendId: number) {
     return await MessageRepository.getLatestMessage(userId, friendId)
   }
 
-  async deleteAllMessage(senderId: string, receiverId: string) {
+  async deleteAllMessage(senderId: number, receiverId: number) {
     return await MessageRepository.deleteAllMessage(senderId, receiverId)
   }
 }
