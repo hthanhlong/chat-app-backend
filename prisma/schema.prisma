@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id             Int      @id @default(autoincrement())
+  uuid           String   @unique @default(uuid())
+  name           String   @unique @db.VarChar(255)
+  email          String   @unique @db.VarChar(255)
+  phone          String?  @db.VarChar(10)
+  hashedPassword String   @map("hashed_password") @db.VarChar(255)
+  nickName       String   @map("nick_name") @db.VarChar(255)
+  caption        String?  @map("caption") @db.VarChar(400)
+  profilePicUrl  String?  @map("profile_pic_url") @db.VarChar(1500)
+  isVerified     Boolean  @default(true) @map("is_verified")
+  isActive       Boolean  @default(true) @map("is_active")
+  salt           String   @default("") @db.VarChar(255)
+  isDeleted      Boolean  @default(false) @map("is_deleted")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// FriendShip model
+model FriendShip {
+  id        Int              @id @default(autoincrement())
+  uuid      String           @unique @default(uuid())
+  userId    Int              @map("user_id")
+  friendId  Int              @map("friend_id")
+  status    FriendShipStatus @default(PENDING)
+  isDeleted Boolean          @default(false) @map("is_deleted")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@map("friend_ships")
+}
+
+// Message model
+model Message {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @default(uuid())
+  senderId   Int      @map("sender_id")
+  receiverId Int      @map("receiver_id")
+  message    String   @db.VarChar(1500)
+  file       String?  @db.VarChar(1500)
+  isDeleted  Boolean  @default(false) @map("is_deleted")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("messages")
+}
+
+// Notification model
+model Notification {
+  id         Int                @id @default(autoincrement())
+  uuid       String             @unique @default(uuid())
+  senderId   Int                @map("sender_id")
+  receiverId Int                @map("receiver_id")
+  type       NotificationType   @default(FRIEND)
+  content    String             @db.VarChar(1500)
+  status     NotificationStatus @default(UNREAD)
+  isDeleted  Boolean            @default(false) @map("is_deleted")
+  createdAt  DateTime           @default(now()) @map("created_at")
+  updatedAt  DateTime           @updatedAt @map("updated_at")
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  FRIEND
+  MESSAGE
+  POST
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+}
+
+enum FriendShipStatus {
+  PENDING
+  FRIEND
+  BLOCKED
+  REJECTED
+}

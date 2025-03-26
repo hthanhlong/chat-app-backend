@@ -39,8 +39,9 @@ interface sendDataToIdByWs {
 }
 
 interface JWT_PAYLOAD {
-  userId: string
-  username: string
+  id: string
+  uuid: string
+  name: string
 }
 
 interface WebSocketEvent {

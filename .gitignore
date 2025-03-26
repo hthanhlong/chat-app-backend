@@ -38,3 +38,6 @@ temp
 *.save.*
 
 ecosystem.config.js
+
+#prisma
+prisma/migrations/*

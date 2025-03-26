@@ -6,7 +6,7 @@ import LoggerService from '../services/LoggerService'
 
 class UserController {
   getUser = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     const user = await UserService.findUserById(userId)
 
     LoggerService.info({
@@ -50,7 +50,7 @@ class UserController {
   }
 
   getUsersNonFriends = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     if (!userId) throw HttpException.badRequestError()
     const users = await FriendShipService.getAllUsersNonFriends(userId)
 
@@ -68,7 +68,7 @@ class UserController {
   }
 
   updateUser = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     if (!userId) throw HttpException.badRequestError()
     const user = await UserService.updateUserById(userId, req.body)
 

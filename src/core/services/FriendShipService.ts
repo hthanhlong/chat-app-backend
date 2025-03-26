@@ -4,18 +4,45 @@ import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'
 import RedisService from './RedisService'
+import { IUser } from '../../database/model/User'
+import { dataSelectedByKeys } from '../../utils'
 
 class FriendShipService {
   async addFriend(data: FriendRequest) {
-    return await FriendShipRepository.addFriend({
+    await FriendShipRepository.addFriend({
       senderId: data.senderId,
       receiverId: data.receiverId,
       status: data.status
     })
+
+    const user = await UserService.findUserById(data.senderId)
+
+    await NotificationService.createNotification({
+      senderId: data.senderId,
+      receiverId: data.receiverId,
+      type: 'FRIEND',
+      content: `${user.nickname} has sent you a friend request`,
+      status: 'UNREAD'
+    })
+
+    return true
   }
 
   async getAllUsersNonFriends(userId: string) {
-    return await FriendShipRepository.GetAllUsersNonFriends(userId)
+    const ids = await FriendShipRepository.GetAllUsersNonFriends(userId)
+
+    let nonFriends = await UserService.getAllUsers(userId)
+    if (Array.isArray(ids) && ids.length > 0) {
+      if (!nonFriends) return []
+      nonFriends = nonFriends.filter((user: IUser) => {
+        return !ids.some(
+          // @ts-ignore
+          (id) => id.toString() === user._id.toString()
+        )
+      })
+      return nonFriends
+    }
+    return nonFriends
   }
 
   async getFriendRequest(userId: string) {

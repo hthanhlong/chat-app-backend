@@ -1,5 +1,6 @@
 import { NotificationRepository } from '../repositories'
 import RedisService from './RedisService'
+import WsService from './WsService'
 class NotificationService {
   async createNotification({
     senderId,
@@ -14,13 +15,20 @@ class NotificationService {
     content: string
     status: 'READ' | 'UNREAD'
   }) {
-    return await NotificationRepository.createNotification({
+    await NotificationRepository.createNotification({
       senderId,
       receiverId,
       type,
       content,
       status
     })
+
+    WsService.sendDataToClientById(receiverId, {
+      type: 'HAS_NEW_NOTIFICATION',
+      payload: null
+    })
+
+    return true
   }
 
   async updateNotification({

@@ -148,7 +148,7 @@ class AuthController {
   }
 
   signOut = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     RedisService.deleteUser(userId)
 
     LoggerService.info({

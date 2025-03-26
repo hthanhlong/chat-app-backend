@@ -2,7 +2,7 @@ import { checkPassword, generateSalt, hashPassword } from '../../utils'
 import { FriendShipService, JWTService, UserService } from '.'
 import { signUpInput, JWT_PAYLOAD } from '../../types'
 import { IUser } from '../../database/model/User'
-
+import { v4 as uuidv4 } from 'uuid'
 class AuthService {
   async validatePassword(
     password: string,
@@ -44,7 +44,8 @@ class AuthService {
   async signIn({ id, username }: { id: string; username: string }) {
     if (!username) return null
     const payload = {
-      userId: id,
+      id: id,
+      uuid: uuidv4(),
       username: username
     } as JWT_PAYLOAD
     const { accessToken, refreshToken } = JWTService.generateToken(payload)
@@ -53,8 +54,8 @@ class AuthService {
   }
 
   async refreshToken(refreshToken: JWT_PAYLOAD): Promise<string> {
-    const { userId, username } = refreshToken
-    const accessToken = JWTService.signAccessToken({ userId, username })
+    const { id, username, uuid } = refreshToken
+    const accessToken = JWTService.signAccessToken({ id, username, uuid })
     return accessToken
   }
 }

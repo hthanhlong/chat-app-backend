@@ -38,12 +38,12 @@ class WsService {
     }
     try {
       const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-      WsService.clients.set(data.userId, socket)
+      WsService.clients.set(data.id, socket)
       RedisService.publishClients(
         JSON.stringify({
           type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
           payload: {
-            userId: data.userId
+            userId: data.id
           }
         })
       )
@@ -69,7 +69,7 @@ class WsService {
         })
       )
       socket.on('close', () => {
-        WsService.clients.delete(data.userId)
+        WsService.clients.delete(data.id)
       })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')

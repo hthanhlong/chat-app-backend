@@ -5,7 +5,7 @@ import LoggerService from '../services/LoggerService'
 
 class NotificationController {
   getNotifications = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
 
     const notifications =
       await NotificationService.getAllNotificationsById(userId)

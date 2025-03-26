@@ -1,5 +1,4 @@
 import { NotificationModel } from '../../database/model'
-import { WsService } from '../services'
 
 class NotificationRepository {
   async createNotification({
@@ -23,11 +22,6 @@ class NotificationRepository {
       status: status
     }
     await NotificationModel.create(notification)
-
-    WsService.sendDataToClientById(receiverId, {
-      type: 'HAS_NEW_NOTIFICATION',
-      payload: null
-    })
   }
 
   async updateNotification({

@@ -5,7 +5,7 @@ import { IRequest } from '../../types'
 import LoggerService from '../services/LoggerService'
 class MessageController {
   getMessages = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { friendId } = req.params
     const { page } = req.query
     if (!friendId) {
@@ -31,7 +31,7 @@ class MessageController {
   }
 
   getLatestMessage = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { friendId } = req.params
     if (!friendId) throw HttpException.badRequestError()
 
@@ -54,7 +54,7 @@ class MessageController {
   }
 
   deleteAllMessage = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { friendId } = req.body
     await MessageService.deleteAllMessage(senderId, friendId)
 

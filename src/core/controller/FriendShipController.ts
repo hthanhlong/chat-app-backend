@@ -5,7 +5,7 @@ import LoggerService from '../services/LoggerService'
 
 class FriendShipController {
   addFriend = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { receiverId, status } = req.body
     await FriendShipService.addFriend({ senderId, receiverId, status })
 
@@ -23,7 +23,7 @@ class FriendShipController {
   }
 
   getFriendRequest = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     const users = await FriendShipService.getFriendRequest(userId)
 
     LoggerService.info({
@@ -40,7 +40,7 @@ class FriendShipController {
   }
 
   updateStatusFriend = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { receiverId, status } = req.body
 
     const result = await FriendShipService.updateStatusFriend({
@@ -76,7 +76,7 @@ class FriendShipController {
   }
 
   getAllUsersNonFriends = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     const users = await FriendShipService.getAllUsersNonFriends(userId)
     LoggerService.info({
       where: 'FriendShipController',
@@ -92,7 +92,7 @@ class FriendShipController {
   }
 
   getFriends = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     const users = await FriendShipService.getMyFriends(userId)
 
     LoggerService.info({
@@ -109,7 +109,7 @@ class FriendShipController {
   }
 
   searchFriendByKeyword = async (req: IRequest, res: Response) => {
-    const { userId } = req.decoded
+    const { id: userId } = req.decoded
     const { keyword } = req.query
 
     if (!userId || !keyword) {
@@ -145,7 +145,7 @@ class FriendShipController {
   }
 
   unFriend = async (req: IRequest, res: Response) => {
-    const { userId: senderId } = req.decoded
+    const { id: senderId } = req.decoded
     const { friendId } = req.params
     await FriendShipService.unfriend({ senderId, friendId })
     await MessageService.deleteAllMessage(senderId, friendId)

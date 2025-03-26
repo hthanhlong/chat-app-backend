@@ -6,6 +6,7 @@ import JWTService from './JWTService'
 import FriendShipService from './FriendShipService'
 import MessageService from './MessageService'
 import RedisService from './RedisService'
+
 export {
   AuthService,
   NotificationService,
