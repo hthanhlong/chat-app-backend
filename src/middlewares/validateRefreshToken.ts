@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express'
-import HttpException from '../utils/httpExceptions'
+import HttpException from '../exceptions/httpExceptions'
 import JWTService from '../core/services/JWTService'
 import { IRequest } from '../types'
 

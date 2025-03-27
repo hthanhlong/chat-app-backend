@@ -10,7 +10,8 @@ class RedisService {
     get_notifications_by_id: (id: number) => `get-notifications-by-id:${id}`,
     get_friend_list_by_id: (id: number) => `get-friend-list-by-id:${id}`,
     get_user_by_id: (id: number) => `get-user-by-id:${id}`,
-    get_user_by_email: (email: string) => `get-user-by-email:${email}`
+    get_user_by_email: (email: string) => `get-user-by-email:${email}`,
+    get_id_by_uuid: (uuid: string) => `user:${uuid}`
   }
 
   CHANNELS = {
@@ -148,6 +149,28 @@ class RedisService {
 
   subOnMessage(callback: (channel: string, message: string) => void) {
     this.redisSub.on('message', callback)
+  }
+
+  async getIdByUUID(uuid: string): Promise<number | null> {
+    const result = await this.redisPub.get(this.CACHE_KEYS.get_id_by_uuid(uuid))
+    if (result) {
+      return parseInt(result)
+    }
+    return null
+  }
+
+  setIdByUUID(uuid: string, id: number) {
+    const randomTime = Math.floor(Math.random() * 1000)
+    this.redisPub.set(
+      this.CACHE_KEYS.get_id_by_uuid(uuid),
+      id.toString(),
+      'EX',
+      randomTime + 180000 // 3 minutes
+    )
+  }
+
+  deleteIdByUUID(uuid: string) {
+    this.redisPub.del(this.CACHE_KEYS.get_id_by_uuid(uuid))
   }
 }
 

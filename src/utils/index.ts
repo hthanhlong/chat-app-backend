@@ -33,10 +33,7 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export const dataSelectedByKeys = (
-  data: any,
-  options = ['email', 'username']
-) => {
+export const dataSelectedByKeys = (data: any, options = ['email', 'name']) => {
   if (!data) return null
   if (Array.isArray(data)) {
     return data.map((item) => {

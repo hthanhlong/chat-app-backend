@@ -1,20 +1,24 @@
 import { NotificationRepository } from '../repositories'
 import RedisService from './RedisService'
 import WsService from './WsService'
+import Utils from './UtilsService'
 class NotificationService {
   async createNotification({
     senderId,
-    receiverId,
+    receiverUuid,
     type,
     content,
     status
   }: {
     senderId: number
-    receiverId: number
+    receiverUuid: string
     type: 'FRIEND' | 'MESSAGE' | 'POST'
     content: string
     status: 'READ' | 'UNREAD'
   }) {
+    const receiverId = await Utils.getUserIdFromUserUuid(receiverUuid)
+    if (!receiverId) return false
+
     await NotificationRepository.createNotification({
       senderId,
       receiverId,
@@ -23,7 +27,7 @@ class NotificationService {
       status
     })
 
-    WsService.sendDataToClientById(receiverId, {
+    WsService.sendDataToClientById(receiverUuid, {
       type: 'HAS_NEW_NOTIFICATION',
       payload: null
     })

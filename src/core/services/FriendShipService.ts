@@ -5,21 +5,23 @@ import UserService from './UserService'
 import WsService from './WsService'
 import RedisService from './RedisService'
 import { User } from '@prisma/client'
+import Utils from './UtilsService'
 class FriendShipService {
   async addFriend(data: FriendRequest) {
+    const receiverId = await Utils.getUserIdFromUserUuid(data.receiverUuid)
+    if (!receiverId) return false
+
     await FriendShipRepository.addFriend({
       senderId: data.senderId,
-      receiverId: data.receiverId,
+      receiverId,
       status: data.status
     })
 
-    const user = await UserService.findUserById(data.senderId)
-
     await NotificationService.createNotification({
       senderId: data.senderId,
-      receiverId: data.receiverId,
+      receiverUuid: data.receiverUuid,
       type: 'FRIEND',
-      content: `${user.nickname} has sent you a friend request`,
+      content: `${data.senderNickName} has sent you a friend request`,
       status: 'UNREAD'
     })
 
@@ -35,33 +37,50 @@ class FriendShipService {
       nonFriends = nonFriends.filter((user: User) => {
         return !ids.some(
           // @ts-ignore
-          (id) => id.toString() === user._id.toString()
+          (id) => id === user.id
         )
       })
       return nonFriends
     }
-    return nonFriends
+    if (!nonFriends) return []
+
+    const sanitizedFriends = nonFriends.map((user: User) => {
+      const { id, ...rest } = user
+      return rest
+    })
+
+    return sanitizedFriends
   }
 
   async getFriendRequest(userId: number) {
     return await FriendShipRepository.GetFriendRequests(userId)
   }
 
-  async getMyFriends(id: number) {
-    return await FriendShipRepository.getMyFriends(id)
+  async getMyFriendsByUuid(userUuid: string) {
+    const id = await Utils.getUserIdFromUserUuid(userUuid)
+    if (!id) return []
+    return await this.getMyFriendsById(id)
+  }
+
+  async getMyFriendsById(userId: number) {
+    return await FriendShipRepository.getMyFriends(userId)
   }
 
   async updateStatusFriend(data: FriendRequest) {
-    const result = await FriendShipRepository.updateStatusFriend(data)
+    const receiverId = await Utils.getUserIdFromUserUuid(data.receiverUuid)
+    if (!receiverId) return false
+    const result = await FriendShipRepository.updateStatusFriend({
+      senderId: data.senderId,
+      receiverId,
+      status: data.status
+    })
     if (!result) return false
     if (result?.status === 'FRIEND') {
-      const user = await UserService.findUserById(data.receiverId)
-
       await NotificationService.createNotification({
-        senderId: data.receiverId,
-        receiverId: data.senderId,
+        senderId: data.senderId,
+        receiverUuid: data.receiverUuid,
         type: 'FRIEND',
-        content: `${user.nickname} has accepted your friend request`,
+        content: `${data.senderNickName} has accepted your friend request`,
         status: 'UNREAD'
       })
 
@@ -69,20 +88,20 @@ class FriendShipService {
         RedisService.CACHE_KEYS.get_friend_list_by_id(data.senderId)
       )
       RedisService.delete(
-        RedisService.CACHE_KEYS.get_friend_list_by_id(data.receiverId)
+        RedisService.CACHE_KEYS.get_friend_list_by_id(receiverId)
       )
 
-      WsService.sendDataToClientById(data.senderId, {
+      WsService.sendDataToClientById(data.senderUuid, {
         type: 'UPDATE_FRIEND_LIST',
         payload: null
       })
 
-      WsService.sendDataToClientById(data.receiverId, {
+      WsService.sendDataToClientById(data.receiverUuid, {
         type: 'UPDATE_FRIEND_LIST',
         payload: null
       })
 
-      WsService.sendDataToClientById(data.receiverId, {
+      WsService.sendDataToClientById(data.receiverUuid, {
         type: 'HAS_NEW_NOTIFICATION',
         payload: null
       })
@@ -106,11 +125,13 @@ class FriendShipService {
 
   async unfriend({
     senderId,
-    friendId
+    friendUuid
   }: {
     senderId: number
-    friendId: number
+    friendUuid: string
   }) {
+    const friendId = await Utils.getUserIdFromUserUuid(friendUuid)
+    if (!friendId) return false
     return await FriendShipRepository.unfriend({
       senderId,
       friendId

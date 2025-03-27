@@ -11,12 +11,12 @@ class AuthService {
     return checkPassword(password, hashedPassword, salt)
   }
 
-  async signUp({ nickname, username, email, password, caption }: signUpInput) {
+  async signUp({ nickName, username, email, password, caption }: signUpInput) {
     const salt = await generateSalt()
     const hashedPassword = await hashPassword(password, salt)
 
     const user: Omit<User, 'id' | 'uuid' | 'createdAt' | 'updatedAt'> = {
-      nickName: nickname,
+      nickName: nickName,
       name: username,
       email,
       hashedPassword,
@@ -35,7 +35,9 @@ class AuthService {
     if (myAI && result) {
       await FriendShipService.updateStatusFriend({
         senderId: myAI.id,
-        receiverId: result.id,
+        senderUuid: myAI.uuid,
+        senderNickName: myAI.nickName,
+        receiverUuid: result.uuid,
         status: 'FRIEND'
       })
     }
@@ -44,18 +46,21 @@ class AuthService {
 
   async signIn({
     id,
-    username,
-    uuid
+    name,
+    uuid,
+    nickName
   }: {
     id: number
-    username: string
+    name: string
     uuid: string
+    nickName: string
   }) {
-    if (!username) return null
+    if (!name) return null
     const payload = {
       id: id,
       uuid: uuid,
-      username: username
+      name: name,
+      nickName: nickName
     } as JWT_PAYLOAD
     const { accessToken, refreshToken } = JWTService.generateToken(payload)
     const result = Object.assign(payload, { accessToken, refreshToken })
@@ -63,8 +68,8 @@ class AuthService {
   }
 
   async refreshToken(refreshToken: JWT_PAYLOAD): Promise<string> {
-    const { id, username, uuid } = refreshToken
-    const accessToken = JWTService.signAccessToken({ id, username, uuid })
+    const { id, name, uuid, nickName } = refreshToken
+    const accessToken = JWTService.signAccessToken({ id, name, uuid, nickName })
     return accessToken
   }
 }

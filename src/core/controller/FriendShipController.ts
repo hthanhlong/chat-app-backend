@@ -5,9 +5,19 @@ import LoggerService from '../services/LoggerService'
 
 class FriendShipController {
   addFriend = async (req: IRequest, res: Response) => {
-    const { id: senderId } = req.decoded
-    const { receiverId, status } = req.body
-    await FriendShipService.addFriend({ senderId, receiverId, status })
+    const {
+      id: senderId,
+      nickName: senderNickName,
+      uuid: senderUuid
+    } = req.decoded
+    const { receiverUuid, status } = req.body
+    await FriendShipService.addFriend({
+      senderId,
+      senderNickName,
+      senderUuid,
+      receiverUuid,
+      status
+    })
 
     LoggerService.info({
       where: 'FriendShipController',
@@ -40,12 +50,18 @@ class FriendShipController {
   }
 
   updateStatusFriend = async (req: IRequest, res: Response) => {
-    const { id: senderId } = req.decoded
-    const { receiverId, status } = req.body
+    const {
+      id: senderId,
+      nickName: senderNickName,
+      uuid: senderUuid
+    } = req.decoded
+    const { receiverUuid, status } = req.body
 
     const result = await FriendShipService.updateStatusFriend({
       senderId,
-      receiverId,
+      senderUuid,
+      senderNickName,
+      receiverUuid,
       status
     })
 
@@ -93,7 +109,7 @@ class FriendShipController {
 
   getFriends = async (req: IRequest, res: Response) => {
     const { id: userId } = req.decoded
-    const users = await FriendShipService.getMyFriends(userId)
+    const users = await FriendShipService.getMyFriendsById(userId)
 
     LoggerService.info({
       where: 'FriendShipController',
@@ -145,12 +161,13 @@ class FriendShipController {
   }
 
   unFriend = async (req: IRequest, res: Response) => {
-    const { id: senderId } = req.decoded
-    const { friendId } = req.params
-    await FriendShipService.unfriend({ senderId, friendId: Number(friendId) })
-    await MessageService.deleteAllMessage(senderId, Number(friendId))
-    WsService.sendDataToClientById(Number(friendId), {
-      type: 'UPDATE_FRIEND_LIST'
+    const { id: senderId, uuid: senderUuid } = req.decoded
+    const { friendUuid } = req.params
+    await FriendShipService.unfriend({ senderId, friendUuid })
+    await MessageService.deleteAllMessage(senderId, friendUuid)
+    WsService.sendDataToClientById(senderUuid, {
+      type: 'UPDATE_FRIEND_LIST',
+      payload: null
     })
 
     LoggerService.info({

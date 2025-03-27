@@ -32,7 +32,7 @@ class MessageRepository {
     })
 
     return {
-      messages: messages.reverse(),
+      messages: messages.length > 0 ? messages.reverse() : [],
       hasMore: skip + messages.length < totalCount,
       currentPage: page
     }

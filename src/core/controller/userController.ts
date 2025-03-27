@@ -1,6 +1,6 @@
 import { Response } from 'express'
 import { IRequest } from '../../types'
-import HttpException from '../../utils/httpExceptions'
+import HttpException from '../../exceptions/httpExceptions'
 import { UserService, FriendShipService } from '../services'
 import LoggerService from '../services/LoggerService'
 
@@ -22,10 +22,10 @@ class UserController {
     })
   }
 
-  getUserById = async (req: IRequest, res: Response) => {
-    const userId = req.params.userId
-    if (!userId) throw HttpException.badRequestError()
-    const user = await UserService.findUserById(Number(userId))
+  getUserByUuid = async (req: IRequest, res: Response) => {
+    const userUuid = req.params.userUuid
+    if (!userUuid) throw HttpException.badRequestError()
+    const user = await UserService.findUserByUuid(userUuid)
     if (!user) {
       res.status(200).json({
         isSuccess: true,

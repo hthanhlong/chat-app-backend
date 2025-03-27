@@ -10,7 +10,7 @@ const friendPaths = {
   searchFriendByKeyword: '/search-friend',
   addFriend: '/add-friend',
   updateFriendStatus: '/update-friend-status',
-  unFriend: '/unfriend/:friendId',
+  unFriend: '/unfriend/:friendUuid',
   getFriends: '/'
 }
 

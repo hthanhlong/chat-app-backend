@@ -1,5 +1,5 @@
 import { Request } from 'express'
-
+import { FriendShipStatus } from '@prisma/client'
 interface IRequest extends Request {
   decoded: JWT_PAYLOAD
   refreshToken: JWT_PAYLOAD
@@ -7,7 +7,7 @@ interface IRequest extends Request {
 }
 
 interface signUpInput {
-  nickname: string
+  nickName: string
   username: string
   email: string
   password: string
@@ -21,13 +21,15 @@ interface SignInInput {
 
 interface FriendRequest {
   senderId: number
-  receiverId: number
-  status: 'PENDING' | 'FRIEND' | 'UNFRIEND'
+  senderUuid: string
+  senderNickName: string
+  receiverUuid: string
+  status: FriendShipStatus
 }
 
 interface NotificationInput {
   senderId: number
-  receiverId: number
+  receiverUuid: string
   type: 'FRIEND' | 'MESSAGE' | 'POST'
   content: string
   status: 'UNREAD' | 'READ'
@@ -41,7 +43,8 @@ interface sendDataToIdByWs {
 interface JWT_PAYLOAD {
   id: number
   uuid: string
-  username: string
+  name: string
+  nickName: string
 }
 
 interface WebSocketEvent {
@@ -50,19 +53,19 @@ interface WebSocketEvent {
 }
 
 interface ISocketEventGetOnlineUsers {
-  userId: number
+  userUuid: string
 }
 
 interface ISocketEventSendMessage {
   senderId: number
-  receiverId: number
+  receiverUuid: string
   message: string
   createdAt: Date
 }
 
 interface ISocketEventHasNewMessage {
   senderId: number
-  receiverId: number
+  receiverUuid: string
   message: string
   createdAt: Date
 }
@@ -85,15 +88,15 @@ interface ISocketEventGetFriendRequest {
 
 interface ISocketEventSendFriendRequest {
   senderId: number
-  receiverId: number
+  receiverUuid: string
 }
 
 interface ISocketEventAcceptFriendRequest {
   senderId: number
-  receiverId: number
+  receiverUuid: string
 }
 
 interface ISocketEventRejectFriendRequest {
   senderId: number
-  receiverId: number
+  receiverUuid: string
 }

@@ -1,19 +1,17 @@
 import { Response } from 'express'
-import HttpException from '../../utils/httpExceptions'
+import HttpException from '../../exceptions/httpExceptions'
 import { MessageService } from '../services'
 import { IRequest } from '../../types'
 import LoggerService from '../services/LoggerService'
 class MessageController {
   getMessages = async (req: IRequest, res: Response) => {
     const { id: senderId } = req.decoded
-    const { friendId } = req.params
+    const { friendUuid } = req.params
     const { page } = req.query
-    if (!friendId) {
-      throw HttpException.badRequestError()
-    }
+
     const messages = await MessageService.getAllMessages(
       senderId,
-      Number(friendId),
+      friendUuid,
       page ? Number(page) : 1
     )
 
@@ -32,12 +30,12 @@ class MessageController {
 
   getLatestMessage = async (req: IRequest, res: Response) => {
     const { id: senderId } = req.decoded
-    const { friendId } = req.params
-    if (!friendId) throw HttpException.badRequestError()
+    const { friendUuid } = req.params
+    if (!friendUuid) throw HttpException.badRequestError()
 
     const lastMessage = await MessageService.getLatestMessage(
       senderId,
-      Number(friendId)
+      friendUuid
     )
 
     LoggerService.info({

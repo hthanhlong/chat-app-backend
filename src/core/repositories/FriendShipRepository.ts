@@ -11,8 +11,8 @@ class FriendShipRepository {
   }) {
     await prisma.friendShip.create({
       data: {
-        userId: data.senderId,
-        friendId: data.receiverId,
+        userId_1: data.senderId,
+        userId_2: data.receiverId,
         status: data.status as FriendShipStatus
       }
     })
@@ -21,20 +21,20 @@ class FriendShipRepository {
   async GetAllUsersNonFriends(userId: number) {
     const friendListIds = await prisma.friendShip.findMany({
       where: {
-        OR: [{ userId: userId }, { friendId: userId }]
+        OR: [{ userId_1: userId }, { userId_2: userId }]
       },
       take: 100
     })
 
     const friendIds = friendListIds.map(function (user: {
-      userId: number
-      friendId: number
+      userId_1: number
+      userId_2: number
     }) {
-      if (user.userId.toString() === userId.toString()) {
-        return user.friendId
+      if (user.userId_1 === userId) {
+        return user.userId_2
       }
-      if (user.friendId.toString() === userId.toString()) {
-        return user.userId
+      if (user.userId_2 === userId) {
+        return user.userId_1
       }
     })
 
@@ -44,21 +44,21 @@ class FriendShipRepository {
   async getFriendListIdsByUserId(id: number) {
     const friendListIds = await prisma.friendShip.findMany({
       where: {
-        OR: [{ userId: id }, { friendId: id }],
+        OR: [{ userId_1: id }, { userId_2: id }],
         status: FriendShipStatus.FRIEND
       },
       take: 100
     })
 
     const friendIds = friendListIds.map(function (user: {
-      userId: number
-      friendId: number
+      userId_1: number
+      userId_2: number
     }) {
-      if (user.userId.toString() === id.toString()) {
-        return user.friendId
+      if (user.userId_1.toString() === id.toString()) {
+        return user.userId_2
       }
-      if (user.friendId.toString() === id.toString()) {
-        return user.userId
+      if (user.userId_2.toString() === id.toString()) {
+        return user.userId_1
       }
     })
 
@@ -68,20 +68,20 @@ class FriendShipRepository {
   async GetFriendRequests(userId: number) {
     const friendRequests = await prisma.friendShip.findMany({
       where: {
-        friendId: userId,
+        userId_2: userId,
         status: FriendShipStatus.PENDING
       }
     })
 
     const senderIds = friendRequests.map(function (user: {
-      userId: number
-      friendId: number
+      userId_1: number
+      userId_2: number
     }) {
-      if (user.userId.toString() === userId.toString()) {
-        return user.friendId
+      if (user.userId_1.toString() === userId.toString()) {
+        return user.userId_2
       }
-      if (user.friendId.toString() === userId.toString()) {
-        return user.userId
+      if (user.userId_2.toString() === userId.toString()) {
+        return user.userId_1
       }
     })
 
@@ -89,7 +89,7 @@ class FriendShipRepository {
       where: { id: { in: senderIds.filter((id) => id !== undefined) } }
     })
 
-    return dataSelectedByKeys(result, ['id', 'nickName', 'name'])
+    return dataSelectedByKeys(result, ['uuid', 'nickName', 'name'])
   }
 
   async getMyFriends(id: number) {
@@ -98,34 +98,46 @@ class FriendShipRepository {
     const friends = await prisma.user.findMany({
       where: { id: { in: friendListIds.filter((id) => id !== undefined) } }
     })
-    return dataSelectedByKeys(friends, ['id', 'nickName', 'name'])
+    return dataSelectedByKeys(friends, [
+      'uuid',
+      'nickName',
+      'name',
+      'profilePicUrl',
+      'caption'
+    ])
   }
 
   async updateStatusFriend(data: {
     senderId: number
     receiverId: number
-    status: string
+    status: FriendShipStatus
   }) {
-    const result = await prisma.friendShip.update({
+    const friendship = await prisma.friendShip.findFirst({
       where: {
-        id: await prisma.friendShip
-          .findFirst({
-            where: {
-              userId: data.receiverId,
-              friendId: data.senderId
-            },
-            select: {
-              id: true
-            }
-          })
-          .then((result) => result?.id)
-      },
-      data: { status: data.status as FriendShipStatus }
+        OR: [
+          { userId_1: data.receiverId, userId_2: data.senderId },
+          { userId_1: data.senderId, userId_2: data.receiverId }
+        ]
+      }
     })
-    if (result) {
+    if (friendship) {
+      const result = await prisma.friendShip.update({
+        where: { id: friendship.id },
+        data: {
+          status: data.status
+        }
+      })
+      return result
+    } else {
+      const result = await prisma.friendShip.create({
+        data: {
+          userId_1: data.receiverId,
+          userId_2: data.senderId,
+          status: data.status
+        }
+      })
       return result
     }
-    return false
   }
 
   async searchFriendByKeyword({
@@ -145,7 +157,7 @@ class FriendShipRepository {
         id: { in: friendListIds.filter((id) => id !== undefined) }
       }
     })
-    return dataSelectedByKeys(result, ['id', 'nickName', 'name'])
+    return dataSelectedByKeys(result, ['uuid', 'nickName', 'name'])
   }
 
   async unfriend({
@@ -158,8 +170,8 @@ class FriendShipRepository {
     await prisma.friendShip.deleteMany({
       where: {
         OR: [
-          { userId: senderId, friendId: friendId },
-          { userId: friendId, friendId: senderId }
+          { userId_1: senderId, userId_2: friendId },
+          { userId_1: friendId, userId_2: senderId }
         ]
       }
     })

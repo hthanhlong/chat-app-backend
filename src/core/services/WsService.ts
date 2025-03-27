@@ -52,9 +52,9 @@ class WsService {
           const data = JSON.parse(message)
           const { type, payload } = data
           if (type === WsService.SOCKET_EVENTS.GET_ONLINE_USERS) {
-            const { userId } = payload as ISocketEventGetOnlineUsers
-            if (!WsService.clients.has(userId.toString())) {
-              WsService.clients.set(userId.toString(), socket)
+            const { userUuid } = payload as ISocketEventGetOnlineUsers
+            if (!WsService.clients.has(userUuid)) {
+              WsService.clients.set(userUuid, socket)
             }
           }
         }
@@ -88,33 +88,33 @@ class WsService {
       const { type, payload } = data
       switch (type) {
         case WsService.SOCKET_EVENTS.GET_ONLINE_USERS:
-          const { userId } = payload as ISocketEventGetOnlineUsers
-          const user = WsService.clients.get(userId.toString())
-          if (!user) return WsService.closeConnection(userId)
-          const friends = await FriendShipService.getMyFriends(userId)
+          const { userUuid } = payload as ISocketEventGetOnlineUsers
+          const user = WsService.clients.get(userUuid)
+          if (!user) return WsService.closeConnection(userUuid)
+          const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
           const onlineUsers = clientIds.filter((id: string) =>
-            friends?.some((friend: any) => friend._id.toString() === id)
+            friends?.some((friend: any) => friend.id === id)
           )
-          WsService.sendDataToClientById(userId, {
+          WsService.sendDataToClientById(userUuid, {
             type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
             payload: onlineUsers
           })
           break
         case WsService.SOCKET_EVENTS.SEND_MESSAGE:
-          const { senderId, receiverId, message, createdAt } =
+          const { senderId, receiverUuid, message, createdAt } =
             payload as ISocketEventSendMessage
           const result = await MessageService.createMessage({
             senderId,
-            receiverId,
+            receiverUuid,
             message,
             createdAt
           })
-          WsService.sendDataToClientById(receiverId, {
+          WsService.sendDataToClientById(receiverUuid, {
             type: WsService.SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
-              _id: result.id,
+              id: result.id,
               senderId,
-              receiverId,
+              receiverUuid,
               message,
               createdAt
             }
@@ -129,16 +129,16 @@ class WsService {
     }
   }
 
-  static sendDataToClientById(userId: number, data: any) {
-    const client = WsService.clients.get(userId.toString())
+  static sendDataToClientById(receiverUuid: string, data: any) {
+    const client = WsService.clients.get(receiverUuid)
     if (!client) return
     client.send(JSON.stringify(data))
   }
 
-  static closeConnection(userId: number) {
-    const client = WsService.clients.get(userId.toString())
+  static closeConnection(receiverUuid: string) {
+    const client = WsService.clients.get(receiverUuid)
     client?.close()
-    WsService.clients.delete(userId.toString())
+    WsService.clients.delete(receiverUuid)
   }
 }
 

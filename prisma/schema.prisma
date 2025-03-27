@@ -38,8 +38,8 @@ model User {
 model FriendShip {
   id        Int              @id @default(autoincrement())
   uuid      String           @unique @default(uuid())
-  userId    Int              @map("user_id")
-  friendId  Int              @map("friend_id")
+  userId_1  Int              @map("user_id_1")
+  userId_2  Int              @map("user_id_2")
   status    FriendShipStatus @default(PENDING)
   isDeleted Boolean          @default(false) @map("is_deleted")
   createdAt DateTime         @default(now()) @map("created_at")

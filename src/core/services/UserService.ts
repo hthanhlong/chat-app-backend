@@ -2,6 +2,7 @@ import { dataSelectedByKeys } from '../../utils'
 import { UserRepository } from '../repositories'
 import RedisService from './RedisService'
 import { User } from '@prisma/client/default'
+import Utils from './UtilsService'
 
 class UserService {
   async createUser(user: User) {
@@ -12,10 +13,11 @@ class UserService {
   async getAllUsers(id: number) {
     const users = await UserRepository.getAllUsers(id)
     const response = dataSelectedByKeys(users, [
-      '_id',
-      'username',
+      'id',
+      'uuid',
+      'name',
       'email',
-      'nickname',
+      'nickName',
       'caption'
     ])
     return response
@@ -43,6 +45,12 @@ class UserService {
     const result = await UserRepository.findUserById(id)
     if (result) RedisService.setUser(id, result as User)
     return result
+  }
+
+  async findUserByUuid(uuid: string) {
+    const id = await Utils.getUserIdFromUserUuid(uuid)
+    if (!id) return null
+    return await this.findUserById(id)
   }
 
   async findUserByUsername(username: string): Promise<User | null> {

@@ -7,8 +7,8 @@ import { deleteAllMessageSchema } from '../../validation'
 const messageRouter = express.Router()
 
 const messagePaths = {
-  getMessages: '/:friendId',
-  getLatestMessage: '/:friendId/latest-message',
+  getMessages: '/:friendUuid',
+  getLatestMessage: '/:friendUuid/latest-message',
   deleteAllMessage: '/delete-all-message'
 }
 

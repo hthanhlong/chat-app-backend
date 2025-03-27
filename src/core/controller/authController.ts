@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import HttpException from '../../utils/httpExceptions'
+import HttpException from '../../exceptions/httpExceptions'
 import { OAuth2Client, TokenPayload } from 'google-auth-library'
 import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
@@ -78,7 +78,8 @@ class AuthController {
     const data = await AuthService.signIn({
       id: user.id,
       uuid: user.uuid,
-      username: user.name
+      name: user.name,
+      nickName: user.nickName
     })
     LoggerService.info({
       where: 'AuthController',
@@ -124,7 +125,7 @@ class AuthController {
       const newUser = await AuthService.signUp({
         email: email as string,
         username: email as string,
-        nickname: name as string,
+        nickName: name as string,
         password: (envConfig.PASSWORD_KEY + email) as string
       })
 
@@ -134,7 +135,8 @@ class AuthController {
     const data = await AuthService.signIn({
       id: user.id,
       uuid: user.uuid,
-      username: user.name
+      name: user.name,
+      nickName: user.nickName
     })
     LoggerService.info({
       where: 'AuthController',

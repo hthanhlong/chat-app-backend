@@ -26,7 +26,7 @@ const createMyAIAccount = async () => {
   const user = await UserService.findUserByEmail('myai@gmail.com')
   if (user) return
   await AuthService.signUp({
-    nickname: `I'm AI`,
+    nickName: `I'm AI`,
     username: 'MyAI',
     email: 'myai@gmail.com',
     password: 'pjUl0Y+Ne62tvXvn',

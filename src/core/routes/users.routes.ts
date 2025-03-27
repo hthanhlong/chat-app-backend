@@ -9,7 +9,7 @@ const userRouter = express.Router()
 const userPaths = {
   getUsersNonFriends: '/non-friends',
   getUser: '/me',
-  getUserById: '/:userId',
+  getUserByUuid: '/:userUuid',
   updateUser: '/'
 }
 
@@ -22,7 +22,10 @@ userRouter.get(
 
 userRouter.get(userPaths.getUser, asyncHandler(UserController.getUser))
 
-userRouter.get(userPaths.getUserById, asyncHandler(UserController.getUserById))
+userRouter.get(
+  userPaths.getUserByUuid,
+  asyncHandler(UserController.getUserByUuid)
+)
 
 userRouter.post(
   userPaths.updateUser,

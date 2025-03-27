@@ -1,20 +1,27 @@
 import { MessageRepository } from '../repositories'
+import Utils from './UtilsService'
+import HttpException from '../../exceptions/httpExceptions'
+
 class MessageService {
-  async getAllMessages(userId: number, friendId: number, page: number = 1) {
+  async getAllMessages(userId: number, friendUuid: string, page: number = 1) {
+    const friendId = await Utils.getUserIdFromUserUuid(friendUuid)
+    if (!friendId) throw HttpException.badRequestError()
     return await MessageRepository.getAllMessages(userId, friendId, page)
   }
 
   async createMessage({
     senderId,
-    receiverId,
+    receiverUuid,
     message,
     createdAt
   }: {
     senderId: number
-    receiverId: number
+    receiverUuid: string
     message: string
     createdAt: Date
   }) {
+    const receiverId = await Utils.getUserIdFromUserUuid(receiverUuid)
+    if (!receiverId) throw HttpException.badRequestError()
     return await MessageRepository.createMessage({
       senderId,
       receiverId,
@@ -23,11 +30,15 @@ class MessageService {
     })
   }
 
-  async getLatestMessage(userId: number, friendId: number) {
+  async getLatestMessage(userId: number, friendUuid: string) {
+    const friendId = await Utils.getUserIdFromUserUuid(friendUuid)
+    if (!friendId) throw HttpException.badRequestError()
     return await MessageRepository.getLatestMessage(userId, friendId)
   }
 
-  async deleteAllMessage(senderId: number, receiverId: number) {
+  async deleteAllMessage(senderId: number, receiverUuid: string) {
+    const receiverId = await Utils.getUserIdFromUserUuid(receiverUuid)
+    if (!receiverId) throw HttpException.badRequestError()
     return await MessageRepository.deleteAllMessage(senderId, receiverId)
   }
 }

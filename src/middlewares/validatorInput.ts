@@ -1,6 +1,6 @@
 import { AnySchema } from 'joi'
 import { Response, NextFunction } from 'express'
-import HttpException from '../utils/httpExceptions'
+import HttpException from '../exceptions/httpExceptions'
 import { IRequest } from '../types'
 
 const validatorInput =
