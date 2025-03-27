@@ -4,30 +4,27 @@ import WsService from './WsService'
 import Utils from './UtilsService'
 class NotificationService {
   async createNotification({
-    senderId,
-    receiverUuid,
+    userUuid,
     type,
     content,
     status
   }: {
-    senderId: number
-    receiverUuid: string
+    userUuid: string
     type: 'FRIEND' | 'MESSAGE' | 'POST'
     content: string
     status: 'READ' | 'UNREAD'
   }) {
-    const receiverId = await Utils.getUserIdFromUserUuid(receiverUuid)
-    if (!receiverId) return false
+    const userId = await Utils.getUserIdFromUserUuid(userUuid)
+    if (!userId) return false
 
     await NotificationRepository.createNotification({
-      senderId,
-      receiverId,
+      userId,
       type,
       content,
       status
     })
 
-    WsService.sendDataToClientById(receiverUuid, {
+    WsService.sendDataToClientById(userUuid, {
       type: 'HAS_NEW_NOTIFICATION',
       payload: null
     })
@@ -50,7 +47,7 @@ class NotificationService {
   async getAllNotificationsById(id: number) {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(id)
     const cachedNotifications = await RedisService.get(cacheKey)
-    if (cachedNotifications) return cachedNotifications
+    if (cachedNotifications.length > 0) return cachedNotifications
     const notifications =
       await NotificationRepository.getAllNotificationsById(id)
     RedisService.set(cacheKey, notifications, 180000)

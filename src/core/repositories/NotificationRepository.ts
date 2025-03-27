@@ -3,21 +3,18 @@ const prisma = new PrismaClient()
 
 class NotificationRepository {
   async createNotification({
-    senderId,
-    receiverId,
+    userId,
     type,
     content,
     status
   }: {
-    senderId: number
-    receiverId: number
+    userId: number
     type: 'FRIEND' | 'MESSAGE' | 'POST'
     content: string
     status: 'READ' | 'UNREAD'
   }) {
     const notification = {
-      senderId: senderId,
-      receiverId: receiverId,
+      userId: userId,
       type: type,
       content: content,
       status: status
@@ -42,8 +39,15 @@ class NotificationRepository {
 
   async getAllNotificationsById(id: number) {
     const allNotifications = await prisma.notification.findMany({
-      where: { receiverId: id },
+      where: { userId: id },
       orderBy: { createdAt: 'desc' },
+      select: {
+        uuid: true,
+        type: true,
+        content: true,
+        status: true,
+        createdAt: true
+      },
       take: 50
     })
     return allNotifications

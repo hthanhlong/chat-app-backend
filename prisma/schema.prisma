@@ -67,8 +67,7 @@ model Message {
 model Notification {
   id         Int                @id @default(autoincrement())
   uuid       String             @unique @default(uuid())
-  senderId   Int                @map("sender_id")
-  receiverId Int                @map("receiver_id")
+  userId     Int                @map("user_id")
   type       NotificationType   @default(FRIEND)
   content    String             @db.VarChar(1500)
   status     NotificationStatus @default(UNREAD)

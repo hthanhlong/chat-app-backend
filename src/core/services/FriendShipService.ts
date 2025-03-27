@@ -18,8 +18,7 @@ class FriendShipService {
     })
 
     await NotificationService.createNotification({
-      senderId: data.senderId,
-      receiverUuid: data.receiverUuid,
+      userUuid: data.receiverUuid,
       type: 'FRIEND',
       content: `${data.senderNickName} has sent you a friend request`,
       status: 'UNREAD'
@@ -77,8 +76,7 @@ class FriendShipService {
     if (!result) return false
     if (result?.status === 'FRIEND') {
       await NotificationService.createNotification({
-        senderId: data.senderId,
-        receiverUuid: data.receiverUuid,
+        userUuid: data.receiverUuid,
         type: 'FRIEND',
         content: `${data.senderNickName} has accepted your friend request`,
         status: 'UNREAD'
