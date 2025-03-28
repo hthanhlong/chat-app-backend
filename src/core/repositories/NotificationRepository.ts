@@ -25,14 +25,14 @@ class NotificationRepository {
   }
 
   async updateNotification({
-    id,
+    notificationUuid,
     status
   }: {
-    id: number
+    notificationUuid: string
     status: 'READ' | 'UNREAD'
   }) {
     await prisma.notification.update({
-      where: { id: id },
+      where: { uuid: notificationUuid },
       data: { status }
     })
   }

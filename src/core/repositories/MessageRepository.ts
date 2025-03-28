@@ -3,8 +3,8 @@ const prisma = new PrismaClient()
 
 class MessageRepository {
   async getAllMessages(
-    userId: number,
-    friendId: number,
+    userUuid: string,
+    friendUuid: string,
     page: number = 1,
     limit: number = 20
   ) {
@@ -13,8 +13,8 @@ class MessageRepository {
     const messages = await prisma.message.findMany({
       where: {
         OR: [
-          { senderId: userId, receiverId: friendId },
-          { senderId: friendId, receiverId: userId }
+          { senderUuid: userUuid, receiverUuid: friendUuid },
+          { senderUuid: friendUuid, receiverUuid: userUuid }
         ]
       },
       orderBy: { createdAt: 'desc' },
@@ -25,8 +25,8 @@ class MessageRepository {
     const totalCount = await prisma.message.count({
       where: {
         OR: [
-          { senderId: userId, receiverId: friendId },
-          { senderId: friendId, receiverId: userId }
+          { senderUuid: userUuid, receiverUuid: friendUuid },
+          { senderUuid: friendUuid, receiverUuid: userUuid }
         ]
       }
     })
@@ -39,20 +39,20 @@ class MessageRepository {
   }
 
   async createMessage({
-    senderId,
-    receiverId,
+    senderUuid,
+    receiverUuid,
     message,
     createdAt
   }: {
-    senderId: number
-    receiverId: number
+    senderUuid: string
+    receiverUuid: string
     message: string
     createdAt: Date
   }) {
     const result = await prisma.message.create({
       data: {
-        senderId: senderId,
-        receiverId: receiverId,
+        senderUuid: senderUuid,
+        receiverUuid: receiverUuid,
         message,
         createdAt
       }
@@ -60,12 +60,12 @@ class MessageRepository {
     return result
   }
 
-  async getLatestMessage(userId: number, friendId: number) {
+  async getLatestMessage(userUuid: string, friendUuid: string) {
     return await prisma.message.findFirst({
       where: {
         OR: [
-          { senderId: userId, receiverId: friendId },
-          { senderId: friendId, receiverId: userId }
+          { senderUuid: userUuid, receiverUuid: friendUuid },
+          { senderUuid: friendUuid, receiverUuid: userUuid }
         ]
       },
       orderBy: { createdAt: 'desc' },
@@ -73,12 +73,12 @@ class MessageRepository {
     })
   }
 
-  async deleteAllMessage(senderId: number, receiverId: number) {
+  async deleteAllMessage(senderUuid: string, receiverUuid: string) {
     await prisma.message.deleteMany({
       where: {
         OR: [
-          { senderId: senderId, receiverId: receiverId },
-          { senderId: receiverId, receiverId: senderId }
+          { senderUuid: senderUuid, receiverUuid: receiverUuid },
+          { senderUuid: receiverUuid, receiverUuid: senderUuid }
         ]
       }
     })

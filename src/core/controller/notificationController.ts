@@ -24,8 +24,13 @@ class NotificationController {
   }
 
   updateNotification = async (req: IRequest, res: Response) => {
-    const { notificationId, status } = req.body
-    await NotificationService.updateNotification({ id: notificationId, status })
+    const { id: userId } = req.decoded
+    const { notificationUuid, status } = req.body
+    await NotificationService.updateNotification({
+      userId,
+      notificationUuid,
+      status
+    })
 
     LoggerService.info({
       where: 'NotificationController',

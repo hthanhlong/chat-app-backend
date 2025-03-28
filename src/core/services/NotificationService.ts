@@ -23,7 +23,10 @@ class NotificationService {
       content,
       status
     })
-
+    // delete cache
+    const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(userId)
+    RedisService.delete(cacheKey)
+    // send to client
     WsService.sendDataToClientById(userUuid, {
       type: 'HAS_NEW_NOTIFICATION',
       payload: null
@@ -33,21 +36,29 @@ class NotificationService {
   }
 
   async updateNotification({
-    id,
+    userId,
+    notificationUuid,
     status
   }: {
-    id: number
+    userId: number
+    notificationUuid: string
     status: 'READ' | 'UNREAD'
   }) {
-    const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(id)
+    const notification = await NotificationRepository.updateNotification({
+      notificationUuid,
+      status
+    })
+    // delete cache
+    const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(userId)
     RedisService.delete(cacheKey)
-    return await NotificationRepository.updateNotification({ id, status })
+    return notification
   }
 
   async getAllNotificationsById(id: number) {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(id)
     const cachedNotifications = await RedisService.get(cacheKey)
-    if (cachedNotifications.length > 0) return cachedNotifications
+    if (Array.isArray(cachedNotifications) && cachedNotifications.length > 0)
+      return cachedNotifications
     const notifications =
       await NotificationRepository.getAllNotificationsById(id)
     RedisService.set(cacheKey, notifications, 180000)

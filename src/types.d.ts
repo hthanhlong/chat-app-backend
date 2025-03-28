@@ -57,9 +57,10 @@ interface ISocketEventGetOnlineUsers {
 }
 
 interface ISocketEventSendMessage {
-  senderId: number
-  receiverUuid: string
+  uuid: string
   message: string
+  receiverUuid: string
+  senderUuid: string
   createdAt: Date
 }
 

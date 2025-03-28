@@ -38,12 +38,12 @@ class WsService {
     }
     try {
       const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-      WsService.clients.set(data.id.toString(), socket)
+      WsService.clients.set(data.uuid, socket)
       RedisService.publishClients(
         JSON.stringify({
           type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
           payload: {
-            userId: data.id
+            userId: data.uuid
           }
         })
       )
@@ -60,7 +60,7 @@ class WsService {
         }
       })
       socket.on('message', (event: WebSocketEvent) =>
-        WsService._onMessage(event, req)
+        WsService._onMessage(event)
       )
       socket.on('error', (err: any) =>
         LoggerService.error({
@@ -69,7 +69,7 @@ class WsService {
         })
       )
       socket.on('close', () => {
-        WsService.clients.delete(data.id.toString())
+        WsService.clients.delete(data.uuid)
       })
     } catch (error: Error | any) {
       socket.close(1008, 'INVALID_ACCESS_TOKEN')
@@ -80,7 +80,7 @@ class WsService {
     }
   }
 
-  static async _onMessage(event: WebSocketEvent, req: IRequest): Promise<void> {
+  static async _onMessage(event: WebSocketEvent): Promise<void> {
     try {
       const data = JSON.parse(event as any)
       if (!data.type || !data.payload) return
@@ -92,8 +92,8 @@ class WsService {
           const user = WsService.clients.get(userUuid)
           if (!user) return WsService.closeConnection(userUuid)
           const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
-          const onlineUsers = clientIds.filter((id: string) =>
-            friends?.some((friend: any) => friend.id === id)
+          const onlineUsers = clientIds.filter((uuid: string) =>
+            friends?.some((friend: any) => friend.uuid === uuid)
           )
           WsService.sendDataToClientById(userUuid, {
             type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
@@ -101,10 +101,10 @@ class WsService {
           })
           break
         case WsService.SOCKET_EVENTS.SEND_MESSAGE:
-          const { senderId, receiverUuid, message, createdAt } =
+          const { senderUuid, receiverUuid, message, createdAt } =
             payload as ISocketEventSendMessage
           const result = await MessageService.createMessage({
-            senderId,
+            senderUuid,
             receiverUuid,
             message,
             createdAt
@@ -112,8 +112,8 @@ class WsService {
           WsService.sendDataToClientById(receiverUuid, {
             type: WsService.SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
-              id: result.id,
-              senderId,
+              uuid: result.uuid,
+              senderUuid,
               receiverUuid,
               message,
               createdAt

@@ -50,30 +50,30 @@ model FriendShip {
 
 // Message model
 model Message {
-  id         Int      @id @default(autoincrement())
-  uuid       String   @unique @default(uuid())
-  senderId   Int      @map("sender_id")
-  receiverId Int      @map("receiver_id")
-  message    String   @db.VarChar(1500)
-  file       String?  @db.VarChar(1500)
-  isDeleted  Boolean  @default(false) @map("is_deleted")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  uuid         String   @unique @default(uuid())
+  senderUuid   String   @map("sender_uuid")
+  receiverUuid String   @map("receiver_uuid")
+  message      String   @db.VarChar(1500)
+  file         String?  @db.VarChar(1500)
+  isDeleted    Boolean  @default(false) @map("is_deleted")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("messages")
 }
 
 // Notification model
 model Notification {
-  id         Int                @id @default(autoincrement())
-  uuid       String             @unique @default(uuid())
-  userId     Int                @map("user_id")
-  type       NotificationType   @default(FRIEND)
-  content    String             @db.VarChar(1500)
-  status     NotificationStatus @default(UNREAD)
-  isDeleted  Boolean            @default(false) @map("is_deleted")
-  createdAt  DateTime           @default(now()) @map("created_at")
-  updatedAt  DateTime           @updatedAt @map("updated_at")
+  id        Int                @id @default(autoincrement())
+  uuid      String             @unique @default(uuid())
+  userId    Int                @map("user_id")
+  type      NotificationType   @default(FRIEND)
+  content   String             @db.VarChar(1500)
+  status    NotificationStatus @default(UNREAD)
+  isDeleted Boolean            @default(false) @map("is_deleted")
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
 
   @@map("notifications")
 }

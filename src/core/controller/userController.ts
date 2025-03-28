@@ -14,11 +14,15 @@ class UserController {
       message: 'Get user successful'
     })
 
+    // remove id from user
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, ...rest } = user
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
       message: 'Get user successful',
-      data: user
+      data: rest
     })
   }
 
@@ -41,11 +45,15 @@ class UserController {
       message: 'Get user by id successful'
     })
 
+    // remove id from user
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, ...rest } = user
+
     res.status(200).json({
       isSuccess: true,
       errorCode: null,
       message: 'Get user by id successful',
-      data: user
+      data: rest
     })
   }
 
