@@ -27,6 +27,7 @@ class JWTService {
         token,
         envConfig.JWT_SECRET_ACCESS
       ) as JWT_PAYLOAD
+      if (!decoded.id) throw HttpException.badTokenError()
       return decoded
     } catch (error) {
       if (error instanceof TokenExpiredError) {

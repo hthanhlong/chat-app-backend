@@ -27,7 +27,7 @@ class NotificationService {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(userId)
     RedisService.delete(cacheKey)
     // send to client
-    WsService.sendDataToClientById(userUuid, {
+    WsService.sendDataToClientByUuid(userUuid, {
       type: 'HAS_NEW_NOTIFICATION',
       payload: null
     })

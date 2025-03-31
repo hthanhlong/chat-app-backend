@@ -2,7 +2,7 @@ import express from 'express'
 import { FriendShipController } from '../controller'
 import { asyncHandler } from '../../helpers'
 import { validateAccessToken, validatorInput } from '../../middlewares'
-import { addFriendSchema, updateFriendStatusSchema } from '../../validation'
+import { ValidationSchema } from '../../validation'
 const friendRouter = express.Router()
 
 const friendPaths = {
@@ -18,7 +18,7 @@ friendRouter.use(asyncHandler(validateAccessToken))
 
 friendRouter.post(
   friendPaths.addFriend,
-  validatorInput(addFriendSchema),
+  validatorInput(ValidationSchema.addFriend),
   asyncHandler(FriendShipController.addFriend)
 )
 friendRouter.get(
@@ -28,7 +28,7 @@ friendRouter.get(
 
 friendRouter.post(
   friendPaths.updateFriendStatus,
-  validatorInput(updateFriendStatusSchema),
+  validatorInput(ValidationSchema.updateFriendStatus),
   asyncHandler(FriendShipController.updateStatusFriend)
 )
 friendRouter.get(

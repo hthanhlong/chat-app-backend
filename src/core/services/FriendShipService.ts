@@ -89,17 +89,17 @@ class FriendShipService {
         RedisService.CACHE_KEYS.get_friend_list_by_id(receiverId)
       )
 
-      WsService.sendDataToClientById(data.senderUuid, {
+      WsService.sendDataToClientByUuid(data.senderUuid, {
         type: 'UPDATE_FRIEND_LIST',
         payload: null
       })
 
-      WsService.sendDataToClientById(data.receiverUuid, {
+      WsService.sendDataToClientByUuid(data.receiverUuid, {
         type: 'UPDATE_FRIEND_LIST',
         payload: null
       })
 
-      WsService.sendDataToClientById(data.receiverUuid, {
+      WsService.sendDataToClientByUuid(data.receiverUuid, {
         type: 'HAS_NEW_NOTIFICATION',
         payload: null
       })

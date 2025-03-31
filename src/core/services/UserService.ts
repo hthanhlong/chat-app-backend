@@ -39,6 +39,7 @@ class UserService {
   }
 
   async findUserById(id: number) {
+    if (!id) return null
     const cacheKey = RedisService.CACHE_KEYS.get_user_by_id(id)
     const cachedUser = await RedisService.get(cacheKey)
     if (cachedUser) return cachedUser

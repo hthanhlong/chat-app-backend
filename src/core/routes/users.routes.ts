@@ -2,8 +2,7 @@ import express from 'express'
 import { UserController } from '../controller'
 import { asyncHandler } from '../../helpers'
 import { validateAccessToken, validatorInput } from '../../middlewares'
-import { userUpdateSchema } from '../../validation'
-
+import { ValidationSchema } from '../../validation'
 const userRouter = express.Router()
 
 const userPaths = {
@@ -29,7 +28,7 @@ userRouter.get(
 
 userRouter.post(
   userPaths.updateUser,
-  validatorInput(userUpdateSchema),
+  validatorInput(ValidationSchema.userUpdate),
   asyncHandler(UserController.updateUser)
 )
 

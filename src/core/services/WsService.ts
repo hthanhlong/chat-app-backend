@@ -3,12 +3,11 @@ import MessageService from './MessageService'
 import FriendShipService from './FriendShipService'
 import {
   JWT_PAYLOAD,
-  WebSocketEvent,
   IRequest,
   ISocketEventGetOnlineUsers,
-  ISocketEventSendMessage
+  ISocketEventSendMessage,
+  IWebSocket
 } from '../../types'
-import RedisService from './RedisService'
 import LoggerService from './LoggerService'
 
 class WsService {
@@ -25,54 +24,23 @@ class WsService {
     REJECT_FRIEND_REQUEST: 'REJECT_FRIEND_REQUEST',
     HAS_NEW_NOTIFICATION: 'HAS_NEW_NOTIFICATION',
     GET_NOTIFICATIONS: 'GET_NOTIFICATIONS',
-    UPDATE_NOTIFICATION: 'UPDATE_NOTIFICATION'
+    UPDATE_NOTIFICATION: 'UPDATE_NOTIFICATION',
+    HAS_NEW_ONLINE_USER: 'HAS_NEW_ONLINE_USER',
+    HAS_NEW_OFFLINE_USER: 'HAS_NEW_OFFLINE_USER'
   }
 
-  static clients: Map<string, WebSocket> = new Map()
+  static clientSockets: Map<string, WebSocket> = new Map()
+  static setTimeoutIds: Map<string, NodeJS.Timeout> = new Map()
 
-  static onConnection(socket: any, req: IRequest): void {
-    const accessToken = req.url?.split('?')[1].split('accessToken=')[1]
-    if (!accessToken) {
-      socket.close(1008, 'No access token provided')
-      return
-    }
+  static onConnection = async (socket: any, req: IRequest): Promise<void> => {
     try {
-      const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
-      WsService.clients.set(data.uuid, socket)
-      RedisService.publishClients(
-        JSON.stringify({
-          type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
-          payload: {
-            userId: data.uuid
-          }
-        })
-      )
-      RedisService.subOnMessage((channel, message) => {
-        if (channel === RedisService.CHANNELS.clients_connected) {
-          const data = JSON.parse(message)
-          const { type, payload } = data
-          if (type === WsService.SOCKET_EVENTS.GET_ONLINE_USERS) {
-            const { userUuid } = payload as ISocketEventGetOnlineUsers
-            if (!WsService.clients.has(userUuid)) {
-              WsService.clients.set(userUuid, socket)
-            }
-          }
-        }
-      })
-      socket.on('message', (event: WebSocketEvent) =>
-        WsService._onMessage(event)
-      )
-      socket.on('error', (err: any) =>
-        LoggerService.error({
-          where: 'WsService',
-          message: `Error on socket: ${err.message}`
-        })
-      )
-      socket.on('close', () => {
-        WsService.clients.delete(data.uuid)
-      })
+      const data = await WsService.handleConnect(socket, req)
+      await WsService.triggerUpdateOnlineUsers(data as JWT_PAYLOAD)
+      socket.on('message', (event: IWebSocket) => WsService._onMessage(event))
+      socket.on('error', (err: any) => WsService._onError(socket, err))
+      socket.on('close', () => WsService._onClose(data as JWT_PAYLOAD))
     } catch (error: Error | any) {
-      socket.close(1008, 'INVALID_ACCESS_TOKEN')
+      socket.close(1008, 'Error on connection')
       LoggerService.error({
         where: 'WsService',
         message: `Error on connection: ${error.message}`
@@ -80,22 +48,16 @@ class WsService {
     }
   }
 
-  static async _onMessage(event: WebSocketEvent): Promise<void> {
+  static async _onMessage(event: IWebSocket): Promise<void> {
     try {
       const data = JSON.parse(event as any)
-      if (!data.type || !data.payload) return
-      const clientIds = Array.from(WsService.clients.keys())
+      if (!data.type) return
       const { type, payload } = data
       switch (type) {
         case WsService.SOCKET_EVENTS.GET_ONLINE_USERS:
           const { userUuid } = payload as ISocketEventGetOnlineUsers
-          const user = WsService.clients.get(userUuid)
-          if (!user) return WsService.closeConnection(userUuid)
-          const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
-          const onlineUsers = clientIds.filter((uuid: string) =>
-            friends?.some((friend: any) => friend.uuid === uuid)
-          )
-          WsService.sendDataToClientById(userUuid, {
+          const onlineUsers = await WsService.filterOnlineUsers(userUuid)
+          WsService.sendDataToClientByUuid(userUuid, {
             type: WsService.SOCKET_EVENTS.GET_ONLINE_USERS,
             payload: onlineUsers
           })
@@ -109,7 +71,7 @@ class WsService {
             message,
             createdAt
           })
-          WsService.sendDataToClientById(receiverUuid, {
+          WsService.sendDataToClientByUuid(receiverUuid, {
             type: WsService.SOCKET_EVENTS.HAS_NEW_MESSAGE,
             payload: {
               uuid: result.uuid,
@@ -129,16 +91,123 @@ class WsService {
     }
   }
 
-  static sendDataToClientById(receiverUuid: string, data: any) {
-    const client = WsService.clients.get(receiverUuid)
+  static handleConnect = async (socket: any, req: IRequest) => {
+    return new Promise((resolve, reject) => {
+      try {
+        const accessToken = req.url?.split('?')[1].split('accessToken=')[1]
+        if (!accessToken) {
+          socket.close(1008, 'No access token provided')
+          return
+        }
+        const data: JWT_PAYLOAD = JWTService.verifyAccessToken(accessToken)
+        WsService.clientSockets.set(data.uuid, socket)
+        resolve(data)
+      } catch (error: Error | any) {
+        socket.close(1008, 'INVALID_ACCESS_TOKEN')
+        LoggerService.error({
+          where: 'WsService',
+          message: `Error on connection: ${error.message}`
+        })
+        reject(error)
+      }
+    })
+  }
+
+  static sendDataToClientByUuid(uuid: string, data: any) {
+    const client = WsService.clientSockets.get(uuid)
     if (!client) return
     client.send(JSON.stringify(data))
   }
 
-  static closeConnection(receiverUuid: string) {
-    const client = WsService.clients.get(receiverUuid)
-    client?.close()
-    WsService.clients.delete(receiverUuid)
+  static triggerUpdateOnlineUsers = async (data: JWT_PAYLOAD) => {
+    return new Promise((resolve) => {
+      if (!data.uuid) return
+      const userUuid = data.uuid
+      // check if user reconnect, we will clear the timeout
+      if (WsService.setTimeoutIds.has(`trigger-online-${userUuid}`)) {
+        clearTimeout(WsService.setTimeoutIds.get(`trigger-online-${userUuid}`))
+        resolve(true)
+      }
+      if (WsService.setTimeoutIds.has(`trigger-offline-${userUuid}`)) {
+        clearTimeout(WsService.setTimeoutIds.get(`trigger-offline-${userUuid}`))
+      }
+
+      const timeoutId = setTimeout(async () => {
+        const friendsIsOnline = await WsService.filterOnlineUsers(userUuid)
+        if (Array.isArray(friendsIsOnline) && friendsIsOnline.length === 0)
+          return
+        friendsIsOnline.forEach((uuid: string) => {
+          WsService.sendDataToClientByUuid(uuid, {
+            type: WsService.SOCKET_EVENTS.HAS_NEW_ONLINE_USER,
+            payload: {
+              uuid: userUuid
+            }
+          })
+        })
+        resolve(true)
+      }, 10000)
+      WsService.setTimeoutIds.set(`trigger-online-${userUuid}`, timeoutId)
+    })
+  }
+
+  static triggerUpdateOfflineUsers = async (data: JWT_PAYLOAD) => {
+    return new Promise((resolve) => {
+      if (!data.uuid) return
+      const userUuid = data.uuid
+
+      // check if user reconnect, we will clear the timeout
+      if (WsService.setTimeoutIds.has(`trigger-offline-${userUuid}`)) {
+        clearTimeout(WsService.setTimeoutIds.get(`trigger-offline-${userUuid}`))
+        resolve(true)
+      }
+      if (WsService.setTimeoutIds.has(`trigger-online-${userUuid}`)) {
+        clearTimeout(WsService.setTimeoutIds.get(`trigger-online-${userUuid}`))
+      }
+
+      const timeoutId = setTimeout(async () => {
+        const friendsIsOnline = await WsService.filterOnlineUsers(userUuid)
+        if (Array.isArray(friendsIsOnline) && friendsIsOnline.length === 0)
+          return
+        friendsIsOnline.forEach((uuid: string) => {
+          WsService.sendDataToClientByUuid(uuid, {
+            type: WsService.SOCKET_EVENTS.HAS_NEW_OFFLINE_USER,
+            payload: {
+              uuid: userUuid
+            }
+          })
+        })
+        WsService.clientSockets.delete(userUuid)
+        resolve(true)
+      }, 8000)
+      WsService.setTimeoutIds.set(`trigger-offline-${userUuid}`, timeoutId)
+    })
+  }
+
+  static getClientSockets = () => {
+    return Array.from(WsService.clientSockets.keys())
+  }
+
+  static filterOnlineUsers = async (userUuid: string) => {
+    const clientSockets = WsService.getClientSockets()
+    const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
+    return clientSockets.filter((uuid: string) =>
+      friends?.some((friend: any) => friend.uuid === uuid)
+    )
+  }
+
+  static _onError = (socket: any, error: Error) => {
+    LoggerService.error({
+      where: 'WsService',
+      message: `Error on socket: ${error.message}`
+    })
+  }
+
+  static _onClose = async (data: JWT_PAYLOAD) => {
+    await WsService.triggerUpdateOfflineUsers(data)
+    LoggerService.info({
+      where: 'WsService',
+      message: `User ${data.uuid} disconnected`
+    })
   }
 }
 

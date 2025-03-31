@@ -6,12 +6,7 @@ import {
   validatorInput
 } from '../../middlewares'
 import { asyncHandler } from '../../helpers'
-import {
-  signUpSchema,
-  signInSchema,
-  googleSignInSchema,
-  refreshTokenSchema
-} from '../../validation'
+import { ValidationSchema } from '../../validation'
 
 const authRouter = express.Router()
 
@@ -25,26 +20,26 @@ const authPaths = {
 
 authRouter.post(
   authPaths.signUp,
-  validatorInput(signUpSchema),
+  validatorInput(ValidationSchema.signUp),
   asyncHandler(AuthController.signUp)
 )
 
 authRouter.post(
   authPaths.signIn,
-  validatorInput(signInSchema),
+  validatorInput(ValidationSchema.signIn),
   asyncHandler(AuthController.signIn)
 )
 
 authRouter.post(
   authPaths.refreshToken,
-  validatorInput(refreshTokenSchema),
+  validatorInput(ValidationSchema.refreshToken),
   validateRefreshToken,
   asyncHandler(AuthController.refreshToken)
 )
 
 authRouter.post(
   authPaths.googleSignIn,
-  validatorInput(googleSignInSchema),
+  validatorInput(ValidationSchema.googleSignIn),
   asyncHandler(AuthController.googleSignIn)
 )
 

@@ -1,21 +1,3 @@
-import {
-  signUpSchema,
-  signInSchema,
-  addFriendSchema,
-  refreshTokenSchema,
-  userUpdateSchema,
-  googleSignInSchema,
-  updateFriendStatusSchema,
-  deleteAllMessageSchema
-} from './schema'
+import ValidationSchema from './schema'
 
-export {
-  signUpSchema,
-  signInSchema,
-  addFriendSchema,
-  refreshTokenSchema,
-  userUpdateSchema,
-  googleSignInSchema,
-  updateFriendStatusSchema,
-  deleteAllMessageSchema
-}
+export { ValidationSchema }

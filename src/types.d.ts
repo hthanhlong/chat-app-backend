@@ -47,7 +47,7 @@ interface JWT_PAYLOAD {
   nickName: string
 }
 
-interface WebSocketEvent {
+interface IWebSocket {
   type: string
   payload?: unknown
 }

@@ -1,6 +1,7 @@
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
+import compression from 'compression'
 import routes from './core/routes'
 import envConfig from './config'
 import WebSocketService from './ws'
@@ -30,6 +31,7 @@ async function main() {
   app.use(limiter())
   app.use(LocalStorage.middleware)
   app.use(requestLogger)
+  app.use(compression())
   app.use('/api/v1', routes)
   app.use(handleNotFoundRoute)
   app.use(errorHandler)

@@ -2,7 +2,7 @@ import express from 'express'
 import { MessageController } from '../controller'
 import { asyncHandler } from '../../helpers'
 import { validateAccessToken, validatorInput } from '../../middlewares'
-import { deleteAllMessageSchema } from '../../validation'
+import { ValidationSchema } from '../../validation'
 
 const messageRouter = express.Router()
 
@@ -24,7 +24,7 @@ messageRouter.get(
 )
 messageRouter.post(
   messagePaths.deleteAllMessage,
-  validatorInput(deleteAllMessageSchema),
+  validatorInput(ValidationSchema.deleteAllMessage),
   asyncHandler(MessageController.deleteAllMessage)
 )
 
