@@ -1,46 +1,53 @@
 services:
-  app:
-    build: .
-    container_name: express_app
+  postgres_prod:
+    image: postgres:latest
+    container_name: postgres_prod
     restart: always
     ports:
-      - '8080:8080' # For http
-      - '8081:8081' # For ws
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    env_file:
+      - .env
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    networks:
+      - app_network_prod
+
+  redis_prod:
+    image: redis:latest
+    container_name: redis_prod
+    restart: always
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    networks:
+      - app_network_prod
+
+  app_prod:
+    build: .
+    container_name: express_app_prod
+    restart: always
+    ports:
+      - '${APP_PORT}:${APP_PORT}' # For http
+      - '${SOCKET_PORT}:${SOCKET_PORT}' # For ws
     env_file:
       - .env
     depends_on:
-      - postgres
-      - redis
+      postgres_prod:
+        condition: service_healthy
+      redis_prod:
+        condition: service_started
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/app
+      - /app/node_modules
     networks:
-      - app_network
-
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    restart: always
-    ports:
-      - '5432:5432'
-    env_file:
-      - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    restart: always
-    ports:
-      - '6379:6379'
-    networks:
-      - app_network
+      - app_network_prod
 
 volumes:
-  postgres_data:
+  postgres_data_prod:
 
 networks:
-  app_network:
+  app_network_prod:

@@ -2,7 +2,7 @@
 FROM node:22.14.0-alpine
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package files
 COPY package.json ./
@@ -13,9 +13,7 @@ RUN npm install
 # Copy app source code
 COPY . .
 
-# Expose ports
-EXPOSE 8080
-EXPOSE 8081
+RUN npm run build
 
 # Start the application
-CMD [ "node", "dist/server.js" ]
+CMD [ "npm", "run", "production" ]
