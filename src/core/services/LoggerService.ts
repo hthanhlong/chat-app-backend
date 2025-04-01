@@ -2,6 +2,7 @@ import path from 'path'
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
 import LocalStorage from '../../middlewares/LocalStorage'
+import envConfig from '../../config'
 
 class LoggerService {
   logger: winston.Logger | undefined
@@ -15,12 +16,13 @@ class LoggerService {
         winston.format.colorize({ all: true })
       ),
       transports: [
-        new winston.transports.Console(),
-        new DailyRotateFile({
-          filename: path.join(__dirname, `../../../logs/app.log`), // Log to file // using root path
-          maxSize: '20m', // Max file size: 20MB
-          maxFiles: '14d' // Keep last 14 days log files
-        })
+        envConfig.ENVIRONMENT === 'development'
+          ? new winston.transports.Console()
+          : new DailyRotateFile({
+              filename: path.join(__dirname, `../../../logs/app.log`), // Log to file // using root path
+              maxSize: '20m', // Max file size: 20MB
+              maxFiles: '14d' // Keep last 14 days log files
+            })
       ]
     })
   }
