@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -11,7 +9,7 @@ services:
     env_file:
       - .env
     depends_on:
-      - mongo
+      - postgres
       - redis
     volumes:
       - .:/usr/src/app
@@ -19,16 +17,16 @@ services:
     networks:
       - app_network
 
-  mongo:
-    image: mongo:latest
-    container_name: mongodb
+  postgres:
+    image: postgres:latest
+    container_name: postgres
     restart: always
     ports:
-      - '27017:27017'
+      - '5432:5432'
     env_file:
       - .env
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
 
@@ -42,7 +40,7 @@ services:
       - app_network
 
 volumes:
-  mongo_data:
+  postgres_data:
 
 networks:
   app_network:

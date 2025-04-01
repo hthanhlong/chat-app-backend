@@ -22,8 +22,12 @@ coverage
 
 # Environment varibles
 *.env
+*.env.local
+*.env.production
 *.env.test
-*.env copy
+*.env.development
+*.env.staging
+*.env.production
 
 #keys
 keys/*

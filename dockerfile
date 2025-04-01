@@ -5,7 +5,7 @@ FROM node:22.14.0-alpine
 WORKDIR /usr/src/app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 
 # Install dependencies
 RUN npm install
