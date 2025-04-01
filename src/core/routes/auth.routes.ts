@@ -33,7 +33,7 @@ authRouter.post(
 authRouter.post(
   authPaths.refreshToken,
   validatorInput(ValidationSchema.refreshToken),
-  validateRefreshToken,
+  asyncHandler(validateRefreshToken),
   asyncHandler(AuthController.refreshToken)
 )
 

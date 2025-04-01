@@ -14,6 +14,14 @@ class EnvConfig {
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false // Disable the `X-RateLimit-*` headers
   }
+
+  CORS_OPTIONS = {
+    origin: process.env.CORS_URL || '*',
+    methods: 'GET,POST,PUT,PATCH,DELETE',
+    allowedHeaders: 'Content-Type,Authorization,X-Requested-With'
+    // credentials: true // Allow credential
+  }
+
   JSON_LIMIT = '10mb'
 
   ENVIRONMENT = process.env.NODE_ENV || 'development'
@@ -34,7 +42,6 @@ class EnvConfig {
   REDIS_PORT = process.env.REDIS_PORT || 6379
   REDIS_HOST = process.env.REDIS_HOST || 'localhost'
   REDIS_URL = `redis://${this.REDIS_HOST}:${this.REDIS_PORT}`
-  CORS_URL = process.env.CORS_URL || '*'
   LOG_DIR = process.env.LOG_DIR || 'logs'
 }
 

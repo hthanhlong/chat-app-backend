@@ -25,7 +25,7 @@ async function main() {
   RedisService.initSub()
   WebSocketService.init()
   app.use(helmet())
-  app.use(cors({ origin: envConfig.CORS_URL }))
+  app.use(cors(envConfig.CORS_OPTIONS))
   app.use(express.json({ limit: envConfig.JSON_LIMIT }))
   app.use(express.urlencoded(envConfig.URL_CONFIG_ENCODE))
   app.use(limiter())
