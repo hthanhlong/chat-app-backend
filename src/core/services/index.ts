@@ -6,6 +6,8 @@ import JWTService from './JWTService'
 import FriendShipService from './FriendShipService'
 import MessageService from './MessageService'
 import RedisService from './RedisService'
+import KafkaService from './kafkaService'
+import LoggerService from './LoggerService'
 
 export {
   AuthService,
@@ -15,5 +17,7 @@ export {
   JWTService,
   FriendShipService,
   MessageService,
-  RedisService
+  RedisService,
+  KafkaService,
+  LoggerService
 }

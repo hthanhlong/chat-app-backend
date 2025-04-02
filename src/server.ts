@@ -5,8 +5,7 @@ import compression from 'compression'
 import routes from './core/routes'
 import envConfig from './config'
 import WebSocketService from './ws'
-import RedisService from './core/services/RedisService'
-import LoggerService from './core/services/LoggerService'
+import { RedisService, KafkaService, LoggerService } from './core/services'
 import {
   handleNotFoundRoute,
   limiter,
@@ -21,6 +20,7 @@ async function main() {
   const app = express()
   LoggerService.initLogger()
   await checkDatabaseConnection()
+  await KafkaService.initKafka()
   RedisService.initPub()
   RedisService.initSub()
   WebSocketService.init()
