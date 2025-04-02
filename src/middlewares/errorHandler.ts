@@ -1,10 +1,9 @@
-import { Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import HttpException from '../exceptions/httpExceptions'
-import { IRequest } from '../types'
 import LoggerService from '../core/services/LoggerService'
 const errorHandler = (
   error: HttpException | Error,
-  req: IRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

@@ -1,6 +1,5 @@
 import { checkPassword, generateSalt, hashPassword } from '../../utils'
 import { FriendShipService, JWTService, UserService } from '.'
-import { signUpInput, JWT_PAYLOAD } from '../../types'
 import { User } from '@prisma/client'
 class AuthService {
   async validatePassword(

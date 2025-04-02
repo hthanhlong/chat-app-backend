@@ -1,14 +1,8 @@
 import JWTService from './JWTService'
 import MessageService from './MessageService'
 import FriendShipService from './FriendShipService'
-import {
-  JWT_PAYLOAD,
-  IRequest,
-  ISocketEventGetOnlineUsers,
-  ISocketEventSendMessage,
-  IWebSocket
-} from '../../types'
 import LoggerService from './LoggerService'
+import { Request } from 'express'
 
 class WsService {
   static SOCKET_EVENTS = {
@@ -32,7 +26,7 @@ class WsService {
   static clientSockets: Map<string, WebSocket> = new Map()
   static setTimeoutIds: Map<string, NodeJS.Timeout> = new Map()
 
-  static onConnection = async (socket: any, req: IRequest): Promise<void> => {
+  static onConnection = async (socket: any, req: Request): Promise<void> => {
     try {
       const data = await WsService.handleConnect(socket, req)
       await WsService.triggerUpdateOnlineUsers(data as JWT_PAYLOAD)
@@ -91,7 +85,7 @@ class WsService {
     }
   }
 
-  static handleConnect = async (socket: any, req: IRequest) => {
+  static handleConnect = async (socket: any, req: Request) => {
     return new Promise((resolve, reject) => {
       try {
         const accessToken = req.url?.split('?')[1].split('accessToken=')[1]

@@ -1,17 +1,17 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import HttpException from '../../exceptions/httpExceptions'
 import { OAuth2Client, TokenPayload } from 'google-auth-library'
 import envConfig from '../../config'
 import { UserService, AuthService } from '../services'
-import { JWT_PAYLOAD, IRequest } from '../../types'
 import RedisService from '../services/RedisService'
 import LoggerService from '../services/LoggerService'
 import { User } from '@prisma/client'
+import { JWT_PAYLOAD } from '../../types'
 
 const client = new OAuth2Client(envConfig.GOOGLE_CLIENT_ID)
 
 class AuthController {
-  signUp = async (req: IRequest, res: Response) => {
+  signUp = async (req: Request, res: Response) => {
     const { username, email } = req.body
     LoggerService.info({
       where: 'AuthController',
@@ -52,7 +52,7 @@ class AuthController {
     })
   }
 
-  signIn = async (req: IRequest, res: Response) => {
+  signIn = async (req: Request, res: Response) => {
     const { username, password } = req.body
     LoggerService.info({
       where: 'AuthController',
@@ -93,7 +93,7 @@ class AuthController {
     })
   }
 
-  refreshToken = async (req: IRequest, res: Response) => {
+  refreshToken = async (req: Request, res: Response) => {
     const refreshToken = req.refreshToken as JWT_PAYLOAD
     const newAccessToken = await AuthService.refreshToken(refreshToken)
     LoggerService.info({
@@ -108,7 +108,7 @@ class AuthController {
     })
   }
 
-  googleSignIn = async (req: IRequest, res: Response) => {
+  googleSignIn = async (req: Request, res: Response) => {
     const { credential } = req.body
     const ticket = await client.verifyIdToken({
       idToken: credential,
@@ -151,8 +151,8 @@ class AuthController {
     })
   }
 
-  signOut = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  signOut = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     RedisService.deleteUser(userId)
 
     LoggerService.info({

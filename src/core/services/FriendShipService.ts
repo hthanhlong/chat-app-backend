@@ -1,5 +1,4 @@
 import { FriendShipRepository } from '../repositories'
-import { FriendRequest } from '../../types'
 import NotificationService from './NotificationService'
 import UserService from './UserService'
 import WsService from './WsService'

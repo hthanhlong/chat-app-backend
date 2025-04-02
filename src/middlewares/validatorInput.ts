@@ -1,11 +1,10 @@
 import { AnySchema } from 'joi'
-import { Response, NextFunction } from 'express'
+import { Response, Request, NextFunction } from 'express'
 import HttpException from '../exceptions/httpExceptions'
-import { IRequest } from '../types'
 
 const validatorInput =
   (schema: AnySchema) =>
-  async (req: IRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       await schema.validateAsync(req.body)
       next()

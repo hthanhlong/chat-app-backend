@@ -1,11 +1,10 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import HttpException from '../../exceptions/httpExceptions'
 import { MessageService } from '../services'
-import { IRequest } from '../../types'
 import LoggerService from '../services/LoggerService'
 class MessageController {
-  getMessages = async (req: IRequest, res: Response) => {
-    const { uuid: senderUuid } = req.decoded
+  getMessages = async (req: Request, res: Response) => {
+    const { uuid: senderUuid } = req.decoded as JWT_PAYLOAD
     const { friendUuid } = req.params
     const { page } = req.query
 
@@ -28,8 +27,8 @@ class MessageController {
     })
   }
 
-  getLatestMessage = async (req: IRequest, res: Response) => {
-    const { uuid: senderUuid } = req.decoded
+  getLatestMessage = async (req: Request, res: Response) => {
+    const { uuid: senderUuid } = req.decoded as JWT_PAYLOAD
     const { friendUuid } = req.params
     if (!friendUuid) throw HttpException.badRequestError()
 
@@ -51,8 +50,8 @@ class MessageController {
     })
   }
 
-  deleteAllMessage = async (req: IRequest, res: Response) => {
-    const { uuid: senderUuid } = req.decoded
+  deleteAllMessage = async (req: Request, res: Response) => {
+    const { uuid: senderUuid } = req.decoded as JWT_PAYLOAD
     const { friendUuid } = req.params
     await MessageService.deleteAllMessage(senderUuid, friendUuid)
 

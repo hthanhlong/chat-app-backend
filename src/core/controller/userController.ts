@@ -1,12 +1,11 @@
-import { Response } from 'express'
-import { IRequest } from '../../types'
+import { Response, Request } from 'express'
 import HttpException from '../../exceptions/httpExceptions'
 import { UserService, FriendShipService } from '../services'
 import LoggerService from '../services/LoggerService'
 
 class UserController {
-  getUser = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getUser = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const user = await UserService.findUserById(userId)
 
     LoggerService.info({
@@ -26,7 +25,7 @@ class UserController {
     })
   }
 
-  getUserByUuid = async (req: IRequest, res: Response) => {
+  getUserByUuid = async (req: Request, res: Response) => {
     const userUuid = req.params.userUuid
     if (!userUuid) throw HttpException.badRequestError()
     const user = await UserService.findUserByUuid(userUuid)
@@ -57,8 +56,8 @@ class UserController {
     })
   }
 
-  getUsersNonFriends = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getUsersNonFriends = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     if (!userId) throw HttpException.badRequestError()
     const users = await FriendShipService.getAllUsersNonFriends(userId)
 
@@ -75,8 +74,8 @@ class UserController {
     })
   }
 
-  updateUser = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  updateUser = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     if (!userId) throw HttpException.badRequestError()
     const user = await UserService.updateUserById(userId, req.body)
 

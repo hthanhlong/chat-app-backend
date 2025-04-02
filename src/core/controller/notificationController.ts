@@ -1,11 +1,10 @@
-import { Response } from 'express'
-import { IRequest } from '../../types'
+import { Response, Request } from 'express'
 import { NotificationService } from '../services'
 import LoggerService from '../services/LoggerService'
 
 class NotificationController {
-  getNotifications = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getNotifications = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
 
     const notifications =
       await NotificationService.getAllNotificationsById(userId)
@@ -23,8 +22,8 @@ class NotificationController {
     })
   }
 
-  updateNotification = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  updateNotification = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const { notificationUuid, status } = req.body
     await NotificationService.updateNotification({
       userId,

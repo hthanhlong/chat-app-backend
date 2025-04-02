@@ -1,10 +1,9 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction, Response, Request } from 'express'
 import HttpException from '../exceptions/httpExceptions'
 import JWTService from '../core/services/JWTService'
-import { IRequest } from '../types'
 
 const validateRefreshToken = async (
-  req: IRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {

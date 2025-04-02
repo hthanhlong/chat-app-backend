@@ -1,15 +1,14 @@
-import { Response } from 'express'
+import { Response, Request } from 'express'
 import { WsService, FriendShipService, MessageService } from '../services'
-import { IRequest } from '../../types'
 import LoggerService from '../services/LoggerService'
 
 class FriendShipController {
-  addFriend = async (req: IRequest, res: Response) => {
+  addFriend = async (req: Request, res: Response) => {
     const {
       id: senderId,
       nickName: senderNickName,
       uuid: senderUuid
-    } = req.decoded
+    } = req.decoded as JWT_PAYLOAD
     const { receiverUuid, status } = req.body
     await FriendShipService.addFriend({
       senderId,
@@ -32,8 +31,8 @@ class FriendShipController {
     })
   }
 
-  getFriendRequest = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getFriendRequest = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const users = await FriendShipService.getFriendRequest(userId)
 
     LoggerService.info({
@@ -49,12 +48,12 @@ class FriendShipController {
     })
   }
 
-  updateStatusFriend = async (req: IRequest, res: Response) => {
+  updateStatusFriend = async (req: Request, res: Response) => {
     const {
       id: senderId,
       nickName: senderNickName,
       uuid: senderUuid
-    } = req.decoded
+    } = req.decoded as JWT_PAYLOAD
     const { receiverUuid, status } = req.body
 
     const result = await FriendShipService.updateStatusFriend({
@@ -91,8 +90,8 @@ class FriendShipController {
     })
   }
 
-  getAllUsersNonFriends = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getAllUsersNonFriends = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const users = await FriendShipService.getAllUsersNonFriends(userId)
     LoggerService.info({
       where: 'FriendShipController',
@@ -107,8 +106,8 @@ class FriendShipController {
     })
   }
 
-  getFriends = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  getFriends = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const users = await FriendShipService.getMyFriendsById(userId)
 
     LoggerService.info({
@@ -124,8 +123,8 @@ class FriendShipController {
     })
   }
 
-  searchFriendByKeyword = async (req: IRequest, res: Response) => {
-    const { id: userId } = req.decoded
+  searchFriendByKeyword = async (req: Request, res: Response) => {
+    const { id: userId } = req.decoded as JWT_PAYLOAD
     const { keyword } = req.query
 
     if (!userId || !keyword) {
@@ -160,8 +159,8 @@ class FriendShipController {
     })
   }
 
-  unFriend = async (req: IRequest, res: Response) => {
-    const { id: senderId, uuid: senderUuid } = req.decoded
+  unFriend = async (req: Request, res: Response) => {
+    const { id: senderId, uuid: senderUuid } = req.decoded as JWT_PAYLOAD
     const { friendUuid } = req.params
     await FriendShipService.unfriend({ senderId, friendUuid })
     await MessageService.deleteAllMessage(senderUuid, friendUuid)

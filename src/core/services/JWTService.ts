@@ -1,6 +1,5 @@
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import envConfig from '../../config'
-import { JWT_PAYLOAD } from '../../types'
 import HttpException from '../../exceptions/httpExceptions'
 class JWTService {
   generateToken = (payload: JWT_PAYLOAD) => {
