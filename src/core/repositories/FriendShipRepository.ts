@@ -1,5 +1,5 @@
 import { dataSelectedByKeys } from '../../utils'
-import { FriendShipStatus, PrismaClient } from '@prisma/client'
+import { FriendShipStatus, PrismaClient, User } from '@prisma/client'
 const prisma = new PrismaClient()
 // const regexPattern = /[-[\]{}()*+?.,\\^$|#\s]/g // todo: refactor
 
@@ -92,7 +92,7 @@ class FriendShipRepository {
     return dataSelectedByKeys(result, ['uuid', 'nickName', 'name'])
   }
 
-  async getMyFriends(id: number) {
+  async getMyFriends(id: number): Promise<User[]> {
     const friendListIds = await this.getFriendListIdsByUserId(id)
     if (!friendListIds) return []
     const friends = await prisma.user.findMany({
@@ -104,7 +104,7 @@ class FriendShipRepository {
       'name',
       'profilePicUrl',
       'caption'
-    ])
+    ]) as User[]
   }
 
   async updateStatusFriend(data: {

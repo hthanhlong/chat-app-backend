@@ -1,52 +1,36 @@
+import { ProducerEvents } from './../../../node_modules/kafkajs/types/index.d'
 import { Kafka, Producer, Consumer } from 'kafkajs'
 import LoggerService from './LoggerService'
 import FriendShipService from './FriendShipService'
-
+import { User } from '@prisma/client'
 class KafkaService {
-  static kafka: Kafka
-  static kafkaProducer: Producer
-  static kafkaConsumerFriendsService: Consumer
+  static _kafka: Kafka
+  static _kafkaProducer: Producer
+  static _kafkaConsumerFriendsService: Consumer
+  static groupId = 'api-friends-service'
 
   static async initKafka() {
-    this.kafka = new Kafka({
+    this._kafka = new Kafka({
       clientId: 'chat-app',
       brokers: ['localhost:19092']
     })
+    this._kafkaProducer = this.createKafProducer()
+    this._kafkaConsumerFriendsService = this.createKafConsumer(this.groupId)
     await this._checkKafkaConnection()
-    this.kafkaProducer = await this.createKafkaProducer()
-    this.kafkaConsumerFriendsService =
-      await this.createKafkaConsumer('friends-service')
+    await this.consumeFriendsService()
   }
 
-  static async createKafkaProducer() {
-    this.kafkaProducer = this.kafka.producer()
-    try {
-      await this.kafkaProducer.connect()
-    } catch (error) {
-      LoggerService.error({
-        where: 'KafkaService',
-        message: `❌ Kafka producer connection failed: ${error}`
-      })
-    }
-    return this.kafkaProducer
+  static createKafProducer() {
+    return this._kafka.producer()
   }
 
-  static async createKafkaConsumer(groupId: string) {
-    const kafkaConsumer = this.kafka.consumer({ groupId })
-    try {
-      await kafkaConsumer.connect()
-    } catch (error) {
-      LoggerService.error({
-        where: 'KafkaService',
-        message: `❌ Kafka consumer connection failed: ${error}`
-      })
-    }
-    return kafkaConsumer
+  static createKafConsumer(groupId: string) {
+    return this._kafka.consumer({ groupId })
   }
 
   static async _checkKafkaConnection() {
     try {
-      const admin = this.kafka.admin()
+      const admin = this._kafka.admin()
       await admin.connect()
       LoggerService.info({
         where: 'KafkaService',
@@ -66,27 +50,47 @@ class KafkaService {
     }
   }
 
+  static async produceMessage<T>({
+    topic,
+    message
+  }: {
+    topic: string
+    message: T
+  }) {
+    await this._kafkaProducer.connect()
+    await this._kafkaProducer.send({
+      topic,
+      messages: [{ value: JSON.stringify(message) }]
+    })
+    await this._kafkaProducer.disconnect()
+  }
+
   static async consumeFriendsService() {
-    await this.kafkaConsumerFriendsService.connect()
-    await this.kafkaProducer.connect()
-    this.kafkaConsumerFriendsService.subscribe({
+    await this._kafkaConsumerFriendsService.disconnect()
+    await this._kafkaConsumerFriendsService.connect()
+    await this._kafkaConsumerFriendsService.subscribe({
       topic: 'friends-service-request',
       fromBeginning: true
     })
-    this.kafkaConsumerFriendsService.run({
+    await this._kafkaConsumerFriendsService.run({
       eachMessage: async ({ topic, partition, message }) => {
-        const value = message.value?.toString()
-        if (value) {
-          const { userUuid } = JSON.parse(value)
-          console.log({
-            userUuid
-          })
-          const friends = await FriendShipService.getMyFriendsByUuid(
-            userUuid as string
-          )
-          this.kafkaProducer.send({
-            topic: 'friends-service-response',
-            messages: [{ value: JSON.stringify(friends) }]
+        try {
+          const value = message.value?.toString()
+          if (value) {
+            const { userUuid } = JSON.parse(value)
+            const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
+            if (Array.isArray(friends) && friends.length > 0) {
+              console.log('friends', friends)
+              await this.produceMessage<User[]>({
+                topic: 'friends-service-response',
+                message: friends
+              })
+            }
+          }
+        } catch (error) {
+          LoggerService.error({
+            where: 'KafkaService',
+            message: `❌ Kafka producer connection failed: ${error}`
           })
         }
       }

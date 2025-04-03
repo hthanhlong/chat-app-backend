@@ -3,6 +3,7 @@
   "version": "2.0.1",
   "description": "backend for chat page",
   "main": "server.js",
+  "license": "MIT",
   "scripts": {
     "dev": "npm run db:deploy && nodemon --ext ts --exec ts-node src/server.ts",
     "local-env": "cp .env.local .env && docker compose -f docker-compose-local.yml up -d --remove-orphans",

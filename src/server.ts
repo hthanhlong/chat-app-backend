@@ -4,7 +4,7 @@ import cors from 'cors'
 import compression from 'compression'
 import routes from './core/routes'
 import envConfig from './config'
-import WebSocketService from './ws'
+// import WebSocketService from './ws'
 import { RedisService, KafkaService, LoggerService } from './core/services'
 import {
   handleNotFoundRoute,
@@ -23,7 +23,7 @@ async function main() {
   await KafkaService.initKafka()
   RedisService.initPub()
   RedisService.initSub()
-  WebSocketService.init()
+  // WebSocketService.init()
   app.use(helmet())
   app.use(cors(envConfig.CORS_OPTIONS))
   app.use(express.json({ limit: envConfig.JSON_LIMIT }))

@@ -54,13 +54,13 @@ class FriendShipService {
     return await FriendShipRepository.GetFriendRequests(userId)
   }
 
-  async getMyFriendsByUuid(userUuid: string) {
+  async getMyFriendsByUuid(userUuid: string): Promise<User[]> {
     const id = await Utils.getUserIdFromUserUuid(userUuid)
     if (!id) return []
     return await this.getMyFriendsById(id)
   }
 
-  async getMyFriendsById(userId: number) {
+  async getMyFriendsById(userId: number): Promise<User[]> {
     return await FriendShipRepository.getMyFriends(userId)
   }
 
