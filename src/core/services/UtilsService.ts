@@ -4,6 +4,7 @@ const prisma = new PrismaClient()
 
 class Utils {
   static async getUserIdFromUserUuid(uuid: string) {
+    if (!uuid) return null
     const cachedId = await RedisService.getIdByUUID(uuid)
     if (cachedId) {
       return cachedId

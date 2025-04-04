@@ -4,33 +4,33 @@ import LoggerService from './LoggerService'
 import FriendShipService from './FriendShipService'
 import { User } from '@prisma/client'
 class KafkaService {
-  static _kafka: Kafka
-  static _kafkaProducer: Producer
-  static _kafkaConsumerFriendsService: Consumer
-  static groupId = 'api-friends-service'
+  kafka!: Kafka
+  kafkaProducer!: Producer
+  kafkaConsumer!: Consumer
+  groupId = 'api-friends-service'
 
-  static async initKafka() {
-    this._kafka = new Kafka({
+  init() {
+    this.kafka = new Kafka({
       clientId: 'chat-app',
       brokers: ['localhost:19092']
     })
-    this._kafkaProducer = this.createKafProducer()
-    this._kafkaConsumerFriendsService = this.createKafConsumer(this.groupId)
-    await this._checkKafkaConnection()
-    await this.consumeFriendsService()
+    this.kafkaProducer = this.createKafProducer()
+    this.kafkaConsumer = this.createKafConsumer(this.groupId)
+    this._checkKafkaConnection()
+    this.consumeMessageFromTopic('friends-service-request')
   }
 
-  static createKafProducer() {
-    return this._kafka.producer()
+  createKafProducer() {
+    return this.kafka.producer()
   }
 
-  static createKafConsumer(groupId: string) {
-    return this._kafka.consumer({ groupId })
+  createKafConsumer(groupId: string) {
+    return this.kafka.consumer({ groupId })
   }
 
-  static async _checkKafkaConnection() {
+  async _checkKafkaConnection() {
     try {
-      const admin = this._kafka.admin()
+      const admin = this.kafka.admin()
       await admin.connect()
       LoggerService.info({
         where: 'KafkaService',
@@ -50,40 +50,41 @@ class KafkaService {
     }
   }
 
-  static async produceMessage<T>({
+  async produceMessage<T>({
     topic,
-    message
+    key,
+    value
   }: {
     topic: string
-    message: T
+    key: string
+    value: T
   }) {
-    await this._kafkaProducer.connect()
-    await this._kafkaProducer.send({
+    await this.kafkaProducer.connect()
+    await this.kafkaProducer.send({
       topic,
-      messages: [{ value: JSON.stringify(message) }]
+      messages: [{ key: JSON.stringify(key), value: JSON.stringify(value) }]
     })
-    await this._kafkaProducer.disconnect()
+    await this.kafkaProducer.disconnect()
   }
 
-  static async consumeFriendsService() {
-    await this._kafkaConsumerFriendsService.disconnect()
-    await this._kafkaConsumerFriendsService.connect()
-    await this._kafkaConsumerFriendsService.subscribe({
-      topic: 'friends-service-request',
+  async consumeMessageFromTopic(topic: string) {
+    await this.kafkaConsumer.connect()
+    await this.kafkaConsumer.subscribe({
+      topic,
       fromBeginning: true
     })
-    await this._kafkaConsumerFriendsService.run({
+    await this.kafkaConsumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const value = message.value?.toString()
           if (value) {
-            const { userUuid } = JSON.parse(value)
-            const friends = await FriendShipService.getMyFriendsByUuid(userUuid)
+            const { uuid } = JSON.parse(value)
+            const friends = await FriendShipService.getMyFriendsByUuid(uuid)
             if (Array.isArray(friends) && friends.length > 0) {
-              console.log('friends', friends)
               await this.produceMessage<User[]>({
                 topic: 'friends-service-response',
-                message: friends
+                key: uuid,
+                value: friends
               })
             }
           }
@@ -98,4 +99,4 @@ class KafkaService {
   }
 }
 
-export default KafkaService
+export default new KafkaService()

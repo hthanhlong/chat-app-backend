@@ -20,7 +20,7 @@ async function main() {
   const app = express()
   LoggerService.initLogger()
   await checkDatabaseConnection()
-  await KafkaService.initKafka()
+  KafkaService.init()
   RedisService.initPub()
   RedisService.initSub()
   // WebSocketService.init()
