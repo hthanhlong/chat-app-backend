@@ -50,21 +50,24 @@ class KafkaService {
     }
   }
 
-  async produceMessage<T>({
-    topic,
-    key,
-    value
-  }: {
-    topic: string
-    key: string
-    value: T
-  }) {
-    await this.kafkaProducer.connect()
-    await this.kafkaProducer.send({
-      topic,
-      messages: [{ key: JSON.stringify(key), value: JSON.stringify(value) }]
-    })
-    await this.kafkaProducer.disconnect()
+  async produceMessageToTopic<T>(topic: string, data: T) {
+    try {
+      if (!this.kafkaProducer) return
+      await this.kafkaProducer.connect()
+      await this.kafkaProducer.send({
+        topic,
+        messages: [{ value: JSON.stringify(data) }]
+      })
+    } catch (error) {
+      LoggerService.error({
+        where: 'KafkaService',
+        message: `Error producing message to topic ${topic}: ${error}`
+      })
+      throw error
+    } finally {
+      if (!this.kafkaProducer) return
+      await this.kafkaProducer.disconnect()
+    }
   }
 
   async consumeMessageFromTopic(topic: string) {
@@ -77,14 +80,21 @@ class KafkaService {
       eachMessage: async ({ topic, partition, message }) => {
         try {
           const value = message.value?.toString()
-          if (value) {
-            const { uuid } = JSON.parse(value)
-            const friends = await FriendShipService.getMyFriendsByUuid(uuid)
+          if (!value) return
+          const _value = JSON.parse(value)
+          const { data, requestId } = _value
+          if (data.uuid) {
+            const friends = await FriendShipService.getMyFriendsByUuid(
+              data.uuid
+            )
             if (Array.isArray(friends) && friends.length > 0) {
-              await this.produceMessage<User[]>({
-                topic: 'friends-service-response',
-                key: uuid,
-                value: friends
+              await this.produceMessageToTopic('friends-service-response', {
+                requestId,
+                data: {
+                  event: data.event,
+                  uuid: data.uuid,
+                  friends: friends
+                }
               })
             }
           }
