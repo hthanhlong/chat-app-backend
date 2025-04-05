@@ -1,6 +1,5 @@
 import { NotificationRepository } from '../repositories'
 import RedisService from './RedisService'
-import WsService from './WsService'
 import Utils from './UtilsService'
 class NotificationService {
   async createNotification({
@@ -27,11 +26,6 @@ class NotificationService {
     const cacheKey = RedisService.CACHE_KEYS.get_notifications_by_id(userId)
     RedisService.delete(cacheKey)
     // send to client
-    WsService.sendDataToClientByUuid(userUuid, {
-      type: 'HAS_NEW_NOTIFICATION',
-      payload: null
-    })
-
     return true
   }
 

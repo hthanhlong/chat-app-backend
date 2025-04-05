@@ -1,5 +1,5 @@
 import { Response, Request } from 'express'
-import { WsService, FriendShipService, MessageService } from '../services'
+import { FriendShipService, MessageService } from '../services'
 import LoggerService from '../services/LoggerService'
 
 class FriendShipController {
@@ -164,10 +164,6 @@ class FriendShipController {
     const { friendUuid } = req.params
     await FriendShipService.unfriend({ senderId, friendUuid })
     await MessageService.deleteAllMessage(senderUuid, friendUuid)
-    WsService.sendDataToClientByUuid(senderUuid, {
-      type: 'UPDATE_FRIEND_LIST',
-      payload: null
-    })
 
     LoggerService.info({
       where: 'FriendShipController',

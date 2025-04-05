@@ -1,7 +1,6 @@
 import { FriendShipRepository } from '../repositories'
 import NotificationService from './NotificationService'
 import UserService from './UserService'
-import WsService from './WsService'
 import RedisService from './RedisService'
 import { User } from '@prisma/client'
 import Utils from './UtilsService'
@@ -87,21 +86,6 @@ class FriendShipService {
       RedisService.delete(
         RedisService.CACHE_KEYS.get_friend_list_by_id(receiverId)
       )
-
-      WsService.sendDataToClientByUuid(data.senderUuid, {
-        type: 'UPDATE_FRIEND_LIST',
-        payload: null
-      })
-
-      WsService.sendDataToClientByUuid(data.receiverUuid, {
-        type: 'UPDATE_FRIEND_LIST',
-        payload: null
-      })
-
-      WsService.sendDataToClientByUuid(data.receiverUuid, {
-        type: 'HAS_NEW_NOTIFICATION',
-        payload: null
-      })
     }
 
     return true
