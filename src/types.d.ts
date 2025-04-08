@@ -101,7 +101,17 @@ declare global {
 
   interface ISocketEventRejectFriendRequest {
     senderId: number
+
     receiverUuid: string
+  }
+
+  type IFriend = {
+    id: number
+    uuid: string
+    nickName: string
+    username: string
+    caption: string
+    avatar: string
   }
 }
 

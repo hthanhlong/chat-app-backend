@@ -1,8 +1,7 @@
-import { ProducerEvents } from './../../../node_modules/kafkajs/types/index.d'
 import { Kafka, Producer, Consumer } from 'kafkajs'
 import LoggerService from './LoggerService'
 import FriendShipService from './FriendShipService'
-import { User } from '@prisma/client'
+import MessageService from './MessageService'
 class KafkaService {
   kafka!: Kafka
   kafkaProducer!: Producer
@@ -17,7 +16,7 @@ class KafkaService {
     this.kafkaProducer = this.createKafProducer()
     this.kafkaConsumer = this.createKafConsumer(this.groupId)
     this._checkKafkaConnection()
-    this.consumeMessageFromTopic('friends-service-request')
+    this.consumeMessageFromTopicFriendsServiceRequest()
   }
 
   createKafProducer() {
@@ -50,13 +49,23 @@ class KafkaService {
     }
   }
 
-  async produceMessageToTopic<T>(topic: string, data: T) {
+  async produceMessageToTopic<T>(
+    topic: string,
+    data: {
+      key: string
+      value: T & {
+        requestId: string
+        eventName: string
+        uuid: string
+      }
+    }
+  ) {
     try {
       if (!this.kafkaProducer) return
       await this.kafkaProducer.connect()
       await this.kafkaProducer.send({
         topic,
-        messages: [{ value: JSON.stringify(data) }]
+        messages: [{ key: data.key, value: JSON.stringify(data.value) }]
       })
     } catch (error) {
       LoggerService.error({
@@ -70,10 +79,10 @@ class KafkaService {
     }
   }
 
-  async consumeMessageFromTopic(topic: string) {
+  async consumeMessageFromTopicFriendsServiceRequest() {
     await this.kafkaConsumer.connect()
     await this.kafkaConsumer.subscribe({
-      topic,
+      topic: 'friends-service-request',
       fromBeginning: true
     })
     await this.kafkaConsumer.run({
@@ -82,21 +91,52 @@ class KafkaService {
           const value = message.value?.toString()
           if (!value) return
           const _value = JSON.parse(value)
-          const { data, requestId } = _value
-          if (data.uuid) {
-            const friends = await FriendShipService.getMyFriendsByUuid(
-              data.uuid
-            )
+          const { uuid, requestId, eventName } = _value
+          if (uuid) {
+            const friends = await FriendShipService.getMyFriendsByUuid(uuid)
             if (Array.isArray(friends) && friends.length > 0) {
-              await this.produceMessageToTopic('friends-service-response', {
-                requestId,
-                data: {
-                  event: data.event,
-                  uuid: data.uuid,
-                  friends: friends
+              await this.produceMessageToTopic<{
+                friendList: string[]
+              }>('friends-service-response', {
+                key: 'RETURN_FRIENDS_LIST',
+                value: {
+                  requestId: requestId,
+                  eventName: eventName,
+                  uuid: uuid,
+                  friendList: friends.map((friend) => friend.uuid)
                 }
               })
             }
+          }
+        } catch (error) {
+          LoggerService.error({
+            where: 'KafkaService',
+            message: `❌ Kafka producer connection failed: ${error}`
+          })
+        }
+      }
+    })
+  }
+
+  async consumeMessageFromTopicMessageServiceRequest() {
+    await this.kafkaConsumer.connect()
+    await this.kafkaConsumer.subscribe({
+      topic: 'message-service-request',
+      fromBeginning: true
+    })
+    await this.kafkaConsumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        try {
+          const value = message.value?.toString()
+          if (!value) return
+          const _value = JSON.parse(value)
+          const { senderUuid, receiverUuid, message: _message } = _value
+          if (senderUuid && receiverUuid && _message) {
+            await MessageService.createMessage({
+              senderUuid,
+              receiverUuid,
+              message: _message
+            })
           }
         } catch (error) {
           LoggerService.error({
