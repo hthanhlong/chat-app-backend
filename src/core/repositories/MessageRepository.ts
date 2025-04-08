@@ -41,14 +41,17 @@ class MessageRepository {
   async createMessage({
     senderUuid,
     receiverUuid,
-    message
+    message,
+    uuid
   }: {
     senderUuid: string
     receiverUuid: string
     message: string
+    uuid: string
   }) {
     const result = await prisma.message.create({
       data: {
+        uuid,
         senderUuid: senderUuid,
         receiverUuid: receiverUuid,
         message

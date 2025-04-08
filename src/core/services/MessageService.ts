@@ -6,15 +6,18 @@ class MessageService {
   }
 
   async createMessage({
+    uuid,
     senderUuid,
     receiverUuid,
     message
   }: {
+    uuid: string
     senderUuid: string
     receiverUuid: string
     message: string
   }) {
     return await MessageRepository.createMessage({
+      uuid,
       senderUuid,
       receiverUuid,
       message

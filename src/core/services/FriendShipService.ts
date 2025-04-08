@@ -4,6 +4,7 @@ import UserService from './UserService'
 import RedisService from './RedisService'
 import { User } from '@prisma/client'
 import Utils from './UtilsService'
+import kafkaService from './kafkaService'
 class FriendShipService {
   async addFriend(data: FriendRequest) {
     const receiverId = await Utils.getUserIdFromUserUuid(data.receiverUuid)
@@ -20,6 +21,16 @@ class FriendShipService {
       type: 'FRIEND',
       content: `${data.senderNickName} has sent you a friend request`,
       status: 'UNREAD'
+    })
+
+    kafkaService.produceMessageToTopic('NOTIFICATION_TOPIC', {
+      key: 'HAS_NEW_NOTIFICATION',
+      value: {
+        requestId: null,
+        eventName: 'HAS_NEW_NOTIFICATION',
+        sendByProducer: 'API_SERVER',
+        uuid: data.receiverUuid
+      }
     })
 
     return true

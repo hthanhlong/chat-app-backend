@@ -46,6 +46,8 @@ async function main() {
       where: 'server',
       message: 'Server is shutting down'
     })
+    KafkaService.disconnectKafkaConsumer()
+    KafkaService.disconnectKafkaProducer()
     RedisService.disconnect()
     process.exit(0)
   })
@@ -55,6 +57,8 @@ async function main() {
       where: 'server',
       message: 'Server is shutting down'
     })
+    KafkaService.disconnectKafkaConsumer()
+    KafkaService.disconnectKafkaProducer()
     RedisService.disconnect()
     process.exit(0)
   })
