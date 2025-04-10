@@ -48,12 +48,6 @@ declare global {
     type: string
     payload?: unknown
   }
-
-  interface IWebSocket {
-    type: string
-    payload?: unknown
-  }
-
   interface ISocketEventGetOnlineUsers {
     userUuid: string
   }

@@ -7,6 +7,8 @@ import MessageService from './MessageService'
 import RedisService from './RedisService'
 import KafkaService from './kafkaService'
 import LoggerService from './LoggerService'
+import AwsService from './AwsService'
+import UtilsService from './UtilsService'
 
 export {
   AuthService,
@@ -17,5 +19,7 @@ export {
   MessageService,
   RedisService,
   KafkaService,
-  LoggerService
+  LoggerService,
+  AwsService,
+  UtilsService
 }

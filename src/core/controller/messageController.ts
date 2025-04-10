@@ -67,6 +67,26 @@ class MessageController {
       data: null
     })
   }
+
+  uploadFile = async (req: Request, res: Response) => {
+    const file = req.file
+    if (!file) throw HttpException.badRequestError()
+    const body = req.body
+    const newMessage = {
+      senderUuid: body.senderUuid,
+      receiverUuid: body.receiverUuid,
+      message: body.message,
+      uuid: body.uuid,
+      file: file
+    }
+    const savedMessage = await MessageService.uploadFile(newMessage)
+    res.status(200).json({
+      isSuccess: true,
+      errorCode: null,
+      message: 'Upload file successfully',
+      data: savedMessage
+    })
+  }
 }
 
 export default new MessageController()

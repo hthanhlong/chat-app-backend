@@ -69,7 +69,7 @@ class KafkaService {
       value: T & {
         requestId: string | null
         eventName: string
-        sendByProducer: string
+        sendByProducer: 'API_SERVER' | ''
         uuid: string
       }
     }

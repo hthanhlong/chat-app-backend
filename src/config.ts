@@ -43,6 +43,10 @@ class EnvConfig {
   REDIS_HOST = process.env.REDIS_HOST || 'localhost'
   REDIS_URL = `redis://${this.REDIS_HOST}:${this.REDIS_PORT}`
   LOG_DIR = process.env.LOG_DIR || 'logs'
+  AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || ''
+  AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || ''
+  AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || ''
+  AWS_REGION = process.env.AWS_REGION || ''
 }
 
 const envConfig = new EnvConfig()

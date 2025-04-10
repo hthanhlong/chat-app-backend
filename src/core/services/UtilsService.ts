@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import RedisService from './RedisService'
+import multer from 'multer'
+import sharp from 'sharp'
 const prisma = new PrismaClient()
 
 class Utils {
@@ -17,6 +19,21 @@ class Utils {
       return result.id
     }
     return null
+  }
+
+  static getMulter() {
+    const multerConfig = {
+      storage: multer.memoryStorage(),
+      limits: {
+        fileSize: 1024 * 1024 * 5 // 5MB
+      }
+    }
+    return multer(multerConfig)
+  }
+
+  static compressImage(file: Express.Multer.File) {
+    const image = sharp(file.buffer)
+    return image.resize({ width: 1024, height: 1024 }).toBuffer()
   }
 }
 

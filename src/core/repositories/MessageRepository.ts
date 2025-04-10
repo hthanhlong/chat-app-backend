@@ -42,19 +42,22 @@ class MessageRepository {
     senderUuid,
     receiverUuid,
     message,
-    uuid
+    uuid,
+    file
   }: {
     senderUuid: string
     receiverUuid: string
     message: string
     uuid: string
+    file?: string
   }) {
     const result = await prisma.message.create({
       data: {
         uuid,
         senderUuid: senderUuid,
         receiverUuid: receiverUuid,
-        message
+        message,
+        file: file ? file : null
       }
     })
     return result
