@@ -3,8 +3,7 @@ import envConfig from '../../config'
 import LoggerService from './LoggerService'
 import { User } from '@prisma/client'
 class RedisService {
-  private redisPub!: Redis
-  private redisSub!: Redis
+  private redis!: Redis
 
   CACHE_KEYS = {
     get_notifications_by_id: (id: number) => `get-notifications-by-id:${id}`,
@@ -18,67 +17,23 @@ class RedisService {
     clients_connected: 'clients_connected'
   }
 
-  initPub() {
-    this.redisPub = new Redis({
+  init() {
+    this.redis = new Redis({
       host: envConfig.REDIS_HOST,
       port: Number(envConfig.REDIS_PORT)
-    })
-
-    this.redisPub.on('connect', () => {
-      LoggerService.info({
-        where: 'RedisService',
-        message: 'RedisPub connected successfully'
-      })
-    })
-
-    this.redisPub.on('error', (err) => {
-      LoggerService.error({
-        where: 'RedisService',
-        message: 'Redis error'
-      })
-      process.exit(1)
-    })
-  }
-
-  initSub() {
-    this.redisSub = new Redis({
-      host: envConfig.REDIS_HOST,
-      port: Number(envConfig.REDIS_PORT)
-    })
-
-    this.redisSub.on('connect', () => {
-      LoggerService.info({
-        where: 'RedisService',
-        message: 'RedisSub connected successfully'
-      })
-    })
-
-    this.redisSub.on('error', (err) => {
-      LoggerService.error({
-        where: 'RedisService',
-        message: 'Redis error'
-      })
-      process.exit(1)
-    })
-
-    this.redisSub.on('message', (channel, message) => {
-      if (channel === this.CHANNELS.clients_connected) {
-        const data = JSON.parse(message)
-        console.log(data)
-      }
     })
   }
 
   set(key: string, value: any, ttl?: number) {
     if (ttl) {
-      this.redisPub.set(key, JSON.stringify(value), 'EX', ttl)
+      this.redis.set(key, JSON.stringify(value), 'EX', ttl)
     } else {
-      this.redisPub.set(key, JSON.stringify(value))
+      this.redis.set(key, JSON.stringify(value))
     }
   }
 
   async get(key: string) {
-    const result = await this.redisPub.get(key)
+    const result = await this.redis.get(key)
     if (result) {
       return JSON.parse(result)
     }
@@ -86,15 +41,15 @@ class RedisService {
   }
 
   delete(key: string) {
-    this.redisPub.del(key)
+    this.redis.del(key)
   }
 
   setUser(userId: number, user: User) {
-    this.redisPub.set(userId.toString(), JSON.stringify(user), 'EX', 180000)
+    this.redis.set(userId.toString(), JSON.stringify(user), 'EX', 180000)
   }
 
   async getUser(userId: number) {
-    const cachedUser = await this.redisPub.get(userId.toString())
+    const cachedUser = await this.redis.get(userId.toString())
     if (cachedUser) {
       return JSON.parse(cachedUser)
     }
@@ -102,12 +57,11 @@ class RedisService {
   }
 
   deleteUser(userId: number) {
-    this.redisPub.del(userId.toString())
+    this.redis.del(userId.toString())
   }
 
   disconnect() {
-    this.redisPub.disconnect()
-    this.redisSub.disconnect()
+    this.redis.disconnect()
     LoggerService.info({
       where: 'RedisService',
       message: 'Redis disconnected successfully'
@@ -115,7 +69,7 @@ class RedisService {
   }
 
   subscribe(channel: string) {
-    this.redisSub.subscribe(channel, (err) => {
+    this.redis.subscribe(channel, (err) => {
       if (err) {
         LoggerService.error({
           where: 'RedisService',
@@ -126,7 +80,7 @@ class RedisService {
   }
 
   unsubscribe(channel: string) {
-    this.redisSub.unsubscribe(channel, (err) => {
+    this.redis.unsubscribe(channel, (err) => {
       if (err) {
         LoggerService.error({
           where: 'RedisService',
@@ -137,7 +91,7 @@ class RedisService {
   }
 
   publishClients(message: string) {
-    this.redisPub.publish(this.CHANNELS.clients_connected, message, (err) => {
+    this.redis.publish(this.CHANNELS.clients_connected, message, (err) => {
       if (err) {
         LoggerService.error({
           where: 'RedisService',
@@ -148,11 +102,11 @@ class RedisService {
   }
 
   subOnMessage(callback: (channel: string, message: string) => void) {
-    this.redisSub.on('message', callback)
+    this.redis.on('message', callback)
   }
 
   async getIdByUUID(uuid: string): Promise<number | null> {
-    const result = await this.redisPub.get(this.CACHE_KEYS.get_id_by_uuid(uuid))
+    const result = await this.redis.get(this.CACHE_KEYS.get_id_by_uuid(uuid))
     if (result) {
       return parseInt(result)
     }
@@ -161,7 +115,7 @@ class RedisService {
 
   setIdByUUID(uuid: string, id: number) {
     const randomTime = Math.floor(Math.random() * 1000)
-    this.redisPub.set(
+    this.redis.set(
       this.CACHE_KEYS.get_id_by_uuid(uuid),
       id.toString(),
       'EX',
@@ -170,7 +124,7 @@ class RedisService {
   }
 
   deleteIdByUUID(uuid: string) {
-    this.redisPub.del(this.CACHE_KEYS.get_id_by_uuid(uuid))
+    this.redis.del(this.CACHE_KEYS.get_id_by_uuid(uuid))
   }
 }
 
