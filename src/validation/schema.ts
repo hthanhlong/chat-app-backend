@@ -24,8 +24,9 @@ class ValidationSchema {
   })
 
   static userUpdate = Joi.object({
+    file: Joi.string().optional(),
     caption: Joi.string().max(1000).optional(),
-    nickName: Joi.string().required().min(3).max(64).optional()
+    nickName: Joi.string().min(3).max(64).optional()
   })
 
   static googleSignIn = Joi.object({

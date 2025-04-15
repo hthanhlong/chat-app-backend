@@ -77,7 +77,13 @@ class UserController {
   updateUser = async (req: Request, res: Response) => {
     const { id: userId } = req.decoded as JWT_PAYLOAD
     if (!userId) throw HttpException.badRequestError()
-    const user = await UserService.updateUserById(userId, req.body)
+    const { caption, nickName } = req.body
+    const file = req.file
+    const user = await UserService.updateUserById(userId, {
+      file: file as Express.Multer.File,
+      caption,
+      nickName
+    })
 
     LoggerService.info({
       where: 'UserController',

@@ -17,7 +17,14 @@ class UserRepository {
     return createdUser
   }
 
-  async updateUserById(id: number, user: User) {
+  async updateUserById(
+    id: number,
+    user: {
+      profilePicUrl?: string
+      caption: string
+      nickName: string
+    }
+  ) {
     const updatedUser = await prisma.user.update({
       where: { id: id },
       data: user

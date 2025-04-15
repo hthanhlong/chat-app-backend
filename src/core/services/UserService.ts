@@ -1,8 +1,8 @@
 import { dataSelectedByKeys } from '../../utils'
 import { UserRepository } from '../repositories'
-import RedisService from './RedisService'
 import { User } from '@prisma/client/default'
 import Utils from './UtilsService'
+import { AwsService, RedisService } from '.'
 
 class UserService {
   async createUser(user: User) {
@@ -23,10 +23,30 @@ class UserService {
     return response
   }
 
-  async updateUserById(id: number, newDataOfUser: User) {
+  async updateUserById(
+    id: number,
+    data: {
+      file: Express.Multer.File
+      caption: string
+      nickName: string
+    }
+  ) {
     const cacheKey = RedisService.CACHE_KEYS.get_user_by_id(id)
     RedisService.delete(cacheKey)
-    const result = await UserRepository.updateUserById(id, newDataOfUser)
+    const file = data.file
+    const newData: {
+      profilePicUrl?: string
+      caption: string
+      nickName: string
+    } = {
+      caption: data.caption,
+      nickName: data.nickName
+    }
+    if (file) {
+      const profilePicUrl = await AwsService.uploadFile(file)
+      newData.profilePicUrl = profilePicUrl
+    }
+    const result = await UserRepository.updateUserById(id, newData)
     if (result) {
       RedisService.setUser(id, result as User)
     }

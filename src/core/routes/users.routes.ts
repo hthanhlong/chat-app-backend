@@ -3,6 +3,8 @@ import { UserController } from '../controller'
 import { asyncHandler } from '../../helpers'
 import { validateAccessToken, validatorInput } from '../../middlewares'
 import { ValidationSchema } from '../../validation'
+import { UtilsService } from '../../core/services'
+
 const userRouter = express.Router()
 
 const userPaths = {
@@ -29,6 +31,7 @@ userRouter.get(
 userRouter.post(
   userPaths.updateUser,
   validatorInput(ValidationSchema.userUpdate),
+  UtilsService.getMulter().single('file'),
   asyncHandler(UserController.updateUser)
 )
 
