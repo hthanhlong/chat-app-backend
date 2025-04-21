@@ -8,7 +8,6 @@
     "dev": "npm run db:deploy && nodemon --ext ts --exec ts-node src/server.ts",
     "local-env": "cp .env.local .env && docker compose -f docker-compose-local.yml up -d --remove-orphans",
     "production": "npm run db:deploy && node dist/server.js",
-    "production-env": "cp .env.production .env && docker compose -f docker-compose.yml up -d --remove-orphans",
     "build": "npm run pre-build && npx prisma generate && npm run build-ts",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
     "pre-build": "rimraf ./dist",

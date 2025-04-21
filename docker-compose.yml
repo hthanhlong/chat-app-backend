@@ -14,8 +14,6 @@ services:
       interval: 5s
       timeout: 2s
       retries: 20
-    networks:
-      - app_network_prod
 
   redis_prod:
     image: redis:latest
@@ -23,8 +21,6 @@ services:
     restart: always
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
-    networks:
-      - app_network_prod
 
   app_prod:
     build: .
@@ -43,11 +39,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    networks:
-      - app_network_prod
 
 volumes:
   postgres_data_prod:
-
-networks:
-  app_network_prod:

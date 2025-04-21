@@ -44,4 +44,3 @@ temp
 ecosystem.config.js
 
 #prisma
-prisma/migrations/*
