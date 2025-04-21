@@ -8,7 +8,7 @@
     "dev": "nodemon --ext ts --exec ts-node src/server.ts",
     "local-env": "cp .env.local .env && docker compose -f docker-compose-local.yml up -d --remove-orphans",
     "production": "npm run migrate && node dist/server.js",
-    "build-ts": "rimraf ./dist && tsc",
+    "build": "rimraf ./dist && npx prisma generate && tsc",
     "migrate": "npx prisma migrate deploy && npx prisma generate",
     "generate": "npx prisma generate",
     "clean-up": "rimraf ./dist && rimraf ./logs && rimraf ./package-lock.json && rimraf ./yarn.lock && rimraf ./node_modules",
@@ -23,6 +23,9 @@
     ],
     "*.{json,js,ts,jsx,tsx,html}": [
       "prettier --write --ignore-unknown"
+    ],
+    "*.{ts,tsx}": [
+      "check-ts"
     ]
   },
   "dependencies": {

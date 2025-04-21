@@ -1,44 +1,11 @@
 services:
-  postgres_prod:
-    image: postgres:latest
-    container_name: postgres_prod
-    restart: always
-    ports:
-      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
-    env_file:
-      - .env
-    volumes:
-      - postgres_data_prod:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
-      interval: 5s
-      timeout: 2s
-      retries: 20
-
-  redis_prod:
-    image: redis:latest
-    container_name: redis_prod
-    restart: always
-    ports:
-      - '${REDIS_PORT}:${REDIS_PORT}'
-
-  app_prod:
-    build: .
+  express_app_prod:
     container_name: express_app_prod
-    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: express_app_prod:latest
     ports:
-      - '${APP_PORT}:${APP_PORT}' # For http
-      - '${SOCKET_PORT}:${SOCKET_PORT}' # For ws
+      - '${APP_PORT}:${APP_PORT}'
     env_file:
       - .env
-    depends_on:
-      postgres_prod:
-        condition: service_healthy
-      redis_prod:
-        condition: service_started
-    volumes:
-      - .:/app
-      - /app/node_modules
-
-volumes:
-  postgres_data_prod:

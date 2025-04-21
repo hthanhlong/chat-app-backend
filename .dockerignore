@@ -1,9 +1,39 @@
+# Node modules
 node_modules
-package-lock.json
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Dependency directories
 dist
-.env.example
-.env.local
-.env.development.local
-.env.test.local
-.env.production
-.env.sample
+build
+.next
+out
+
+# Environment files
+.env
+
+# Git and OS files
+.git
+.gitignore
+Dockerfile
+.dockerignore
+.vscode
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Tests / coverage
+coverage
+__tests__
+*.test.js
+*.spec.js
+
+# package-lock.json
+package-lock.json
