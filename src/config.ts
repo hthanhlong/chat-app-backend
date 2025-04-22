@@ -26,7 +26,6 @@ class EnvConfig {
 
   ENVIRONMENT = process.env.NODE_ENV || 'development'
   APP_PORT = process.env.APP_PORT || '8080'
-  SOCKET_PORT = process.env.SOCKET_PORT || '8081'
   DB_USER = process.env.MONGO_INITDB_ROOT_USERNAME || 'root'
   DB_PASSWORD = process.env.MONGO_INITDB_ROOT_PASSWORD || 'root'
   DB_NAME = process.env.MONGO_DB_NAME || 'chat-app'
@@ -47,6 +46,7 @@ class EnvConfig {
   AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || ''
   AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME || ''
   AWS_REGION = process.env.AWS_REGION || ''
+  KAFKA_BROKER_HOST = process.env.KAFKA_BROKER_HOST || 'localhost:9092'
 }
 
 const envConfig = new EnvConfig()

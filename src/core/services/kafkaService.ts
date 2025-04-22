@@ -1,9 +1,9 @@
-import { dataSelectedByKeys } from './../../utils/index'
 import { Message } from './../../../node_modules/.prisma/client/index.d'
 import { Kafka, Producer, Consumer } from 'kafkajs'
 import LoggerService from './LoggerService'
 import FriendShipService from './FriendShipService'
 import MessageService from './MessageService'
+import envConfig from '../../config'
 class KafkaService {
   kafka!: Kafka
   kafkaProducer!: Producer
@@ -11,9 +11,10 @@ class KafkaService {
   kafkaMessageConsumer!: Consumer
 
   init() {
+    const kafkaHost = envConfig.KAFKA_BROKER_HOST
     this.kafka = new Kafka({
       clientId: 'chat-app',
-      brokers: ['localhost:19092']
+      brokers: [kafkaHost]
     })
     this.kafkaProducer = this.createKafProducer()
     this.kafkaFriendConsumer = this.createKafConsumer('api-friends-group')

@@ -5,8 +5,10 @@
   "main": "server.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --ext ts --exec ts-node src/server.ts",
-    "local-env": "cp .env.local .env && docker compose -f docker-compose-local.yml up -d --remove-orphans",
+    "dev": "npm run migrate && nodemon --ext ts --exec ts-node src/server.ts",
+    "pre-prod": "node dist/server.js",
+    "dev:up": "docker compose -f docker-compose-dev.yml up -d --remove-orphans",
+    "dev:down": "docker compose -f docker-compose-dev.yml down",
     "production": "npm run migrate && node dist/server.js",
     "build": "rimraf ./dist && npx prisma generate && tsc",
     "migrate": "npx prisma migrate deploy && npx prisma generate",
@@ -23,9 +25,6 @@
     ],
     "*.{json,js,ts,jsx,tsx,html}": [
       "prettier --write --ignore-unknown"
-    ],
-    "*.{ts,tsx}": [
-      "check-ts"
     ]
   },
   "dependencies": {

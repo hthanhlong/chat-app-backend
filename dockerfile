@@ -1,5 +1,6 @@
-# Use Node.js LTS (Long Term Support) as the base image
-FROM node:22.14.0-alpine
+# Production
+# # Use Node.js LTS (Long Term Support) as the base image
+FROM node:22-alpine AS production
 
 # Create app directory
 WORKDIR /app
@@ -17,3 +18,16 @@ RUN npm run build
 
 # Start the application
 CMD [ "npm", "run", "production" ]
+
+
+# Development
+FROM node:22.14.0-alpine AS development
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "dev"]

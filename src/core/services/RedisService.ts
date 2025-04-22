@@ -22,6 +22,12 @@ class RedisService {
       host: envConfig.REDIS_HOST,
       port: Number(envConfig.REDIS_PORT)
     })
+    this.redis.on('connect', () => {
+      LoggerService.info({
+        where: 'RedisService',
+        message: 'Redis connected successfully'
+      })
+    })
   }
 
   set(key: string, value: any, ttl?: number) {
